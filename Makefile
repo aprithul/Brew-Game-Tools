@@ -1,21 +1,24 @@
 SRC_DIR = src
 BUILD_DIR = build/debug
 CC = clang++
-OBJ_NAME = libDrawGL
+OBJ_NAME = libCanvas
 INCLUDE_PATHS = -Iinclude
 COMPILER_FLAGS = -std=c++11 -c -arch arm64
+BACKENDS = $(wildcard $(BUILD_DIR)/Backend_*.o)
 
-all: graphics engine
-	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Engine.o $(BUILD_DIR)/Graphics.o
-	rm $(BUILD_DIR)/Graphics.o
-	rm $(BUILD_DIR)/Engine.o
+
+all: backends engine
+	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Canvas.o $(BACKENDS)
+	rm $(BUILD_DIR)/Canvas.o
+	rm $(BACKENDS)
 
 
 clean:
 	rm -r -f $(BUILD_DIR)/*
 
-graphics:
-	$(CC) $(INCLUDE_PATHS) $(COMPILER_FLAGS) $(SRC_DIR)/Graphics.cpp -o $(BUILD_DIR)/Graphics.o
+backends:
+	$(CC) $(INCLUDE_PATHS) $(COMPILER_FLAGS) $(SRC_DIR)/Backend_SDL2_OpenGL.cpp -o $(BUILD_DIR)/Backend_SDL2_OpenGL.o
+	$(CC) $(INCLUDE_PATHS) $(COMPILER_FLAGS) $(SRC_DIR)/Backend_Dummy.cpp -o $(BUILD_DIR)/Backend_Dummy.o
 
 engine:
-	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/Engine.cpp -o $(BUILD_DIR)/Engine.o
+	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/Canvas.cpp -o $(BUILD_DIR)/Canvas.o

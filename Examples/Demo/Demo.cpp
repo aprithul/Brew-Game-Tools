@@ -1,4 +1,4 @@
-#include "Engine.hpp"
+#include "Canvas.hpp"
 #include "stdio.h"
 
 void init()
@@ -8,7 +8,7 @@ void init()
 
 void update()
 {
-    printf("Updated\n");
+    
 }
 
 void close()
@@ -18,7 +18,7 @@ void close()
 
 int main()
 {
-    Canvas canvas;
+    Canvas canvas("Canvas Demo", 1024, 768);
     canvas.SetInitFunc(init);
     canvas.SetUpdateFunc(update);
     canvas.SetCloseFunc(close);

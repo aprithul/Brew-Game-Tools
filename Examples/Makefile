@@ -1,4 +1,4 @@
-SRC_DIR = Linking
+SRC_DIR = Demo
 SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 BUILD_DIR = $(SRC_DIR)
 CC = clang++
@@ -8,9 +8,9 @@ LIBRARY_PATHS = -L../lib -L../lib/SDL2 -L../lib/GL -L../build/debug
 COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
 
 ifeq ($(OS),Windows_NT)
-	LINKER_FLAGS = -lsdl2 -lopengl32 -lglew32 -lDrawGL
+	LINKER_FLAGS = -lsdl2 -lopengl32 -lglew32 -lCanvas
 else
-	LINKER_FLAGS = -lsdl2 -framework OpenGL -lglew -lDrawGL
+	LINKER_FLAGS = -lsdl2 -framework OpenGL -lglew -lCanvas
 endif
 
 all:

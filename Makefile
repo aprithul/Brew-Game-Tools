@@ -1,20 +1,21 @@
 SRC_DIR = src
 BUILD_DIR = build/debug
 CC = clang++
-SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
-OBJ_NAME = game
+OBJ_NAME = libDrawGL
 INCLUDE_PATHS = -Iinclude
-LIBRARY_PATHS = -Llib -Llib/SDL2 -Llib/GL
-COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
+COMPILER_FLAGS = -std=c++11 -c -arch arm64
 
-ifeq ($(OS),Windows_NT)
-	LINKER_FLAGS = -lsdl2 -lopengl32 -lglew32
-else
-	LINKER_FLAGS = -lsdl2 -framework OpenGL -lglew
-endif
+all: graphics engine
+	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Engine.o $(BUILD_DIR)/Graphics.o
+	rm $(BUILD_DIR)/Graphics.o
+	rm $(BUILD_DIR)/Engine.o
 
-all:
-	$(CC) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SRC_FILES) -o $(BUILD_DIR)/$(OBJ_NAME)
 
 clean:
 	rm -r -f $(BUILD_DIR)/*
+
+graphics:
+	$(CC) $(INCLUDE_PATHS) $(COMPILER_FLAGS) $(SRC_DIR)/Graphics.cpp -o $(BUILD_DIR)/Graphics.o
+
+engine:
+	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/Engine.cpp -o $(BUILD_DIR)/Engine.o

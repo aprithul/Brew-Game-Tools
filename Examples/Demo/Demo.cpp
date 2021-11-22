@@ -11,11 +11,11 @@ Canvas canvas("Canvas Demo", 1024, 768);
 
 void update()
 {
-    for(int x=0; x<640; x++)
+    for(int x=0; x<1024; x++)
     {
-        for(int y=0; y<360; y++)
+        for(int y=0; y<768; y++)
         {
-            canvas.DrawPixel(x,y, Color(1,0,0,1, RGBA));            
+            canvas.DrawPixel(x,y, Color(0,255,0,255, RGBA));            
         }
     }
 }

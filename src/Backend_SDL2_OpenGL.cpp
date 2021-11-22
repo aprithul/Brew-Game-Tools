@@ -117,7 +117,9 @@ void makeShaderForQuad()
 
 }
 
-
+        Int_32 texWidth = 0;
+        Int_32 texHeight = 0;
+  stbi_uc* tex_data;
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING)==0)
@@ -180,14 +182,13 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 
         // create texture for use with framebuffer
 
-        Int_32 texWidth = 0;
-        Int_32 texHeight = 0;
+
         Int_32 comp = 0;
 
 
         const char* texture_path = "grass.png";
         stbi_set_flip_vertically_on_load(true);
-        stbi_uc* tex_data = stbi_load(texture_path, &texWidth, &texHeight, &comp, 0);
+        tex_data = stbi_load(texture_path, &texWidth, &texHeight, &comp, 0);
         if (!tex_data)
         {
             printf("Failed to load image: %s . skipped texture creation\n", texture_path);
@@ -204,7 +205,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
             printf("privided data\n");
 
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -225,7 +226,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         makeShaderForQuad();
 
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        canvasBuffer = new GLuint[_width * _height];
+        canvasBuffer = new GLuint[width * height];
     }
     else
     {
@@ -256,7 +257,15 @@ void ProcessInput()
 
 void DrawScreen()
 {
-    //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
+    //memset(canvasBuffer, 0xff0000ff, sizeof(Uint_32)*width *height);
+    // for(int x=0; x<width; x++)
+    // {
+    //     for(int y=0; y<height; y++)
+    //     {
+    //         canvasBuffer[width*y + x] = 0xff0000ff;         
+    //     }
+    // }
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width*0.8, height*0.8, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
 
     //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);

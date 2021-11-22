@@ -42,7 +42,7 @@ void Canvas::SetCloseFunc(void (*_close) ())
 void Canvas::DrawPixel(int _x, int _y, Color color)
 {
     Uint_32 _index = Width*_y + _x;
-    if(_index > 0 && _index < Width * Height)
+    if(_index >= 0 && _index < Width * Height)
         canvasBuffer[_index] = color.value;
 }
 

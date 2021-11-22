@@ -16,14 +16,13 @@
 SDL_Window* window;
 SDL_GLContext gl_context;
 
-GLuint frameBuffer;
-GLuint frameBufferTexture;
 GLuint vbo;
 GLuint ibo;
 GLuint vao;
 GLuint vShader;
 GLuint fShader;
 GLuint shaderProgram;
+GLuint canvasTexture;
 
 Int_32 width;
 Int_32 height;
@@ -117,9 +116,6 @@ void makeShaderForQuad()
 
 }
 
-        Int_32 texWidth = 0;
-        Int_32 texHeight = 0;
-  stbi_uc* tex_data;
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING)==0)
@@ -180,52 +176,19 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        // create texture for use with framebuffer
+        // create texture to draw to
+        glGenTextures(1, &canvasTexture);
+        glBindTexture(GL_TEXTURE_2D, canvasTexture);
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-        Int_32 comp = 0;
-
-
-        const char* texture_path = "grass.png";
-        stbi_set_flip_vertically_on_load(true);
-        tex_data = stbi_load(texture_path, &texWidth, &texHeight, &comp, 0);
-        if (!tex_data)
-        {
-            printf("Failed to load image: %s . skipped texture creation\n", texture_path);
-        }
-        else
-        {
-            printf("loaded texture\n");
-
-            glGenTextures(1, &frameBufferTexture);
-            glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
-            printf("generated texture\n");
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-            printf("privided data\n");
-
-            glBindTexture(GL_TEXTURE_2D, 0);
-            printf("created texture\n");
-
-        }
-        // // create frame buffer to draw to
-        // glGenFramebuffers(1, &frameBuffer);
-        // glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-        // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
-
-        // GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        // if (status != GL_FRAMEBUFFER_COMPLETE)
-        //     printf("Frame buffer creation failed\n");
-        // else
-        //     printf("Frame buffer created successfully\n");
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         makeShaderForQuad();
-
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
         canvasBuffer = new GLuint[width * height];
     }
     else
@@ -257,32 +220,19 @@ void ProcessInput()
 
 void DrawScreen()
 {
-    //memset(canvasBuffer, 0xff0000ff, sizeof(Uint_32)*width *height);
-    // for(int x=0; x<width; x++)
-    // {
-    //     for(int y=0; y<height; y++)
-    //     {
-    //         canvasBuffer[width*y + x] = 0xff0000ff;         
-    //     }
-    // }
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width*0.8, height*0.8, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor( 0,0,1,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    glBindTexture(GL_TEXTURE_2D, canvasTexture);
     
     glUniform1i(glGetUniformLocation(shaderProgram, "tex2d"), 0);
     glBindVertexArray(vao);
-    //glUniform1i(0, 0);
  
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     SDL_GL_SwapWindow(window);
 }
 

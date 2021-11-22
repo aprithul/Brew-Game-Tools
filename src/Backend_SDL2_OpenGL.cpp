@@ -45,23 +45,23 @@ void set_sdl_gl_attributes()
 void makeShaderForQuad()
 {   
     //// texture(tex2d,UV);
-    char vertex_shader[4096] = "#version 410 core\
-                            layout(location=0) in vec3 position;\
-                            layout(location=1) in vec2 uv;\
-                            out vec2 UV;\
-                            void main()\
-                            {\
-                                UV = uv;\
-                                gl_Position = vec4(position.x, position.y, 0, 1);\
-                            }";
-	char fragment_shader[4096] = "#version 410 core\
-                                uniform sampler2D tex2d;\
-                                in vec2 UV;\
-                                out vec4 frag_color;\
-                                void main()\
-                                {\
-                                    frag_color = texture(tex2d,UV);\
-                                }";
+    char vertex_shader[4096] = "#version 410 core\n"
+                            "layout(location=0) in vec3 position;\n"
+                           "layout(location=1) in vec2 uv;\n"
+                           "out vec2 UV;\n"
+                           "void main()\n"
+                           "{\n"
+                           "    UV = uv;\n"
+                           "    gl_Position = vec4(position.x, position.y, 0, 1);\n"
+                           "}";
+	char fragment_shader[4096] = "#version 410 core\n"
+                                "uniform sampler2D tex2d;\n"
+                                "in vec2 UV;\n"
+                                "out vec4 frag_color;\n"
+                                "void main()\n"
+                                "{\n"
+                                "    frag_color = texture(tex2d,UV);\n"
+                                "}";
 
     vShader = glCreateShader(GL_VERTEX_SHADER);
     char* vs_p = &vertex_shader[0];
@@ -151,14 +151,17 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Float_32)*5*4, vertices, GL_STATIC_DRAW);
-
+        printf("created vertex buffer\n");
+        
         glGenBuffers(1, &ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Uint_32)*6, indices, GL_STATIC_DRAW);
+        printf("created index buffer\n");
 
         // vao that will be used for drawing the quad
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
+        printf("created vertex array\n");
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -182,7 +185,8 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         Int_32 comp = 0;
 
 
-        const char* texture_path = "particle.png";
+        const char* texture_path = "grass.png";
+        stbi_set_flip_vertically_on_load(true);
         stbi_uc* tex_data = stbi_load(texture_path, &texWidth, &texHeight, &comp, 0);
         if (!tex_data)
         {
@@ -190,30 +194,37 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         }
         else
         {
+            printf("loaded texture\n");
+
             glGenTextures(1, &frameBufferTexture);
             glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+            printf("generated texture\n");
 
             glTexParameteri(frameBufferTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(frameBufferTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(frameBufferTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(frameBufferTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+            printf("privided data\n");
+
             glBindTexture(GL_TEXTURE_2D, 0);
+            printf("created texture\n");
+
         }
         // // create frame buffer to draw to
-        glGenFramebuffers(1, &frameBuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
+        // glGenFramebuffers(1, &frameBuffer);
+        // glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
 
-        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE)
-            printf("Frame buffer creation failed\n");
-        else
-            printf("Frame buffer created successfully\n");
+        // GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        // if (status != GL_FRAMEBUFFER_COMPLETE)
+        //     printf("Frame buffer creation failed\n");
+        // else
+        //     printf("Frame buffer created successfully\n");
 
         makeShaderForQuad();
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
         canvasBuffer = new GLuint[_width * _height];
     }
     else
@@ -248,6 +259,7 @@ void DrawScreen()
     //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
 
     //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor( 0,0,1,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -255,9 +267,9 @@ void DrawScreen()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
     
-    //glUniform1i(glGetUniformLocation(shaderProgram, "tex2d"), 0);
+    glUniform1i(glGetUniformLocation(shaderProgram, "tex2d"), 0);
     glBindVertexArray(vao);
-    glUniform1i(0, 0);
+    //glUniform1i(0, 0);
  
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);

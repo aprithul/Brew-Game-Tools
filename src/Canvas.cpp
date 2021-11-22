@@ -16,6 +16,8 @@ Bool_8 is_game_running;
 
 Canvas::Canvas(const char* _name, Int_32 _width, Int_32 _height)
 {
+    Width = _width;
+    Height = _height;
     CreateWindow(_name, _width, _height);
 }
 
@@ -37,6 +39,13 @@ void Canvas::SetCloseFunc(void (*_close) ())
     this->close = _close;
 }
 
+void Canvas::DrawPixel(int _x, int _y, Color color)
+{
+    Uint_32 _index = Width*_y + _x;
+    if(_index > 0 && _index < Width * Height)
+        canvasBuffer[_index] = color.value;
+}
+
 Int_32 Canvas::Start()
 {
     init();
@@ -50,7 +59,7 @@ Int_32 Canvas::Start()
             is_game_running = false;
 
         update();
-        Draw();
+        DrawScreen();
     }
 
     close();

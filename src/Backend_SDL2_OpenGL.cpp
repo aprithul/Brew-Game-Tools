@@ -6,12 +6,30 @@
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #endif
 
 SDL_Window* window;
 SDL_GLContext gl_context;
+
+GLuint frameBuffer;
+GLuint frameBufferTexture;
+GLuint vbo;
+GLuint ibo;
+GLuint vao;
+GLuint vShader;
+GLuint fShader;
+GLuint shaderProgram;
+
+Int_32 width;
+Int_32 height;
+Uint_32* canvasBuffer;
+
+
 
 void set_sdl_gl_attributes()
 {
@@ -24,6 +42,81 @@ void set_sdl_gl_attributes()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE); 
 }
 
+void makeShaderForQuad()
+{   
+    //// texture(tex2d,UV);
+    char vertex_shader[4096] = "#version 410 core\
+                            layout(location=0) in vec3 position;\
+                            layout(location=1) in vec2 uv;\
+                            out vec2 UV;\
+                            void main()\
+                            {\
+                                UV = uv;\
+                                gl_Position = vec4(position.x, position.y, 0, 1);\
+                            }";
+	char fragment_shader[4096] = "#version 410 core\
+                                uniform sampler2D tex2d;\
+                                in vec2 UV;\
+                                out vec4 frag_color;\
+                                void main()\
+                                {\
+                                    frag_color = texture(tex2d,UV);\
+                                }";
+
+    vShader = glCreateShader(GL_VERTEX_SHADER);
+    char* vs_p = &vertex_shader[0];
+	glShaderSource(vShader, 1, &vs_p,NULL);
+	glCompileShader(vShader);
+
+	GLint vCompileResult;
+	glGetShaderiv(vShader, GL_COMPILE_STATUS, &vCompileResult);
+	char log_data[1024];
+	GLsizei log_len = 0;
+	if (vCompileResult == GL_FALSE)
+	{
+		glGetShaderInfoLog(vShader, 1024, &log_len, log_data);
+		printf("%s\n", log_data);
+	}
+
+    fShader = glCreateShader(GL_FRAGMENT_SHADER);
+    char* fs_p = &fragment_shader[0];
+	glShaderSource(fShader, 1, &fs_p,NULL);
+	glCompileShader(fShader);
+
+	GLint fCompileResult;
+	glGetShaderiv(fShader, GL_COMPILE_STATUS, &fCompileResult);
+	log_len = 0;
+	if (fCompileResult == GL_FALSE)
+	{
+		glGetShaderInfoLog(fShader, 1024, &log_len, log_data);
+		printf("%s\n", log_data);
+	}
+
+    if (vCompileResult && fCompileResult)
+	{
+		shaderProgram = glCreateProgram();
+		glAttachShader(shaderProgram, vShader);
+		glAttachShader(shaderProgram, fShader);
+		glLinkProgram(shaderProgram);
+
+		GLint program_status;
+		glGetProgramiv(shaderProgram, GL_LINK_STATUS, &program_status);
+
+		if (program_status == GL_FALSE)
+		{
+			glGetProgramInfoLog(shaderProgram, 1024, &log_len, log_data);
+			printf("%s\n", log_data);
+		}
+		else
+		{
+			glDeleteShader(vShader);
+			glDeleteShader(fShader);
+			printf("Shader program linking successful\n");
+		}
+	}
+
+}
+
 
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 {
@@ -31,16 +124,97 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
     {
         set_sdl_gl_attributes();
         window = SDL_CreateWindow(_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL);
+        width = _width;
+        height = _height;
         gl_context = SDL_GL_CreateContext(window);
 
         if(glewInit() == GLEW_OK)
         {
-            printf("Canvas created with OpenGL context : %s", (const char*)glGetString(GL_VERSION));
+            printf("Canvas created with OpenGL context : %s\n", (const char*)glGetString(GL_VERSION));
         }
         else
         {
-            printf("GLEW initialization failed");
+            printf("GLEW initialization failed\n");
         }
+
+        float _w = width/height;
+        Float_32 vertices[] = {
+            -_w,  1.f, 0, 0, 1,
+             _w,  1.f, 0, 1, 1,
+             _w, -1.f, 0, 1, 0,
+            -_w, -1.f, 0, 0, 0
+        };
+
+        Uint_32 indices[6] = {0,1,3, 1,2,3};
+
+        // create quad to use as surface for drawing
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Float_32)*5*4, vertices, GL_STATIC_DRAW);
+
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Uint_32)*6, indices, GL_STATIC_DRAW);
+
+        // vao that will be used for drawing the quad
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+        // position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Float_32)*5, (void*)0);
+        // uv
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(Float_32)*5, (void*)0);
+
+        // unbind vbo and ibo after unbinding vao
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        // create texture for use with framebuffer
+
+        Int_32 texWidth = 0;
+        Int_32 texHeight = 0;
+        Int_32 comp = 0;
+
+
+        const char* texture_path = "particle.png";
+        stbi_uc* tex_data = stbi_load(texture_path, &texWidth, &texHeight, &comp, 0);
+        if (!tex_data)
+        {
+            printf("Failed to load image: %s . skipped texture creation\n", texture_path);
+        }
+        else
+        {
+            glGenTextures(1, &frameBufferTexture);
+            glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+
+            glTexParameteri(frameBufferTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(frameBufferTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(frameBufferTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(frameBufferTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        // // create frame buffer to draw to
+        glGenFramebuffers(1, &frameBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
+
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+            printf("Frame buffer creation failed\n");
+        else
+            printf("Frame buffer created successfully\n");
+
+        makeShaderForQuad();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        canvasBuffer = new GLuint[_width * _height];
     }
     else
     {
@@ -68,10 +242,25 @@ void ProcessInput()
 }
 
 
-void Draw()
+
+void DrawScreen()
 {
-    glClearColor( 0,0,0,1);
+    //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
+
+    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glClearColor( 0,0,1,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shaderProgram);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    
+    //glUniform1i(glGetUniformLocation(shaderProgram, "tex2d"), 0);
+    glBindVertexArray(vao);
+    glUniform1i(0, 0);
+ 
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     SDL_GL_SwapWindow(window);
 }
@@ -79,7 +268,9 @@ void Draw()
 
 void Cleanup()
 {
+    delete[] canvasBuffer;
     SDL_Quit();
+    printf("SDL2_OpenGL backend cleaned up\n");
 }
 
 #endif

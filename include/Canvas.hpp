@@ -3,7 +3,7 @@
 
 
 #include "MathUtil.hpp"
-
+#include "GraphicsUtil.hpp"
 struct Canvas
 {
 
@@ -13,6 +13,10 @@ struct Canvas
     void SetInitFunc(void (*_init) ());
     void SetUpdateFunc(void (*_update) ());
     void SetCloseFunc(void (*_close) ());
+    void DrawPixel(int _x, int _y, Color color);
+
+    Uint_32 Width;
+    Uint_32 Height;
 
     private:
         void (*init) ();

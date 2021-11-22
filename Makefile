@@ -8,7 +8,7 @@ BACKENDS = $(wildcard $(BUILD_DIR)/Backend_*.o)
 
 
 all: backends engine
-	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Canvas.o $(BACKENDS)
+	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Canvas.o $(BUILD_DIR)/GraphicsUtil.o $(BACKENDS)
 	rm $(BUILD_DIR)/Canvas.o
 	rm $(BACKENDS)
 
@@ -22,3 +22,4 @@ backends:
 
 engine:
 	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/Canvas.cpp -o $(BUILD_DIR)/Canvas.o
+	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/GraphicsUtil.cpp -o $(BUILD_DIR)/GraphicsUtil.o

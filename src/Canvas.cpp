@@ -85,14 +85,11 @@ Int_32 Canvas::Start()
     using namespace std::chrono;
     init();
     is_game_running = true;
-    steady_clock::time_point _lastTime, _newTime;
-    _lastTime = steady_clock::now();
-    _newTime = _lastTime;
+    steady_clock::time_point _lastTime = steady_clock::now();
 
-    Double_64 accumulator = 0;
     Double_64 targetFrameTime = (Double_64)1000/60;
     Uint_32 frameCount = 0;
-    Double_64 secondCounter = 0;
+    Double_64 milSecondCounter = 0;
 
     while(is_game_running)
     {
@@ -107,45 +104,19 @@ Int_32 Canvas::Start()
         update();
         DrawScreen();
         
-        _lastTime = _newTime;
-        _newTime = steady_clock::now();
-        duration<Double_64> time_span = duration_cast<duration<Double_64>>(_newTime - _lastTime);
-        DeltaTime = time_span.count() * 1000;
-        accumulator = (targetFrameTime - DeltaTime);
+        duration<Double_64> time_span = duration_cast<duration<Double_64>>(steady_clock::now() - _lastTime);
+        _lastTime = steady_clock::now();
 
-        secondCounter += (Double_64)DeltaTime/1000;
+        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
+
+        milSecondCounter += DeltaTime;
         frameCount++;
-        if(secondCounter >= 1.0)
+        if(milSecondCounter >= 1000.0)
         {
             printf("FPS: %d\n", frameCount);
-            secondCounter = 0;
+            milSecondCounter -= 1000.0;
             frameCount = 0;
         }
-
-        
-        //Delay(accumulator);
-        // //printf("%f %f\n", DeltaTime, accumulator);
-        // if(accumulator > 0)
-        // {
-        //     steady_clock::time_point _beforeWait = steady_clock::now();
-        //     Delay(accumulator);
-        //     duration<Double_64> _waitDuration = duration_cast<duration<Double_64>>(steady_clock::now() - _beforeWait);
-        //     //printf("%f\n", _waitDuration);
-        //     DeltaTime += _waitDuration.count()*1000;
-        // }
-        //if(accumulator > 0)
-        //printf("Accum: %f\n", accumulator);
-
-        // steady_clock::time_point _dts = steady_clock::now();
-        // while(accumulator > 0)
-        // {
-        //     duration<Double_64> _dt = duration_cast<duration<Double_64>>(steady_clock::now() - _dts);
-        //     //printf("%f\n", dt);
-        //     _dts = steady_clock::now();
-        //     accumulator -= _dt.count()*1000;
-        //     DeltaTime += _dt.count()*1000;
-        //     Delay(1);
-        // }
 
     }
 

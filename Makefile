@@ -3,13 +3,14 @@ BUILD_DIR = build/debug
 CC = clang++
 OBJ_NAME = libCanvas
 INCLUDE_PATHS = -Iinclude
-COMPILER_FLAGS = -std=c++11 -c -arch arm64
+COMPILER_FLAGS = -std=c++11 -c -Wall -ggdb -O0 -arch arm64
 BACKENDS = $(wildcard $(BUILD_DIR)/Backend_*.o)
 
 
 all: backends engine
 	ar rvs $(BUILD_DIR)/$(OBJ_NAME).a $(BUILD_DIR)/Canvas.o $(BUILD_DIR)/GraphicsUtil.o $(BACKENDS)
 	rm $(BUILD_DIR)/Canvas.o
+	rm $(BUILD_DIR)/GraphicsUtil.o
 	rm $(BACKENDS)
 
 

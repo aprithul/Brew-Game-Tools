@@ -11,7 +11,7 @@ Bool_8 WasWindowCrossed();
 void DrawPixel(int _x, int _y, Color color);
 void DrawScreen();
 void Cleanup();
-
+void Delay(Uint_32 ms);
 extern Uint_32* canvasBuffer;
 
 

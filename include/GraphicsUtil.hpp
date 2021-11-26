@@ -15,4 +15,5 @@ struct Color
     Uint_32 value;
 };
 
+
 #endif

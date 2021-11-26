@@ -116,15 +116,24 @@ void makeShaderForQuad()
 
 }
 
+// int _texWidth = 0;
+// int _texHeight = 0;
+// stbi_uc* pixelData = 0;
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING)==0)
     {
         set_sdl_gl_attributes();
         window = SDL_CreateWindow(_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL);
+        
         width = _width;
         height = _height;
         gl_context = SDL_GL_CreateContext(window);
+        
+        if( SDL_GL_SetSwapInterval( 0 ) < 0 )
+        {
+            printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+        }
 
         if(glewInit() == GLEW_OK)
         {
@@ -169,12 +178,16 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
         glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Float_32)*5, (void*)0);
         // uv
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(Float_32)*5, (void*)0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(Float_32)*5, (void*)(sizeof(Float_32)*3));
 
         // unbind vbo and ibo after unbinding vao
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        //int comp = 0;
+        //stbi_set_flip_vertically_on_load(true);
+        //pixelData = stbi_load("grass.png", &_texWidth, &_texHeight, &comp, 0);
 
         // create texture to draw to
         glGenTextures(1, &canvasTexture);
@@ -220,7 +233,7 @@ void ProcessInput()
 
 void DrawScreen()
 {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width*0.8, height*0.8, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
 
     glClearColor( 0,0,1,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -242,6 +255,11 @@ void Cleanup()
     delete[] canvasBuffer;
     SDL_Quit();
     printf("SDL2_OpenGL backend cleaned up\n");
+}
+
+void Delay(Uint_32 ms)
+{
+    SDL_Delay(ms);
 }
 
 #endif

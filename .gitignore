@@ -31,7 +31,6 @@
 *.out
 
 #hidden files
-.vscode
 .git
 
 #sdl2 and GLEW directory

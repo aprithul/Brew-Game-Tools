@@ -3,8 +3,13 @@
 // user headers
 #include "Backend.hpp"
 #include "Canvas.hpp"
-#define MATH_UTIL_IMPLEMENTATION
 
+#define MATH_UTIL_IMPLEMENTATION
+#include "MathUtil.hpp"
+
+
+#define UTILS_IMPLEMENTATION
+#include "Utils.hpp"
 
 
 Bool_8 is_game_running;
@@ -39,7 +44,7 @@ void Canvas::SetCloseFunc(void (*_close) ())
     this->close = _close;
 }
 
-void Canvas::DrawPixel(int _x, int _y, Color color)
+void Canvas::DrawPixel(Int_32 _x, Int_32 _y, Color color)
 {
     Int_32 _rx = _x * PixelSize;
     Int_32 _ry = _y * PixelSize;
@@ -54,9 +59,166 @@ void Canvas::DrawPixel(int _x, int _y, Color color)
         for(Uint_32 _yOffset = 0; _yOffset < PixelSize; _yOffset++)
         {
             canvasBuffer[ (_rWidth * (_ry+_yOffset)) + (_rx + _xOffset) ] = color.value;
+        }   
+    }
+
+}
+
+void Canvas::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
+{
+    if(_x1 == _x2)
+    {
+        if(_y2 < _y1)
+        {
+            Utils_Swap_i(&_x1, &_x2);
+            Utils_Swap_i(&_y1, &_y2);
+        }
+
+        for(int _yi = _y1, _xi = _x1; _yi <= _y2; _yi++)
+        {
+            DrawPixel(_xi, _yi, _color);
+        }
+    }
+    else if(_y1 == _y2)
+    {
+        if(_x2 < _x1)
+        {
+            Utils_Swap_i(&_x1, &_x2);
+            Utils_Swap_i(&_y1, &_y2);
+        }
+
+        for(int _xi = _x1,_yi = _y1; _xi <= _x2; _xi++)
+        {
+            DrawPixel(_xi, _yi, _color);
+        }
+    }
+    else
+    {
+        Float_32 _error = 0;
+        Float_32 _m = (Float_32)(_y2 - _y1) / (_x2 - _x1);
+        if(_m <= 1.f && _m >= -1.f)
+        {
+            if(_x2 < _x1)
+            {
+                Utils_Swap_i(&_x1, &_x2);
+                Utils_Swap_i(&_y1, &_y2);
+            }
+
+            Int_32 _inc = 1;
+            if(_m < 0 )
+            {
+                _inc = -1;
+                _m = -_m;
+            }
+
+            for(Int_32 _xi = _x1, _yi = _y1; _xi <= _x2; _xi++)
+            {
+                DrawPixel(_xi, _yi, _color);
+
+                _error += _m;
+                if(_error >= 0.5f)
+                {
+                    _error -= 1.0f;
+                    _yi+=_inc;
+                }
+            }
+        }
+        else
+        {
+            if(_y2 < _y1)
+            {
+                Utils_Swap_i(&_x1, &_x2);
+                Utils_Swap_i(&_y1, &_y2);
+            }
+            _m = (Float_32)(_x1 - _x2) / (_y1 - _y2);
+
+            Int_32 _inc = 1;
+            if(_m < 0 )
+            {
+                _inc = -1;
+                _m = -_m;
+            }
+
+            for(Int_32 _yi = _y1, _xi = _x1; _yi <= _y2; _yi++)
+            {
+                DrawPixel(_xi, _yi, _color);
+
+                _error += _m;
+                if(_error >= 0.5f)
+                {
+                    _error -= 1.0f;
+                    _xi+=_inc;
+                }
+                
+            }
         }
     }
 
+
+}
+
+Int_32 sqrd_dist(Int_32 x0, Int_32 y0, Int_32 x1, Int_32 y1)
+{
+    return ((x0 - x1)*(x0 - x1) + (y0-y1)*(y0-y1));
+}
+
+void Canvas::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
+{
+    Float_32 _radius_sq = radius * radius;
+    for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
+    {
+        DrawPixel(_x +_xi, _y + _yi, color);
+        DrawPixel( _y + _yi, _x +_xi, color);
+
+        DrawPixel(_x -_xi, _y + _yi, color);
+        DrawPixel(_y + _yi,_x -_xi,  color);
+
+        DrawPixel(_x +_xi, _y - _yi, color);
+        DrawPixel(_y - _yi, _x +_xi, color);
+
+        DrawPixel(_x -_xi, _y - _yi, color);
+        DrawPixel(_y - _yi, _x -_xi, color);
+
+        Int_32 _nxi = _xi + 1;
+        Int_32 _nyi = _yi - 1;
+
+        Int_32 dif0 = abs(sqrd_dist(0, 0, _nxi, _yi) - _radius_sq);
+        Int_32 dif1 = abs(sqrd_dist(0, 0, _nxi, _nyi) - _radius_sq);
+        
+        if( dif1 < dif0 )
+        {
+            _yi = _nyi;
+        }
+    }
+}
+
+
+
+void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor)
+{
+    Float_32 _radius_sq = radius * radius;
+    for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
+    {
+        DrawLine(_x +_xi, _y + _yi, _x -_xi, _y + _yi, fillColor);
+
+        DrawLine(_y - _yi, _x + _xi, _y + _yi, _x + _xi, fillColor);
+
+        DrawLine(_x +_xi, _y - _yi, _x -_xi, _y - _yi, fillColor);
+
+        DrawLine(_y + _yi, _x -_xi,  _y - _yi, _x -_xi,  fillColor);
+
+
+        Int_32 _nxi = _xi + 1;
+        Int_32 _nyi = _yi - 1;
+
+        Int_32 dif0 = abs(sqrd_dist(0, 0, _nxi, _yi) - _radius_sq);
+        Int_32 dif1 = abs(sqrd_dist(0, 0, _nxi, _nyi) - _radius_sq);
+        
+        if( dif1 < dif0 )
+        {
+            _yi = _nyi;
+        }
+    }
 }
 
 void Canvas::PrintBuffer()
@@ -104,7 +266,7 @@ Int_32 Canvas::Start()
         update();
         DrawScreen();
         
-        duration<Double_64> time_span = duration_cast<duration<Double_64>>(steady_clock::now() - _lastTime);
+        duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
         _lastTime = steady_clock::now();
 
         DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
@@ -113,7 +275,11 @@ Int_32 Canvas::Start()
         frameCount++;
         if(milSecondCounter >= 1000.0)
         {
-            printf("FPS: %d\n", frameCount);
+            
+            //printf("FPS: %d\n", frameCount);
+            char buffer[32];
+            sprintf(buffer, "%d x %d x %d | FPS: %d", Width, Height, PixelSize, frameCount);
+            SetWindowTitle(buffer);
             milSecondCounter -= 1000.0;
             frameCount = 0;
         }

@@ -417,25 +417,6 @@ Mat3x3::Mat3x3(Float_32 v00, Float_32 v01, Float_32 v02,
 	_m(2, 0) = v20; _m(2, 1) = v21; _m(2, 2) = v22;
 }
 
-Mat3x3& Mat3x3::operator=(const Mat4x4& other)
-{
-	Mat3x3& _m = (*this);
-	_m(0, 0) = other(0, 0); _m(0, 1) = other(0, 1); _m(0, 2) = other(0, 2);
-	_m(1, 0) = other(1, 0); _m(1, 1) = other(1, 1); _m(1, 2) = other(1, 2);
-	_m(2, 0) = other(2, 0); _m(2, 1) = other(2, 1); _m(2, 2) = other(2, 2);
-	return _m;
-}
-
-Mat3x3::operator Mat4x4()
-{
-	const Mat3x3& _m = (*this);
-	return Mat4x4{
-		_m(0,0), _m(0,1), _m(0,2), 0,
-		_m(1,0), _m(1,1), _m(1,2), 0,
-		_m(2,0), _m(2,1), _m(2,2), 0,
-		0,		0,		0,		1
-	};
-}
 
 Mat3x3 Mat3x3::operator+(const Mat3x3& m) const
 {

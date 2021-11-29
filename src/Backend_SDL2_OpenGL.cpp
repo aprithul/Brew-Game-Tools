@@ -262,4 +262,10 @@ void Delay(Uint_32 ms)
     SDL_Delay(ms);
 }
 
+void SetWindowTitle(const char* _title)
+{
+    SDL_SetWindowTitle(window, _title);
+}
+
+
 #endif

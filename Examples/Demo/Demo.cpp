@@ -8,9 +8,9 @@ void init()
     printf("Initialized\n");
 }
 
-Int_32 w = 128;
-Int_32 h = 128;
-Canvas canvas("Canvas Demo", w, h, 1);
+Int_32 w = 64;
+Int_32 h = 64;
+Canvas canvas("Canvas Demo", w, h, 4, false);
 
 Color colors[3] = { Color(255,0,0,255, RGBA), Color(0,255,0,255, RGBA), Color(0,0,255,255, RGBA)};
 
@@ -44,9 +44,11 @@ void update()
     p1 = rotMat * p1;
     p1 += p0;
 
-    canvas.DrawFilledCircle(p0.x, p0.y, canvas.Width/3, b);
-    canvas.DrawCircle(p0.x, p0.y, canvas.Width/3, g);
-    canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
+    canvas.DrawFilledCircle(p0.x, p0.y, canvas.Width/4, b);
+    canvas.DrawCircle(p0.x, p0.y, canvas.Width/4, g);
+    //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
+
+    //canvas.DrawRectangle(p0.x - canvas.Width/4, p0.y - canvas.Height/4, canvas.Width/2, canvas.Height/2, r);
 
     //canvas.DrawLine(p0.x, p0.y, p3.x, p3.y, c);
     //printf("Frame time: %f ms\n", canvas.DeltaTime);

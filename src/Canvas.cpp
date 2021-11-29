@@ -19,10 +19,10 @@ Bool_8 is_game_running;
 #endif
 
 Uint_32 canvasBufferSizeInBytes = 0;
-Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize) : 
+Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
-    CreateWindow(_name, Width*PixelSize, Height*PixelSize);
+    CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
 
@@ -168,16 +168,16 @@ void Canvas::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
     for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
     {
         DrawPixel(_x +_xi, _y + _yi, color);
-        DrawPixel( _y + _yi, _x +_xi, color);
+        DrawPixel( _x + _yi, _y +_xi, color);
 
         DrawPixel(_x -_xi, _y + _yi, color);
-        DrawPixel(_y + _yi,_x -_xi,  color);
+        DrawPixel(_x + _yi,_y -_xi,  color);
 
         DrawPixel(_x +_xi, _y - _yi, color);
-        DrawPixel(_y - _yi, _x +_xi, color);
+        DrawPixel(_x - _yi, _y +_xi, color);
 
         DrawPixel(_x -_xi, _y - _yi, color);
-        DrawPixel(_y - _yi, _x -_xi, color);
+        DrawPixel(_x - _yi, _y -_xi, color);
 
         Int_32 _nxi = _xi + 1;
         Int_32 _nyi = _yi - 1;
@@ -201,11 +201,11 @@ void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillCol
     {
         DrawLine(_x +_xi, _y + _yi, _x -_xi, _y + _yi, fillColor);
 
-        DrawLine(_y - _yi, _x + _xi, _y + _yi, _x + _xi, fillColor);
+        DrawLine(_x - _yi, _y + _xi, _x + _yi, _y + _xi, fillColor);
 
         DrawLine(_x +_xi, _y - _yi, _x -_xi, _y - _yi, fillColor);
 
-        DrawLine(_y + _yi, _x -_xi,  _y - _yi, _x -_xi,  fillColor);
+        DrawLine(_x + _yi, _y -_xi,  _x - _yi, _y -_xi,  fillColor);
 
 
         Int_32 _nxi = _xi + 1;
@@ -219,6 +219,14 @@ void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillCol
             _yi = _nyi;
         }
     }
+}
+
+void Canvas::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, Color _color)
+{
+    DrawLine(_x, _y, _x + _width, _y, _color);
+    DrawLine(_x, _y, _x, _y+_height, _color);
+    DrawLine(_x + _width, _y, _x + _width, _y + _height, _color);
+    DrawLine(_x, _y + _height, _x + _width, _y + _height, _color);
 }
 
 void Canvas::PrintBuffer()
@@ -261,7 +269,7 @@ Int_32 Canvas::Start()
             is_game_running = false;
 
         // clear canvasBuffer
-        memset(canvasBuffer, 0, canvasBufferSizeInBytes);
+        memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
 
         update();
         DrawScreen();

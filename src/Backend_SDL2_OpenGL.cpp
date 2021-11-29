@@ -116,16 +116,50 @@ void makeShaderForQuad()
 
 }
 
+
+void getDisplayModes()
+{
+    // Declare display mode structure to be filled in.
+  SDL_DisplayMode current;
+
+  // Get current display mode of all displays.
+  for(int i = 0; i < SDL_GetNumVideoDisplays(); ++i){
+
+    int should_be_zero = SDL_GetDesktopDisplayMode(i, &current);
+
+    if(should_be_zero != 0)
+      // In case of error...
+      printf("Could not get display mode for video display #%d: %s", i, SDL_GetError());
+
+    else
+      // On success, print the current display mode.
+      printf("Display #%d: current display mode is %dx%dpx @ %dhz.\n", i, current.w, current.h, current.refresh_rate);
+
+  }
+}
+
 // int _texWidth = 0;
 // int _texHeight = 0;
 // stbi_uc* pixelData = 0;
-void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
+void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setFullscreen)
 {
     if(SDL_Init(SDL_INIT_EVERYTHING)==0)
     {
         set_sdl_gl_attributes();
-        window = SDL_CreateWindow(_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL);
-        
+
+        window = SDL_CreateWindow(_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, _width, _height, SDL_WINDOW_OPENGL | (SDL_WINDOW_FULLSCREEN_DESKTOP*_setFullscreen));
+
+        int w = 0;
+        int h = 0;
+        SDL_GetWindowSize(window, &w, &h);
+        printf("%d - %d\n", w, h);
+        // SDL_DisplayMode _displayMode;
+        // SDL_GetDesktopDisplayMode(0, &_displayMode);
+
+        // _displayMode.w = 160;
+        // _displayMode.h = 100;
+        // SDL_SetWindowDisplayMode(window, &_displayMode);
+
         width = _width;
         height = _height;
         gl_context = SDL_GL_CreateContext(window);
@@ -144,7 +178,15 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
             printf("GLEW initialization failed\n");
         }
 
-        float _w = width/height;
+        Float_32 r = (Float_32)_width / _height;
+        if(_setFullscreen)
+        {
+            SDL_DisplayMode _displayMode;
+            SDL_GetDesktopDisplayMode(0, &_displayMode);
+            r = (Float_32)_displayMode.w/_displayMode.h;
+        }
+
+        Float_32 _w = (Float_32)width/height/r;
         Float_32 vertices[] = {
             -_w,  1.f, 0, 0, 1,
              _w,  1.f, 0, 1, 1,
@@ -226,6 +268,13 @@ void ProcessInput()
         {
             windowCrossed = true;
         }
+        if(event.type == SDL_KEYDOWN)
+        {
+            if(event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                windowCrossed = true;
+            }
+        }
     }   
 }
 
@@ -235,7 +284,7 @@ void DrawScreen()
 {
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
 
-    glClearColor( 0,0,1,1);
+    glClearColor( 0,0,0,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);

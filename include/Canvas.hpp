@@ -6,7 +6,7 @@
 struct Canvas
 {
 
-    Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize);
+    Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen);
 
     Int_32 Start();
     void SetInitFunc(void (*_init) ());

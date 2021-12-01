@@ -2,7 +2,7 @@ SRC_DIR = src
 BUILD_DIR = build/debug
 CC = clang++
 OBJ_NAME = libCanvas
-INCLUDE_PATHS = -Iinclude
+INCLUDE_PATHS = -Iinclude -IVendor/SDL2/include -IVendor/GL/include
 COMPILER_FLAGS = -std=c++11 -c -Wall -ggdb -O0 -arch arm64
 BACKENDS = $(wildcard $(BUILD_DIR)/Backend_*.o)
 

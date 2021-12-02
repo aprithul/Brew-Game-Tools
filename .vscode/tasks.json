@@ -6,7 +6,7 @@
             "command": "make",
             "args": [],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}/Canvas/"
             },
             "problemMatcher": [
                 "$gcc"
@@ -20,7 +20,7 @@
             "command": "make",
             "args": [],
             "options": {
-                "cwd": "${workspaceFolder}/Examples/"
+                "cwd": "${workspaceFolder}/App/"
             },
             "problemMatcher": [
                 "$gcc"

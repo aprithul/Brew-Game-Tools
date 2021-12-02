@@ -1,10 +1,10 @@
-SRC_DIR = Demo
+SRC_DIR = src
 SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
-BUILD_DIR = $(SRC_DIR)
+BUILD_DIR = build/debug
 CC = clang++
 OBJ_NAME = game
-INCLUDE_PATHS = -I../include -I../Vendor/SDL2/include -I../Vendor/GL/include
-LIBRARY_PATHS = -L../lib -L../Vendor/SDL2/lib -L../Vendor/GL/lib -L../build/debug/
+INCLUDE_PATHS = -Iinclude -I../Canvas/include -I../Vendor/SDL2/include -I../Vendor/GL/include
+LIBRARY_PATHS = -L../Canvas/build/debug/ -L../Vendor/SDL2/lib -L../Vendor/GL/lib
 COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
 
 ifeq ($(OS),Windows_NT)

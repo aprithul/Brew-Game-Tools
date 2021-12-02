@@ -8,7 +8,7 @@
             "name": "clang++ - Build and debug active file",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/Examples/Demo/game",
+            "program": "${workspaceFolder}/App/build/debug/game",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

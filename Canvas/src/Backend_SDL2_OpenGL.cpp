@@ -4,7 +4,7 @@
 
 #include "Backend.hpp"
 #include "SDL2/SDL.h"
-#include "GL/glew.h"
+#include "glew.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

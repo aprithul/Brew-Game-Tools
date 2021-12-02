@@ -32,6 +32,7 @@
 
 #hidden files
 .git
+.DS_Store
 
 #sdl2 and GLEW directory
 App/build/debug/*

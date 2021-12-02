@@ -1,8 +1,13 @@
 mkdir App/build
 mkdir App/build/debug
+mkdir App/src
 mkdir App/include
+
 mkdir Canvas/build
 mkdir Canvas/build/debug
+mkdir Canvas/src
+mkdir Canvas/include
+
 mkdir Vendor
 mkdir Vendor/temp
 cd Vendor/temp/

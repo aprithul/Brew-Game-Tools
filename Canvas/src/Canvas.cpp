@@ -12,6 +12,9 @@
 #include "Utils.hpp"
 
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 Bool_8 is_game_running;
 
 #ifdef main
@@ -20,6 +23,10 @@ Bool_8 is_game_running;
 
 Uint_32 canvasBufferSizeInBytes = 0;
 const char* canvasTitle;
+
+Uint_32 Canvas::_nextId = 1;
+Image Canvas::_imageDataStore[MAX_IMAGES_LOADABLE];
+
 Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
@@ -60,7 +67,7 @@ void Canvas::DrawPixel(Int_32 _x, Int_32 _y, Color color)
     {
         for(Uint_32 _yOffset = 0; _yOffset < PixelSize; _yOffset++)
         {
-            canvasBuffer[ (_rWidth * (_ry+_yOffset)) + (_rx + _xOffset) ] = color.value;
+            canvasBuffer[ (_rWidth * (_ry+_yOffset)) + (_rx + _xOffset) ] = color.Value;
         }   
     }
 
@@ -251,6 +258,59 @@ void Canvas::PrintBuffer()
 
 }
 
+Bool_8 Canvas::LoadImage(const char* _filename)
+{
+    Image& _image = _imageDataStore[_nextImagePosition];
+    Uint_32* _imageData = (Uint_32*)stbi_load(_filename, &_image.Width,&_image.Height, &_image.Channels, 4);
+    if(_imageData)
+    {
+        _image.Id = Canvas::_nextId++;
+        _image.Data = _imageData;
+        _nextImagePosition++;
+        return true;
+    }
+    return false;
+}
+
+
+const Image* Canvas::GetImageById(Uint_32 _id)
+{
+    if(_id> 0)
+    {
+        for(int _i=0; _i<_nextImagePosition; _i++)
+        {
+            if(_imageDataStore[_i].Id == _id)
+                return &_imageDataStore[_i];
+        }
+    }
+
+}
+
+void Canvas::DeleteImageById(Uint_32 _id)
+{
+    if(_id> 0 )
+    {
+        // find image with Id == _id
+        int _i=0;
+        for(; _i<_nextImagePosition; _i++)
+        {
+            if(_imageDataStore[_i].Id == _id)
+                break;
+        }
+
+        if(_i == _nextImagePosition)    // _id not found
+            return;
+
+        // delete image at _i and swap in the last image into it's place
+        stbi_image_free(_imageDataStore[_i].Data);
+        _imageDataStore[_i].Id = 0;
+        _imageDataStore[_i] = _imageDataStore[_nextImagePosition-1];
+        _imageDataStore[_nextImagePosition-1].Id = 0;
+        _nextImagePosition--;
+    }
+
+}
+
 
 Int_32 Canvas::Start()
 {
@@ -271,7 +331,7 @@ Int_32 Canvas::Start()
             is_game_running = false;
 
         // clear canvasBuffer
-        memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
+        memset(canvasBuffer, 0x00, canvasBufferSizeInBytes);
 
         update();
         DrawScreen();

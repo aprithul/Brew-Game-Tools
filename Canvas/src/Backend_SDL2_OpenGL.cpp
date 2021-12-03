@@ -1,13 +1,10 @@
 #include "Config.hpp"
 
 #ifdef ENABLE_BACKEND_SDL2_OPENGL
-
 #include "Backend.hpp"
 #include "SDL2/SDL.h"
 #include "glew.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stdio.h>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>

@@ -19,9 +19,11 @@ Bool_8 is_game_running;
 #endif
 
 Uint_32 canvasBufferSizeInBytes = 0;
+const char* canvasTitle;
 Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
+    canvasTitle = _name;
     CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
@@ -285,8 +287,8 @@ Int_32 Canvas::Start()
         {
             
             //printf("FPS: %d\n", frameCount);
-            char buffer[32];
-            sprintf(buffer, "%d x %d x %d | FPS: %d", Width, Height, PixelSize, frameCount);
+            char buffer[64];
+            sprintf(buffer, "%s | %d x %d x %d | FPS: %d", canvasTitle, Width, Height, PixelSize, frameCount);
             SetWindowTitle(buffer);
             milSecondCounter -= 1000.0;
             frameCount = 0;

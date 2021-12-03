@@ -8,8 +8,8 @@ void init()
     printf("Initialized\n");
 }
 
-Int_32 w = 128;
-Int_32 h = 128;
+Int_32 h = 256;
+Int_32 w = 256;
 Canvas canvas("Canvas Demo", w, h, 4, false);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
@@ -64,7 +64,10 @@ void update()
     }
 
     Image* _img = canvas.GetImageById(_id1);
-    canvas.BlitImage(_img);
+
+    static Float_32 _x = 0,_y=0;
+
+    canvas.BlitImage(_img, _x, _y);
 
     //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
 

@@ -21,7 +21,7 @@ struct Canvas
 
     // image blitting function
 
-    void BlitImage(const Image* const _image);
+    void BlitImage(const Image* const _image, Int_32 _x, Int_32 _y);
 
     
     // drawing funcitons

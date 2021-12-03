@@ -70,7 +70,6 @@ void Canvas::DrawPixel(Int_32 _x, Int_32 _y, Color color)
             canvasBuffer[ (_rWidth * (_ry+_yOffset)) + (_rx + _xOffset) ] = color.Value;
         }   
     }
-
 }
 
 void Canvas::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
@@ -261,6 +260,7 @@ void Canvas::PrintBuffer()
 Uint_32 Canvas::LoadImage(const char* _filename)
 {
     Image& _image = _imageDataStore[_nextImagePosition];
+    stbi_set_flip_vertically_on_load(true);
     stbi_uc* _imageData = stbi_load(_filename, &_image.Width,&_image.Height, &_image.Channels, 4);
     if(_imageData)
     {
@@ -319,7 +319,7 @@ void Canvas::DeleteImageById(Uint_32 _id)
 }
 
 
-void Canvas::BlitImage(const Image* const _image)
+void Canvas::BlitImage(const Image* const _image,Int_32 _x, Int_32 _y)
 {
     for(Uint_32 _i =0; _i< _image->Width; _i++)
     {
@@ -327,7 +327,7 @@ void Canvas::BlitImage(const Image* const _image)
         {
             Uint_32 _pixelVal = _image->Data[ (_image->Width*_j) + _i];
             Color _pixelCol(_pixelVal);
-            DrawPixel(_i, _j, _pixelCol);
+            DrawPixel(_x+_i, _y+_j, _pixelCol);
         }
         
     }

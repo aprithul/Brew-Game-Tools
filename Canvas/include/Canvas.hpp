@@ -14,10 +14,15 @@ struct Canvas
     void SetUpdateFunc(void (*_update) ());
     void SetCloseFunc(void (*_close) ());
     
-    // image functions
-    Bool_8 LoadImage(const char* _filename);
-    const Image* GetImageById(Uint_32 _id);
+    // image loading functions
+    Uint_32 LoadImage(const char* _filename);
+    Image* const GetImageById(Uint_32 _id);
     void DeleteImageById(Uint_32 _id);
+
+    // image blitting function
+
+    void BlitImage(const Image* const _image);
+
     
     // drawing funcitons
     void DrawPixel(Int_32 _x, Int_32 _y, Color color);
@@ -26,6 +31,7 @@ struct Canvas
     void DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color);
     void DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height,Color color);
     
+
     void PrintBuffer();
 
     Uint_32 Width;

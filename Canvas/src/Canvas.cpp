@@ -258,22 +258,30 @@ void Canvas::PrintBuffer()
 
 }
 
-Bool_8 Canvas::LoadImage(const char* _filename)
+Uint_32 Canvas::LoadImage(const char* _filename)
 {
     Image& _image = _imageDataStore[_nextImagePosition];
-    Uint_32* _imageData = (Uint_32*)stbi_load(_filename, &_image.Width,&_image.Height, &_image.Channels, 4);
+    stbi_uc* _imageData = stbi_load(_filename, &_image.Width,&_image.Height, &_image.Channels, 4);
     if(_imageData)
     {
+        // bgra
+        // change byte order so that [r][g][b][a] becomes [b][g][r][a]
+        Uint_32 _img_data_size = _image.Width * _image.Height;
+        for(int _i=0; _i<_img_data_size; _i++)
+        {
+            Utils_Swap_uc( &_imageData[_i*4], &_imageData[_i*4 + 2] );
+        }
+
         _image.Id = Canvas::_nextId++;
-        _image.Data = _imageData;
+        _image.Data = (Uint_32*)_imageData;
         _nextImagePosition++;
-        return true;
+        return _image.Id;
     }
-    return false;
+    return 0;
 }
 
 
-const Image* Canvas::GetImageById(Uint_32 _id)
+Image* const Canvas::GetImageById(Uint_32 _id)
 {
     if(_id> 0)
     {
@@ -283,7 +291,6 @@ const Image* Canvas::GetImageById(Uint_32 _id)
                 return &_imageDataStore[_i];
         }
     }
-
 }
 
 void Canvas::DeleteImageById(Uint_32 _id)
@@ -311,6 +318,20 @@ void Canvas::DeleteImageById(Uint_32 _id)
 
 }
 
+
+void Canvas::BlitImage(const Image* const _image)
+{
+    for(Uint_32 _i =0; _i< _image->Width; _i++)
+    {
+        for (Uint_32 _j = 0; _j < _image->Height; _j++)
+        {
+            Uint_32 _pixelVal = _image->Data[ (_image->Width*_j) + _i];
+            Color _pixelCol(_pixelVal);
+            DrawPixel(_i, _j, _pixelCol);
+        }
+        
+    }
+}
 
 Int_32 Canvas::Start()
 {

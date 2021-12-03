@@ -12,7 +12,7 @@ Int_32 w = 128;
 Int_32 h = 128;
 Canvas canvas("Canvas Demo", w, h, 4, false);
 
-Color colors[3] = { Color(255,0,0,255, RGBA), Color(0,255,0,255, RGBA), Color(0,0,255,255, RGBA)};
+Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
 Float_32 rot = 0;
 Mat3x3 rotMat;
@@ -21,6 +21,8 @@ int load = 0;
 
 void update()
 {
+
+
     // for(int x=0; x<w; x++)
     // {
     //     for(int y=0; y<h; y++)
@@ -33,6 +35,10 @@ void update()
     Color r = colors[0];
     Color g = colors[1];
     Color b = colors[2];
+
+    Color red(0xff, 0,0,0xff, BGRA);
+    Color blue(0, 0,0xff,0xff, BGRA);
+    Color green(0, 0,0xff,0xff, BGRA);
 
     Vec2f p0(canvas.Width/2,canvas.Height/2);
     Vec2f p1(canvas.Width/1.3,canvas.Height/2);
@@ -47,16 +53,18 @@ void update()
     p1 = rotMat * p1;
     p1 += p0;
 
-    canvas.DrawFilledCircle(p0.x, p0.y, canvas.Width/4, b);
-    canvas.DrawCircle(p0.x, p0.y, canvas.Width/4, g);
+    // canvas.DrawFilledCircle(p0.x, p0.y, canvas.Width/4, red);
+    // canvas.DrawCircle(p0.x, p0.y, canvas.Width/4, blue);
 
-
+    static Uint_32 _id1  = 0;
     if(!load)
     {
         load = 1;
-        int _status = canvas.LoadImage("grass.png");
-        printf("Loading status %d\n", _status);
+        _id1 = canvas.LoadImage("App/light.jpg");
     }
+
+    Image* _img = canvas.GetImageById(_id1);
+    canvas.BlitImage(_img);
 
     //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
 

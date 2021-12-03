@@ -6,12 +6,14 @@
 enum ColorFormat
 {
     RGBA,
-    BGRA
+    BGRA,
+    ARGB
 };
 
 struct Color
 {
-    Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _format);
+    Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory);
+    Color(Uint_32 argb);
     Uint_32 Value;
 };
 

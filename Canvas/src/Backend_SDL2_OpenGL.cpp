@@ -279,7 +279,7 @@ void ProcessInput()
 
 void DrawScreen()
 {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, canvasBuffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, canvasBuffer);
 
     glClearColor( 0,0,0,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

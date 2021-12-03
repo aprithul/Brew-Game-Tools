@@ -31,4 +31,11 @@ void Utils_Swap_ui(unsigned int* a, unsigned int* b)
     *b = _temp;
 }
 
+void Utils_Swap_uc(unsigned char* a, unsigned char* b)
+{
+    unsigned char _temp = *a;
+    *a = *b;
+    *b = _temp;
+}
+
 #endif

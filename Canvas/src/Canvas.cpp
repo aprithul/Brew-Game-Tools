@@ -291,6 +291,8 @@ Image* const Canvas::GetImageById(Uint_32 _id)
                 return &_imageDataStore[_i];
         }
     }
+
+    return nullptr;
 }
 
 void Canvas::DeleteImageById(Uint_32 _id)
@@ -328,6 +330,34 @@ void Canvas::BlitImage(const Image* const _image,Int_32 _x, Int_32 _y)
             Uint_32 _pixelVal = _image->Data[ (_image->Width*_j) + _i];
             Color _pixelCol(_pixelVal);
             DrawPixel(_x+_i, _y+_j, _pixelCol);
+        }
+        
+    }
+}
+
+void Canvas::BlitImage(const Image* const _image, Mat3x3& _rotScl, Vec2f& _trans, Vec2f& _scale)
+{
+    Int_32 diagonal =  (Vec2f(_image->Width * _scale.x, _image->Height * _scale.y) - Vec2f(0,0)).GetMagnitude()+1;
+    Int_32 halfDiag = diagonal/2;
+    for(Int_32 _i =-halfDiag; _i< halfDiag; _i++)
+    {
+        for (Int_32 _j = -halfDiag; _j < halfDiag; _j++)
+        {
+            Vec2f _targetPix{ (Float_32)_i, (Float_32)_j};
+            Vec2f _sourcePix = (_rotScl.GetInverse() * _targetPix);
+            _sourcePix.x = (_sourcePix.x/_scale.x) + _image->Width/2;
+            _sourcePix.y = (_sourcePix.y/_scale.y) + _image->Height/2;
+
+            if(_sourcePix.x >=0 && _sourcePix.x<_image->Width 
+                && _sourcePix.y >=0 && _sourcePix.y < _image->Height)
+            {
+                Int_32 _x = _sourcePix.x;
+                Int_32 _y = _sourcePix.y;
+                Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
+                Color _pixelCol(_pixelVal);
+                DrawPixel(_i+_trans.x, _j+_trans.y, _pixelCol);
+            }
+
         }
         
     }

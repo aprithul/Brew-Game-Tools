@@ -10,12 +10,14 @@ void init()
 
 Int_32 h = 256;
 Int_32 w = 256;
-Canvas canvas("Canvas Demo", w, h, 4, false);
+Canvas canvas("Canvas Demo", w, h, 2, false);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
 Float_32 rot = 0;
 Mat3x3 rotMat;
+Mat3x3 sclMat;
+Mat3x3 transMat;
 
 int load = 0;
 
@@ -44,11 +46,17 @@ void update()
     Vec2f p1(canvas.Width/1.3,canvas.Height/2);
     
     rot -= canvas.DeltaTime * 0.001f;
+    rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(rot);
     rotMat(0,1) = -sinf(rot);
     rotMat(1,0) = sinf(rot);
     rotMat(1,1) = cosf(rot);
     
+    sclMat = Mat3x3::Identity();
+    sclMat(0,0) = 2;
+    sclMat(1,1) = 2;
+
+
     p1 -= p0;
     p1 = rotMat * p1;
     p1 += p0;
@@ -67,8 +75,12 @@ void update()
 
     static Float_32 _x = 0,_y=0;
 
-    canvas.BlitImage(_img, _x, _y);
+    //canvas.BlitImage(_img, _x, _y);
 
+    Vec2f trans(w/2, h/2);
+    Float_32 osc = abs(sinf(rot))+0.5f;
+    Vec2f scale(2*osc,2*osc);
+    canvas.BlitImage(_img, rotMat, trans, scale);
     //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
 
     //canvas.DrawRectangle(p0.x - canvas.Width/4, p0.y - canvas.Height/4, canvas.Width/2, canvas.Height/2, r);

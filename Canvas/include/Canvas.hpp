@@ -4,6 +4,8 @@
 #define MAX_IMAGES_LOADABLE 1024
 
 #include "GraphicsUtil.hpp"
+#include "MathUtil.hpp"
+
 struct Canvas
 {
 
@@ -22,6 +24,7 @@ struct Canvas
     // image blitting function
 
     void BlitImage(const Image* const _image, Int_32 _x, Int_32 _y);
+    void BlitImage(const Image* const _image, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale);
 
     
     // drawing funcitons

@@ -8,9 +8,9 @@ void init()
     printf("Initialized\n");
 }
 
-Int_32 h = 256;
-Int_32 w = 256;
-Canvas canvas("Canvas Demo", w, h, 2, false);
+Int_32 h = 512;
+Int_32 w = 512;
+Canvas canvas("Canvas Demo", w, h, 1, false);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
@@ -77,10 +77,18 @@ void update()
 
     //canvas.BlitImage(_img, _x, _y);
 
-    Vec2f trans(w/2, h/2);
+    //Vec2i trans{w/2, h/2};
+    Vec2f transA{(Float_32) w/2, (Float_32)h/2};
+    Vec2f transB{(Float_32) w/2-50, (Float_32)h/2-50};
+    Vec2i origin{_img->Width/2, _img->Height/2};
+
     Float_32 osc = abs(sinf(rot))+0.5f;
     Vec2f scale(2*osc,2*osc);
-    canvas.BlitImage(_img, rotMat, trans, scale);
+    canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
+    //canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
+    //canvas.BlitImage(_img, origin, transA, scale, NEAREST);
+   //canvas.BlitImage(_img, origin, transB, scale, LINEAR);
+    //canvas.BlitImage(_img, trans, origin);
     //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
 
     //canvas.DrawRectangle(p0.x - canvas.Width/4, p0.y - canvas.Height/4, canvas.Width/2, canvas.Height/2, r);

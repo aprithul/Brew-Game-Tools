@@ -161,7 +161,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
         height = _height;
         gl_context = SDL_GL_CreateContext(window);
         
-        if( SDL_GL_SetSwapInterval(1 ) < 0 )
+        if( SDL_GL_SetSwapInterval(0) < 0 )
         {
             printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
         }

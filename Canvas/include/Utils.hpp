@@ -38,4 +38,15 @@ void Utils_Swap_uc(unsigned char* a, unsigned char* b)
     *b = _temp;
 }
 
+float Utils_Clamp_f(float val, float min, float max )
+{
+    if(val < min )
+        return min;
+    if(val > max)
+        return max;
+
+    return val;
+}
+
+
 #endif

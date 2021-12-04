@@ -321,7 +321,7 @@ void Canvas::DeleteImageById(Uint_32 _id)
 }
 
 
-void Canvas::BlitImage(const Image* const _image,Int_32 _x, Int_32 _y)
+void Canvas::BlitImage(const Image* const _image, Vec2i& _pos, Vec2i& _origin)
 {
     for(Uint_32 _i =0; _i< _image->Width; _i++)
     {
@@ -329,13 +329,71 @@ void Canvas::BlitImage(const Image* const _image,Int_32 _x, Int_32 _y)
         {
             Uint_32 _pixelVal = _image->Data[ (_image->Width*_j) + _i];
             Color _pixelCol(_pixelVal);
-            DrawPixel(_x+_i, _y+_j, _pixelCol);
+            DrawPixel(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
         }
         
     }
 }
 
-void Canvas::BlitImage(const Image* const _image, Mat3x3& _rotScl, Vec2f& _trans, Vec2f& _scale)
+void Canvas::BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale,Interpolation _interpolationMode)
+{
+    for(Int_32 _i =-_image->Width/2*_scale.x; _i< _image->Width/2*_scale.x; _i++)
+    {
+        for (Int_32 _j = -_image->Height/2*_scale.y; _j < _image->Height/2*_scale.y; _j++)
+        {
+            Vec2f _targetPix{ (Float_32)_i, (Float_32)_j};
+            Vec2i _sourcePix{ (Int_32)(_targetPix.x/_scale.x) + _origin.x, 
+                                (Int_32)(_targetPix.y/_scale.y) + _origin.y};
+            
+            
+            if(_sourcePix.x >=0 && _sourcePix.x<_image->Width 
+                && _sourcePix.y >=0 && _sourcePix.y < _image->Height)
+            {
+                Color _pixelCol(0);
+                if(_interpolationMode == LINEAR)
+                {
+                    Vec2i _su{_sourcePix.x, _sourcePix.y+1};
+                    Uint_32 _suCol = _image->Data[ (_image->Width*_su.y) + _su.x];
+
+                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1};
+                    Uint_32 _sdCol = _image->Data[ (_image->Width*_sd.y) + _sd.x];
+
+                    Vec2i _sl{_sourcePix.x-1, _sourcePix.y};
+                    Uint_32 _slCol = _image->Data[ (_image->Width*_sl.y) + _sl.x];
+
+                    Vec2i _sr{_sourcePix.x+1, _sourcePix.y};
+                    Uint_32 _srCol = _image->Data[ (_image->Width*_sr.y) + _sr.x];
+
+
+                    const Uint_32 _maskA = 0xff000000;
+                    const Uint_32 _maskR = 0x00ff0000;
+                    const Uint_32 _maskG = 0x0000ff00;
+                    const Uint_32 _maskB = 0x000000ff;
+                    Uint_32 _intA = ((_suCol & _maskA) + (_sdCol & _maskA) + (_slCol & _maskA) + (_srCol  & _maskA))/4;
+                    Uint_32 _intR = ((_suCol & _maskR) + (_sdCol & _maskR) + (_slCol & _maskR) + (_srCol & _maskR))/4;
+                    Uint_32 _intG = ((_suCol & _maskG) + (_sdCol & _maskG) + (_slCol & _maskG) + (_srCol & _maskG))/4;
+                    Uint_32 _intB = ((_suCol & _maskB) + (_sdCol & _maskB) + (_slCol & _maskB) + (_srCol & _maskB))/4;
+                    Uint_32 _avgCol = (_intA & _maskA) | (_intR & _maskR) | (_intG & _maskG) | (_intB & _maskB);
+
+                    _pixelCol = Color(_avgCol);
+                }
+                else // NEAREST
+                {
+                    Int_32 _x = _sourcePix.x;
+                    Int_32 _y = _sourcePix.y;
+                    Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
+                    _pixelCol = Color(_pixelVal);
+                }
+                DrawPixel(_i+_trans.x, _j+_trans.y, _pixelCol);
+
+            }
+
+        }
+        
+    }
+}
+
+void Canvas::BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
     Int_32 diagonal =  (Vec2f(_image->Width * _scale.x, _image->Height * _scale.y) - Vec2f(0,0)).GetMagnitude()+1;
     Int_32 halfDiag = diagonal/2;
@@ -344,24 +402,58 @@ void Canvas::BlitImage(const Image* const _image, Mat3x3& _rotScl, Vec2f& _trans
         for (Int_32 _j = -halfDiag; _j < halfDiag; _j++)
         {
             Vec2f _targetPix{ (Float_32)_i, (Float_32)_j};
-            Vec2f _sourcePix = (_rotScl.GetInverse() * _targetPix);
-            _sourcePix.x = (_sourcePix.x/_scale.x) + _image->Width/2;
-            _sourcePix.y = (_sourcePix.y/_scale.y) + _image->Height/2;
+            Vec2f _invRotatedPoint = (_rot.GetTranspose() * _targetPix);
+            Vec2i _sourcePix{(Int_32)_invRotatedPoint.x, (Int_32)_invRotatedPoint.y};
+            _sourcePix.x = (_sourcePix.x/_scale.x) + _origin.x;
+            _sourcePix.y = (_sourcePix.y/_scale.y) + _origin.y;
 
             if(_sourcePix.x >=0 && _sourcePix.x<_image->Width 
                 && _sourcePix.y >=0 && _sourcePix.y < _image->Height)
             {
-                Int_32 _x = _sourcePix.x;
-                Int_32 _y = _sourcePix.y;
-                Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
-                Color _pixelCol(_pixelVal);
+                Color _pixelCol(0);
+                if(_interpolationMode == LINEAR)
+                {
+                    Vec2i _su{_sourcePix.x, _sourcePix.y+1>=_image->Height?_image->Height-1:_sourcePix.y+1};
+                    Uint_32 _suCol = _image->Data[ (_image->Width*_su.y) + _su.x];
+
+                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1<0?0:_sourcePix.y-1};
+                    Uint_32 _sdCol = _image->Data[ (_image->Width*_sd.y) + _sd.x];
+
+                    Vec2i _sl{_sourcePix.x-1<0?0:_sourcePix.x-1, _sourcePix.y};
+                    Uint_32 _slCol = _image->Data[ (_image->Width*_sl.y) + _sl.x];
+
+                    Vec2i _sr{_sourcePix.x+1>=_image->Width?_image->Width-1:_sourcePix.x+1, _sourcePix.y};
+                    Uint_32 _srCol = _image->Data[ (_image->Width*_sr.y) + _sr.x];
+
+
+                    const Uint_32 _maskA = 0xff000000;
+                    const Uint_32 _maskR = 0x00ff0000;
+                    const Uint_32 _maskG = 0x0000ff00;
+                    const Uint_32 _maskB = 0x000000ff;
+                    Uint_32 _intA = ((_suCol & _maskA) + (_sdCol & _maskA) + (_slCol & _maskA) + (_srCol  & _maskA))/4;
+                    Uint_32 _intR = ((_suCol & _maskR) + (_sdCol & _maskR) + (_slCol & _maskR) + (_srCol & _maskR))/4;
+                    Uint_32 _intG = ((_suCol & _maskG) + (_sdCol & _maskG) + (_slCol & _maskG) + (_srCol & _maskG))/4;
+                    Uint_32 _intB = ((_suCol & _maskB) + (_sdCol & _maskB) + (_slCol & _maskB) + (_srCol & _maskB))/4;
+                    Uint_32 _avgCol = (_intA & _maskA) | (_intR & _maskR) | (_intG & _maskG) | (_intB & _maskB);
+
+                    _pixelCol = Color(_avgCol);
+                }
+                else // NEAREST
+                {
+                    Int_32 _x = _sourcePix.x;
+                    Int_32 _y = _sourcePix.y;
+                    Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
+                    _pixelCol = Color(_pixelVal);
+                }
                 DrawPixel(_i+_trans.x, _j+_trans.y, _pixelCol);
+
             }
 
         }
         
     }
 }
+
 
 Int_32 Canvas::Start()
 {
@@ -382,7 +474,7 @@ Int_32 Canvas::Start()
             is_game_running = false;
 
         // clear canvasBuffer
-        memset(canvasBuffer, 0x00, canvasBufferSizeInBytes);
+        memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
 
         update();
         DrawScreen();

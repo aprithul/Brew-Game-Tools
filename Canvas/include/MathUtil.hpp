@@ -21,6 +21,10 @@ struct Vec2f;
 struct Vec3f;
 struct Mat3x3;
 
+struct Vec2i
+{
+	Int_32 x,y;
+};
 
 struct Vec2f
 {
@@ -106,6 +110,7 @@ struct Mat3x3
 	Mat3x3 operator/(Float_32 v) const;
 	Mat3x3 operator*(Float_32 v) const;
 	Mat3x3 GetInverse() const;
+	Mat3x3 GetTranspose() const;
 	const Vec3f& operator[](Uint_32 col) const;
 	Float_32 operator()(Uint_32 row, Uint_32 col) const;
 	Float_32& operator()(Uint_32 row, Uint_32 col);
@@ -534,6 +539,30 @@ Mat3x3 Mat3x3::GetInverse() const
 		r1.x * inv_det, r1.y * inv_det, r1.z * inv_det,
 		r2.x * inv_det, r2.y * inv_det, r2.z * inv_det
 		});
+}
+
+// inline void swap_f(Float_32& _a, Float_32& _b)
+// {
+// 	Float_32 _temp = _a;
+// 	_a = _b;
+// 	_b = _temp;
+// }
+
+// 036
+// 147
+// 258
+
+Mat3x3 Mat3x3::GetTranspose() const
+{
+	// layout in memory
+	// 036
+	// 147
+	// 258
+
+	auto _md = this->data;
+	return Mat3x3(_md[0], _md[1], _md[2],
+					_md[3], _md[4], _md[5],
+						_md[6], _md[7], _md[8]);
 }
 
 

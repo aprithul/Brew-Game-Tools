@@ -10,6 +10,12 @@ enum ColorFormat
     ARGB
 };
 
+enum Interpolation
+{
+    NEAREST,
+    LINEAR
+};
+
 struct Color
 {
     Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory);

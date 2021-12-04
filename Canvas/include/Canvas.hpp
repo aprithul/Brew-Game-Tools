@@ -23,8 +23,9 @@ struct Canvas
 
     // image blitting function
 
-    void BlitImage(const Image* const _image, Int_32 _x, Int_32 _y);
-    void BlitImage(const Image* const _image, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale);
+    void BlitImage(const Image* const _image, Vec2i& _pos, Vec2i& _origin);
+    void BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
 
     
     // drawing funcitons

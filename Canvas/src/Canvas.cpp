@@ -352,18 +352,17 @@ void Canvas::BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans,
                 Color _pixelCol(0);
                 if(_interpolationMode == LINEAR)
                 {
-                    Vec2i _su{_sourcePix.x, _sourcePix.y+1};
+                    Vec2i _su{_sourcePix.x, _sourcePix.y+1>=_image->Height?_image->Height-1:_sourcePix.y+1};
                     Uint_32 _suCol = _image->Data[ (_image->Width*_su.y) + _su.x];
 
-                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1};
+                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1<0?0:_sourcePix.y-1};
                     Uint_32 _sdCol = _image->Data[ (_image->Width*_sd.y) + _sd.x];
 
-                    Vec2i _sl{_sourcePix.x-1, _sourcePix.y};
+                    Vec2i _sl{_sourcePix.x-1<0?0:_sourcePix.x-1, _sourcePix.y};
                     Uint_32 _slCol = _image->Data[ (_image->Width*_sl.y) + _sl.x];
 
-                    Vec2i _sr{_sourcePix.x+1, _sourcePix.y};
+                    Vec2i _sr{_sourcePix.x+1>=_image->Width?_image->Width-1:_sourcePix.x+1, _sourcePix.y};
                     Uint_32 _srCol = _image->Data[ (_image->Width*_sr.y) + _sr.x];
-
 
                     const Uint_32 _maskA = 0xff000000;
                     const Uint_32 _maskR = 0x00ff0000;

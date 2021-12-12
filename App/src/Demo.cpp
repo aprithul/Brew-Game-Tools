@@ -3,10 +3,87 @@
 #include "stdio.h"
 #include "MathUtil.hpp"
 #include <random>
-void init()
+#include <vector>
+
+struct Particle
 {
-    printf("Initialized\n");
-}
+    int x,y;
+    int rad;
+};
+
+struct Node
+{
+    int x,y;
+    int w,h;
+    Node(int _x, int _y, int _w, int _h) : x(_x), y(_y), w(_w), h(_h)
+    {
+        
+    }
+
+    std::vector<Node*> children;
+    std::vector<Particle> particles;
+
+
+    void Add(Particle _particle)
+    {
+
+        if(particles.size() < 4)
+        {
+            particles.push_back(_particle);
+        }
+        else
+        {
+            if(children.size() == 0)
+            {
+                children.push_back( new Node(x,y, w/2, h/2));
+                children.push_back( new Node(x+w/2,y, w/2, h/2));
+                children.push_back( new Node(x,y+h/2, w/2, h/2));
+                children.push_back( new Node(x+w/2,y+h/2, w/2, h/2));
+            }
+
+
+           for(auto _node : children)
+           {
+                if(_node->Inside(_particle))
+                {
+                    _node->Add(_particle);
+                    break;
+                }
+           }
+        }
+        
+    }
+
+
+    int Inside(Particle& _particle)
+    {
+        if(_particle.x >= x && _particle.x <= x+w && _particle.y >= y && _particle.y <= y+h)
+            return 1;
+        else
+            return 0;
+    }
+
+    void Print()
+    {
+        if(children.size() == 0)
+        {
+            for(auto& p : particles)
+            {
+                printf("[%d, %d, %d, %d] -> [%d, %d]\n", x,y,w,h, p.x, p.y);
+            }
+        }
+        else
+        {
+            for(auto n : children)
+                n->Print();
+        }
+        
+    }
+
+};
+
+
+
 
 Int_32 h = 512;
 Int_32 w = 512;
@@ -18,6 +95,25 @@ Float_32 rot = 0;
 Mat3x3 rotMat;
 Mat3x3 sclMat;
 Mat3x3 transMat;
+
+void init()
+{
+
+    Node* root = new Node(0,0,w,h);
+
+    for(int i=0; i<5; i++)
+    {
+        root->Add(Particle{1,1,2});
+    }
+
+    // print tree
+    root->Print();
+
+    printf("Initialized\n");
+    
+
+}
+
 
 int load = 0;
 
@@ -78,13 +174,13 @@ void update()
     //canvas.BlitImage(_img, _x, _y);
 
     //Vec2i trans{w/2, h/2};
-    Vec2f transA{(Float_32) w/2, (Float_32)h/2};
-    Vec2f transB{(Float_32) w/2-50, (Float_32)h/2-50};
-    Vec2i origin{_img->Width/2, _img->Height/2};
+    // Vec2f transA{(Float_32) w/2, (Float_32)h/2};
+    // Vec2f transB{(Float_32) w/2-50, (Float_32)h/2-50};
+    // Vec2i origin{_img->Width/2, _img->Height/2};
 
-    Float_32 osc = abs(sinf(rot))+0.5f;
-    Vec2f scale(2*osc,2*osc);
-    canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
+    // Float_32 osc = abs(sinf(rot))+0.5f;
+    // Vec2f scale(2*osc,2*osc);
+    // canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
     //canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
     //canvas.BlitImage(_img, origin, transA, scale, NEAREST);
    //canvas.BlitImage(_img, origin, transB, scale, LINEAR);

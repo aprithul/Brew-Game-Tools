@@ -76,7 +76,8 @@
 			"xlocnum": "cpp",
 			"xstring": "cpp",
 			"xtr1common": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"version": "cpp"
 		}
 	}
 }

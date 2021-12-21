@@ -7,7 +7,7 @@
 #include <queue>
 
 #define MAX_LVL 5
-#define PART_COUNT 5
+#define PART_COUNT 128
 struct Particle
 {
     float x,y;
@@ -72,7 +72,7 @@ struct Node
                         if(_node->Inside(_p))
                         {
                             _node->Add(_p);
-                            break;
+                            //break;
                         }
                     }
                 }
@@ -83,7 +83,7 @@ struct Node
                 if(_node->Inside(_particle))
                 {
                     _node->Add(_particle);
-                    break;
+                    //break;
                 }
             }
             
@@ -101,8 +101,8 @@ struct Node
         float _py1 = _particle.y+_particle.rad;
         
         
-        if( (_px0 >= x && _px0 <= (x+w)) || (_px1 >= x && _px1 <= (x+w)) &&
-            (_py0 >= y && _py0 <= (y+h)) || (_py1 >= y && _py1 <= (y+h)) )
+        if( ((_px0 >= x && _px0 <= (x+w)) || (_px1 >= x && _px1 <= (x+w))) &&
+            ((_py0 >= y && _py0 <= (y+h)) || (_py1 >= y && _py1 <= (y+h))) )
         //if(_particle.x >= x && _particle.x <= x+w && _particle.y >= y && _particle.y <= y+h)
             return 1;
         else
@@ -132,7 +132,7 @@ struct Node
         {
             for(auto& p : particles)
             {
-                _canvas.DrawCircle((int)p.x, (int)p.y, p.rad, _colPoint);
+                _canvas.DrawFilledCircle((int)p.x, (int)p.y, p.rad, _colPoint);
                 //_canvas.DrawPixel((int)p.x, (int)p.y, _colPoint);
                 _canvas.DrawRectangle(x,y,w,h, _colGrid);
                 //printf("[%d, %d, %d, %d] -> [%d, %d]\n", x,y,w,h, p.x, p.y);
@@ -163,9 +163,9 @@ struct Node
 std::queue<Node*> Node::NodePool;
 
 
-Int_32 h = 128;
-Int_32 w = 128;
-Canvas canvas("Canvas Demo", w, h, 8, false);
+Int_32 Height = 512;
+Int_32 Width = 512;
+Canvas canvas("Canvas Demo", Width, Height, 2, false);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
@@ -185,7 +185,7 @@ void init()
     
     for(int i=0; i<PART_COUNT; i++)
     {
-        particles.push_back(Particle{ (float)(rand()%w), (float)(rand()%h), 5, (float)(rand()%3)-1, (float)(rand()%3)-1});
+        particles.push_back(Particle{ (float)(rand()%Width), (float)(rand()%Height), 8, (float)(rand()%3)-1, (float)(rand()%3)-1});
     }
    
 
@@ -203,16 +203,16 @@ void ConstructQuadTree(Node* root, float DeltaTime)
 {
     //particles.clear();
     srand(20);
-    root->Set(0,0,w,h,0);
+    root->Set(0,0,Width,Height,0);
 
     
     for(int i=0; i<PART_COUNT; i++)
     {
-        //particles[i].x += particles[i].velX*DeltaTime;
-        //particles[i].y += particles[i].velY*DeltaTime;
-        if(particles[i].x + particles[i].velX <= 0 || particles[i].x + particles[i].velX >w)
+        particles[i].x += particles[i].velX*DeltaTime;
+        particles[i].y += particles[i].velY*DeltaTime;
+        if(particles[i].x + particles[i].velX <= 0 || particles[i].x + particles[i].velX >Width)
             particles[i].velX = -particles[i].velX;
-        if(particles[i].y + particles[i].velY <= 0 || particles[i].y + particles[i].velY >h)
+        if(particles[i].y + particles[i].velY <= 0 || particles[i].y + particles[i].velY >Height)
             particles[i].velY = -particles[i].velY;
 
         //particles.push_back(Particle{rand()%w, rand()%h, 1,});
@@ -278,26 +278,26 @@ void update()
 
     static Node* root = new Node(0,0,0,0,0);
 
-    ConstructQuadTree(root, canvas.DeltaTime*0.0075f);
-    //root->Draw(canvas, red, blue);
+    ConstructQuadTree(root, canvas.DeltaTime*0.025f);
+    root->Draw(canvas, red, blue);
 
-    Node _node1(0,0,w/2, h/2, 0);
-    Node _node2(0,h/2,w/2, h/2, 0);
-    Particle p{20,(float)20,5,0,0};
+    // Node _node1(0,0,Width/2, Height/2, 0);
+    // Node _node2(0,Height/2,Width/2, Height/2, 0);
+    // Particle p{69,64,5,0,0};
 
-    canvas.DrawRectangle(0, 0, w/2,h/2,blue);
-    canvas.DrawRectangle(0, h/2, w/2,h/2,blue);
+    // canvas.DrawRectangle(_node1.x, _node1.y, _node1.w, _node1.h, blue);
+    // canvas.DrawRectangle(_node2.x, _node2.y, _node2.w, _node2.h, blue);
     
-    if(_node1.Inside(p))
-    {
-        canvas.DrawRectangle(0, 0, w/2,h/2,green);
-    }
-    if(_node2.Inside(p))
-    {
-        canvas.DrawRectangle(0, h/2, w/2,h/2,green);
-    }
+    // if(_node1.Inside(p))
+    // {
+    //     canvas.DrawRectangle(_node1.x, _node1.y, _node1.w, _node1.h, green);
+    // }
+    // if(_node2.Inside(p))
+    // {
+    //     canvas.DrawRectangle(_node2.x, _node2.y, _node2.w, _node2.h, green);
+    // }
     
-    canvas.DrawCircle(p.x,p.y, p.rad, blue);
+    // canvas.DrawCircle(p.x,p.y, p.rad, blue);
 
 
     // for(auto p : particles)

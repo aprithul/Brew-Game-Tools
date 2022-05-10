@@ -21,7 +21,7 @@ There is only one pre-requisite before you start, install clang++. <br>
   
 <p> Setting up Clang++ is a one time process. And this really is the hardest part of the whole setup. Once you have clang++ in your path,<br> 
   # Clone the repo whereever you want to.<br>
-  # If you are windows, run the 'setup_windows.bat' file.<br>
+  # If you are windows, run the 'setup_windows.ps1' file.<br>
   # If you are on MacOS. Open a terminal and navigate to the cloned repo. Now run 'bash setup_macos.bat'.<br>
  
 

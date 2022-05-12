@@ -76,7 +76,12 @@
 			"xlocnum": "cpp",
 			"xstring": "cpp",
 			"xtr1common": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"compare": "cpp",
+			"concepts": "cpp",
+			"xfacet": "cpp",
+			"xlocinfo": "cpp",
+			"xstddef": "cpp"
 		}
 	}
 }

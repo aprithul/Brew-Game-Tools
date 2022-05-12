@@ -24,12 +24,14 @@ struct Canvas
     // image blitting function
 
     void BlitImage(const Image* const _image, Vec2i& _pos, Vec2i& _origin);
-    void BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-
+    //void BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    //void BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
     
+
     // drawing funcitons
-    void DrawPixel(Int_32 _x, Int_32 _y, Color color);
+    void DrawPixel(Float_32 _x, Float_32 _y, Color color);
+    void DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color);
     void DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color);
     void DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor);
     void DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color);

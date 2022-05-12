@@ -3,6 +3,14 @@
 #include "stdio.h"
 #include "MathUtil.hpp"
 #include <random>
+
+#ifdef DEBUG
+     //#define respath 
+     #define GetResourcePath(x) ("App/res/" x)
+#else
+    #define GetResourcePath(x) ("../../res/" x)
+#endif
+
 void init()
 {
     printf("Initialized\n");
@@ -16,10 +24,12 @@ Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
 Float_32 rot = 0;
 Mat3x3 rotMat;
+Mat3x3 rotMat_t;
 Mat3x3 sclMat;
 Mat3x3 transMat;
 
 int load = 0;
+
 
 void update()
 {
@@ -45,13 +55,20 @@ void update()
     Vec2f p0(canvas.Width/2,canvas.Height/2);
     Vec2f p1(canvas.Width/1.3,canvas.Height/2);
     
-    rot -= canvas.DeltaTime * 0.001f;
+    //rot = DEG_TO_RAD*45;
+    rot -= canvas.DeltaTime * 0.0005f;
     rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(rot);
     rotMat(0,1) = -sinf(rot);
     rotMat(1,0) = sinf(rot);
     rotMat(1,1) = cosf(rot);
     
+    rotMat_t = Mat3x3::Identity();
+    rotMat_t(0,0) = cosf(rot*0.5f);
+    rotMat_t(0,1) = -sinf(rot*0.5f);
+    rotMat_t(1,0) = sinf(rot*0.5f);
+    rotMat_t(1,1) = cosf(rot*0.5f);
+
     sclMat = Mat3x3::Identity();
     sclMat(0,0) = 2;
     sclMat(1,1) = 2;
@@ -65,26 +82,36 @@ void update()
     // canvas.DrawCircle(p0.x, p0.y, canvas.Width/4, blue);
 
     static Uint_32 _id1  = 0;
+    static Uint_32 _id2  = 0;
     if(!load)
     {
         load = 1;
-        _id1 = canvas.LoadImage("App/light.jpg");
+        //_id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
+        _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
+        _id2 = canvas.LoadImage(GetResourcePath("light.jpg"));
     }
 
     Image* _img = canvas.GetImageById(_id1);
+    Image* _img_t = canvas.GetImageById(_id2);
 
     static Float_32 _x = 0,_y=0;
+    _x += (canvas.DeltaTime * 0.01f);
 
     //canvas.BlitImage(_img, _x, _y);
 
     //Vec2i trans{w/2, h/2};
-    Vec2f transA{(Float_32) w/2, (Float_32)h/2};
-    Vec2f transB{(Float_32) w/2-50, (Float_32)h/2-50};
-    Vec2i origin{_img->Width/2, _img->Height/2};
+    Vec2f transA{(Float_32) w*3/4 , (Float_32)h/2};
+    Vec2f transB{(Float_32) w/4, (Float_32)h/2};
+    //Vec2i origin{_img->Width/2, _img->Height/2};
 
     Float_32 osc = abs(sinf(rot))+0.5f;
-    Vec2f scale(2*osc,2*osc);
-    canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
+    Vec2f scaleA{1,1};// (2*osc,2*osc);
+    Vec2f scaleB{2,2};// (2*osc,2*osc);
+    //Vec2f scale{0.5f,0.5f};// (2*osc,2*osc);
+    
+    Vec2f origin{_img->Width/2.f, _img->Height/2.f};
+    canvas.BlitImage(_img, origin, rotMat, transA, scaleA, INTERPOLATION_NEAREST);
+    canvas.BlitImage(_img_t, origin, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
     //canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
     //canvas.BlitImage(_img, origin, transA, scale, NEAREST);
    //canvas.BlitImage(_img, origin, transB, scale, LINEAR);

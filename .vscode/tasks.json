@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "Build Canvas library",
-            "command": "make",
+            "command": "mingw32-make",
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}/Canvas/"
@@ -17,7 +17,7 @@
         {
             "type": "cppbuild",
             "label": "Build Demo",
-            "command": "make",
+            "command": "mingw32-make",
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}/App/"

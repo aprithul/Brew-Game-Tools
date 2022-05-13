@@ -23,7 +23,8 @@ There is only one pre-requisite before you start, install clang++. In addition t
   You can get it with llvm-mingw for your platform ( likely going to be x86_64): https://github.com/mstorsjo/llvm-mingw/releases <br>
   Once downloaded, extract the zip file. Now add a PATH variable to '<folder with extracted files>/bin'. This folder will contain the clang++ executable, so make sure you have the right folder by checking for it. <br><br>
   
-<p> Setting up Clang++ is a one time process. And this really is the hardest part of the whole setup. Once you have clang++ in your path,<br> 
+### Setting up a new project
+<p> Once you have clang++ in your path,<br> 
   # Clone this repo whereever you want to.<br>
   # If you are on windows, run the 'setup_windows.ps1' file by double clicking.<br>
   # If you are on MacOS. Open a terminal,navigate to the cloned repo, and run:<br>

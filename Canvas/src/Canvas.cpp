@@ -35,46 +35,21 @@ Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixe
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
 
-
 void Canvas::SetInitFunc(void (*_init) ())
 {
     this->init = _init;
 }
-
 
 void Canvas::SetUpdateFunc(void (*_update) ())
 {
     this->update = _update;
 }
 
-
 void Canvas::SetCloseFunc(void (*_close) ())
 {
     this->close = _close;
 }
-/*
-void Canvas::DrawPixel(Float_32 _x, Float_32 _y, Color color)
-{
-    
-    Float_32 _rx = _x * PixelSize;
-    Float_32 _ry = _y * PixelSize;
-    Float_32 _rWidth = Width * PixelSize;
-    Float_32 _rHeight = Height * PixelSize;
 
-    if(_rx < 0 || _ry < 0 || _rx >= _rWidth || _ry >= _rHeight)
-        return;
-
-    canvasBuffer[ (Width* (Int_32)_y) + (Int_32)_x ] = color.Value;
-    return;
-    for(Float_32 _xOffset = 0; _xOffset < PixelSize; _xOffset++)
-    {
-        for(Float_32 _yOffset = 0; _yOffset < PixelSize; _yOffset++)
-        {
-            canvasBuffer[ ((Uint_32)(_rWidth *(_ry+_yOffset)) + (Uint_32)(_rx + _xOffset)) ] = color.Value;
-        }   
-    }
-}
-*/
 void Canvas::DrawPixel(Float_32 _x, Float_32 _y, Color color)
 {
     
@@ -95,24 +70,22 @@ void Canvas::DrawPixel(Float_32 _x, Float_32 _y, Color color)
     }
 }
 
-
-
 void Canvas::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
 {
-    Float_32 _rx = _x * PixelSize;
-    Float_32 _ry = _y * PixelSize;
-    Float_32 _rWidth = Width * PixelSize;
-    Float_32 _rHeight = Height * PixelSize;
+     Int_32 _rx = _x * PixelSize;
+    Int_32 _ry = _y * PixelSize;
+    Int_32 _rWidth = Width * PixelSize;
+    Int_32 _rHeight = Height * PixelSize;
 
     if(_rx < 0 || _ry < 0 || _rx >= _rWidth || _ry >= _rHeight)
         return;
 
-    for(Float_32 _xOffset = 0; _xOffset < PixelSize; _xOffset++)
+    for(Int_32 _xOffset = 0; _xOffset < PixelSize; _xOffset++)
     {
-        for(Float_32 _yOffset = 0; _yOffset < PixelSize; _yOffset++)
+        for(Int_32 _yOffset = 0; _yOffset < PixelSize; _yOffset++)
         {
-            Color sColor = Color(canvasBuffer[ (Uint_32) ((_rWidth * (_ry+_yOffset)) + (_rx + _xOffset)) ]);
-            canvasBuffer[ (Uint_32) ((_rWidth * (_ry+_yOffset)) + (_rx + _xOffset)) ] = Color::alphaBlend(sColor, color).Value;
+            Color sColor = canvasBuffer[(_rWidth *(_ry+_yOffset)) + (_rx + _xOffset)];
+            canvasBuffer[ (_rWidth *(_ry+_yOffset)) + (_rx + _xOffset) ] = Color::alphaBlend(sColor, color).Value;
         }   
     }
 }
@@ -245,8 +218,6 @@ void Canvas::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
     }
 }
 
-
-
 void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor)
 {
     Float_32 _radius_sq = radius * radius;
@@ -326,7 +297,6 @@ Uint_32 Canvas::LoadImage(const char* _filename)
     return 0;
 }
 
-
 Image* const Canvas::GetImageById(Uint_32 _id)
 {
     if(_id> 0)
@@ -366,140 +336,19 @@ void Canvas::DeleteImageById(Uint_32 _id)
 
 }
 
-
-void Canvas::BlitImage(const Image* const _image, Vec2i& _pos, Vec2i& _origin)
+void Canvas::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
 {
-    for(Uint_32 _i =0; _i< _image->Width; _i++)
+    for(Float_32 _i =0; _i< _image->Width; _i++)
     {
-        for (Uint_32 _j = 0; _j < _image->Height; _j++)
+        for (Float_32 _j = 0; _j < _image->Height; _j++)
         {
-            Uint_32 _pixelVal = _image->Data[ (_image->Width*_j) + _i];
+            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width*_j + _i)];
             Color _pixelCol(_pixelVal);
             DrawPixel(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
         }
         
     }
 }
-
-/*
-void Canvas::BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale,Interpolation _interpolationMode)
-{
-    for(Int_32 _i =-_image->Width/2*_scale.x; _i< _image->Width/2*_scale.x; _i++)
-    {
-        for (Int_32 _j = -_image->Height/2*_scale.y; _j < _image->Height/2*_scale.y; _j++)
-        {
-            Vec2f _targetPix{ (Float_32)_i, (Float_32)_j};
-            Vec2i _sourcePix{ (Int_32)(_targetPix.x/_scale.x) + _origin.x, 
-                                (Int_32)(_targetPix.y/_scale.y) + _origin.y};
-            
-            
-            if(_sourcePix.x >=0 && _sourcePix.x<_image->Width 
-                && _sourcePix.y >=0 && _sourcePix.y < _image->Height)
-            {
-                Color _pixelCol(0);
-                if(_interpolationMode == INTERPOLATION_LINEAR)
-                {
-                    Vec2i _su{_sourcePix.x, _sourcePix.y+1>=_image->Height?_image->Height-1:_sourcePix.y+1};
-                    Uint_32 _suCol = _image->Data[ (_image->Width*_su.y) + _su.x];
-
-                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1<0?0:_sourcePix.y-1};
-                    Uint_32 _sdCol = _image->Data[ (_image->Width*_sd.y) + _sd.x];
-
-                    Vec2i _sl{_sourcePix.x-1<0?0:_sourcePix.x-1, _sourcePix.y};
-                    Uint_32 _slCol = _image->Data[ (_image->Width*_sl.y) + _sl.x];
-
-                    Vec2i _sr{_sourcePix.x+1>=_image->Width?_image->Width-1:_sourcePix.x+1, _sourcePix.y};
-                    Uint_32 _srCol = _image->Data[ (_image->Width*_sr.y) + _sr.x];
-
-                    const Uint_32 _maskA = 0xff000000;
-                    const Uint_32 _maskR = 0x00ff0000;
-                    const Uint_32 _maskG = 0x0000ff00;
-                    const Uint_32 _maskB = 0x000000ff;
-                    Uint_32 _intA = ((_suCol & _maskA) + (_sdCol & _maskA) + (_slCol & _maskA) + (_srCol  & _maskA))/4;
-                    Uint_32 _intR = ((_suCol & _maskR) + (_sdCol & _maskR) + (_slCol & _maskR) + (_srCol & _maskR))/4;
-                    Uint_32 _intG = ((_suCol & _maskG) + (_sdCol & _maskG) + (_slCol & _maskG) + (_srCol & _maskG))/4;
-                    Uint_32 _intB = ((_suCol & _maskB) + (_sdCol & _maskB) + (_slCol & _maskB) + (_srCol & _maskB))/4;
-                    Uint_32 _avgCol = (_intA & _maskA) | (_intR & _maskR) | (_intG & _maskG) | (_intB & _maskB);
-
-                    _pixelCol = Color(_avgCol);
-                }
-                else // NEAREST
-                {
-                    Int_32 _x = _sourcePix.x;
-                    Int_32 _y = _sourcePix.y;
-                    Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
-                    _pixelCol = Color(_pixelVal);
-                }
-                DrawPixel(_i+_trans.x, _j+_trans.y, _pixelCol);
-
-            }
-
-        }
-        
-    }
-}
-
-void Canvas::BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
-{
-    Int_32 diagonal =  (Vec2f(_image->Width * _scale.x, _image->Height * _scale.y) - Vec2f(0,0)).GetMagnitude()+1;
-    Int_32 halfDiag = diagonal/2;
-    for(Int_32 _i =-halfDiag; _i< halfDiag; _i++)
-    {
-        for (Int_32 _j = -halfDiag; _j < halfDiag; _j++)
-        {
-            Vec2f _targetPix{ (Float_32)_i, (Float_32)_j};
-            Vec2f _invRotatedPoint = (_rot.GetTranspose() * _targetPix);
-            Vec2i _sourcePix{(Int_32)_invRotatedPoint.x, (Int_32)_invRotatedPoint.y};
-            _sourcePix.x = (_sourcePix.x/_scale.x) + _origin.x;
-            _sourcePix.y = (_sourcePix.y/_scale.y) + _origin.y;
-
-            if(_sourcePix.x >=0 && _sourcePix.x<_image->Width 
-                && _sourcePix.y >=0 && _sourcePix.y < _image->Height)
-            {
-                Color _pixelCol(0);
-                if(_interpolationMode == INTERPOLATION_LINEAR)
-                {
-                    Vec2i _su{_sourcePix.x, _sourcePix.y+1>=_image->Height?_image->Height-1:_sourcePix.y+1};
-                    Uint_32 _suCol = _image->Data[ (_image->Width*_su.y) + _su.x];
-
-                    Vec2i _sd{_sourcePix.x, _sourcePix.y-1<0?0:_sourcePix.y-1};
-                    Uint_32 _sdCol = _image->Data[ (_image->Width*_sd.y) + _sd.x];
-
-                    Vec2i _sl{_sourcePix.x-1<0?0:_sourcePix.x-1, _sourcePix.y};
-                    Uint_32 _slCol = _image->Data[ (_image->Width*_sl.y) + _sl.x];
-
-                    Vec2i _sr{_sourcePix.x+1>=_image->Width?_image->Width-1:_sourcePix.x+1, _sourcePix.y};
-                    Uint_32 _srCol = _image->Data[ (_image->Width*_sr.y) + _sr.x];
-
-
-                    const Uint_32 _maskA = 0xff000000;
-                    const Uint_32 _maskR = 0x00ff0000;
-                    const Uint_32 _maskG = 0x0000ff00;
-                    const Uint_32 _maskB = 0x000000ff;
-                    Uint_32 _intA = ((_suCol & _maskA) + (_sdCol & _maskA) + (_slCol & _maskA) + (_srCol  & _maskA))/4;
-                    Uint_32 _intR = ((_suCol & _maskR) + (_sdCol & _maskR) + (_slCol & _maskR) + (_srCol & _maskR))/4;
-                    Uint_32 _intG = ((_suCol & _maskG) + (_sdCol & _maskG) + (_slCol & _maskG) + (_srCol & _maskG))/4;
-                    Uint_32 _intB = ((_suCol & _maskB) + (_sdCol & _maskB) + (_slCol & _maskB) + (_srCol & _maskB))/4;
-                    Uint_32 _avgCol = (_intA & _maskA) | (_intR & _maskR) | (_intG & _maskG) | (_intB & _maskB);
-
-                    _pixelCol = Color(_avgCol);
-                }
-                else // NEAREST
-                {
-                    Int_32 _x = _sourcePix.x;
-                    Int_32 _y = _sourcePix.y;
-                    Uint_32 _pixelVal = _image->Data[ (_image->Width*_y) + _x];
-                    _pixelCol = Color(_pixelVal);
-                }
-                DrawPixel(_i+_trans.x, _j+_trans.y, _pixelCol);
-
-            }
-
-        }
-        
-    }
-}
-*/
 
 void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
@@ -513,35 +362,14 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
     Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
     Float_32 org_x = _origin.x * _scale.x;
     Float_32 org_y = _origin.y * _scale.y;
-    /*
-    Vec2f p[4];
-    p[0] = _trans+(vu*(-_origin.x)) + (vv*(-_origin.y));
-    p[1] = p[0] + (vu*(_image->Width));
-    p[2] = p[1] + (vv*(_image->Height));
-    p[3] = p[0] + (vv*(_image->Height));
-
-    Float_32 minx = std::min( std::min(p[0].x, p[1].x), std::min(p[2].x, p[3].x));
-    Float_32 miny = std::min( std::min(p[0].y, p[1].y), std::min(p[2].y, p[3].y));
-
-    Float_32 maxx = std::max( std::max(p[0].x, p[1].x), std::max(p[2].x, p[3].x));
-    Float_32 maxy = std::max( std::max(p[0].y, p[1].y), std::max(p[2].y, p[3].y));
-
-
-    DrawLine(minx, miny, maxx, miny, Color(0xffff0000));
-    DrawLine(minx, miny, minx, maxy, Color(0xff00ff00));
-    //DrawLine(p[0].x, p[0].y, p[0].x+100,p[0].y, Color(0xffff0000));
-    */
-
-
 
     for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
     {
         for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
         {
-            //if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
-            //    continue;
+            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+                continue;
 
-            //DrawPixel(_x, _y, Color(0xffff0000));
 
             Vec2f vp(_x-_trans.x, _y-_trans.y);
             Float_32 _u = Dot(vu, vp);
@@ -555,7 +383,6 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
                     case INTERPOLATION_NEAREST:
                     {
                         
-                        //Int_32 imgDataInd = ((_image->Width* (Int_32)(_v+_origin.y)) + (Int_32)(_u+_origin.x));
                         Int_32 imgDataInd = ((_image->Width* (Int_32)( (_v/_scale.y)  +_origin.y)) + (Int_32)( (_u/_scale.x)+_origin.x));
                         Uint_32 _pixelVal = _image->Data[imgDataInd];
 
@@ -600,6 +427,262 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
     }
 
 
+}
+
+
+
+void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+{
+    Vec2f vu(1,0);
+    vu = (_rot * vu);
+    Vec2f vv(0,1);
+    vv = _rot * vv;
+
+    Float_32 img_w = _image->Width*_scale.x;
+    Float_32 img_h = _image->Height*_scale.y;
+    Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
+    Float_32 org_x = _origin.x * _scale.x;
+    Float_32 org_y = _origin.y * _scale.y;
+
+    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    {
+        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        {
+            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+                continue;
+
+
+            Vec2f vp(_x-_trans.x, _y-_trans.y);
+            Float_32 _u = Dot(vu, vp);
+            Float_32 _v = Dot(vv, vp);
+
+            
+            if(_u > -org_x  && _u < img_w - org_x && _v>-org_y && _v <img_h-org_y)
+            {
+                switch (_interpolationMode)
+                {
+                    case INTERPOLATION_NEAREST:
+                    {
+                        
+                        Int_32 imgDataInd = ((_image->Width* (Int_32)( (_v/_scale.y)  +_origin.y)) + (Int_32)( (_u/_scale.x)+_origin.x));
+                        Uint_32 _pixelVal = _image->Data[imgDataInd];
+
+                        // draw if alpha is greater than 0
+                        if(_pixelVal & 0xff000000)
+                        {
+                            static const Uint_32 _maskR = 0x00ff0000;
+                            static const Uint_32 _maskG = 0x0000ff00;
+                            static const Uint_32 _maskB = 0x000000ff;
+                            
+                            Uint_32 _r = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+
+                            _pixelVal = 0xff000000 | _r | _g | _b;
+
+                            Color _pixelCol(_pixelVal);
+                            DrawPixel(_x, _y, _pixelCol);
+                        }
+                    }
+                    break;
+                    case INTERPOLATION_LINEAR:
+                    {
+                        
+                        // Vec2f px(_u+_origin.x, _v+_origin.y); 
+                        
+                        // Color  colUL = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colUR = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::ceil(px.x))]);
+                        // Color  colDL = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colDR = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::ceil(px.x))]);
+
+                        // Float_32 tx = 0;
+                        // Float_32 ty = 0;
+                        // if(std::ceil(px.x) != std::floor(px.x))
+                        //     tx = (std::ceil(px.x) - px.x) / (std::ceil(px.x) - std::floor(px.x));
+
+                        // if(std::ceil(px.y) != std::floor(px.y))
+                        //     ty = (std::ceil(px.y) - px.y) / (std::ceil(px.y) - std::floor(px.y));
+                            
+                        // Color colU = Color::interpolate(colUL, colUR, tx);
+                        // Color colD = Color::interpolate(colDL, colDR, tx);
+                        // Color col = Color::interpolate(colU, colD, ty);
+                        // DrawPixel(_x, _y, col);
+
+                    }
+                    break;
+                        default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+
+void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+{
+    Vec2f vu(1,0);
+    vu = (_rot * vu);
+    Vec2f vv(0,1);
+    vv = _rot * vv;
+
+    Float_32 img_w = _image->Width*_scale.x;
+    Float_32 img_h = _image->Height*_scale.y;
+    Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
+    Float_32 org_x = _origin.x * _scale.x;
+    Float_32 org_y = _origin.y * _scale.y;
+
+    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    {
+        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        {
+            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+                continue;
+
+
+            Vec2f vp(_x-_trans.x, _y-_trans.y);
+            Float_32 _u = Dot(vu, vp);
+            Float_32 _v = Dot(vv, vp);
+
+            
+            if(_u > -org_x  && _u < img_w - org_x && _v>-org_y && _v <img_h-org_y)
+            {
+                switch (_interpolationMode)
+                {
+                    case INTERPOLATION_NEAREST:
+                    {
+                        
+                        Int_32 imgDataInd = ((_image->Width* (Int_32)( (_v/_scale.y)  +_origin.y)) + (Int_32)( (_u/_scale.x)+_origin.x));
+                        Uint_32 _pixelVal = _image->Data[imgDataInd];
+
+                        // draw if alpha is greater than 0
+                        if(_pixelVal & 0xff000000)
+                        {
+                            Color _pixelCol(_pixelVal);
+                            DrawPixelAlphaBlended(_x, _y, _pixelCol);
+                        }
+                    }
+                    break;
+                    case INTERPOLATION_LINEAR:
+                    {
+                        
+                        // Vec2f px(_u+_origin.x, _v+_origin.y); 
+                        
+                        // Color  colUL = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colUR = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::ceil(px.x))]);
+                        // Color  colDL = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colDR = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::ceil(px.x))]);
+
+                        // Float_32 tx = 0;
+                        // Float_32 ty = 0;
+                        // if(std::ceil(px.x) != std::floor(px.x))
+                        //     tx = (std::ceil(px.x) - px.x) / (std::ceil(px.x) - std::floor(px.x));
+
+                        // if(std::ceil(px.y) != std::floor(px.y))
+                        //     ty = (std::ceil(px.y) - px.y) / (std::ceil(px.y) - std::floor(px.y));
+                            
+                        // Color colU = Color::interpolate(colUL, colUR, tx);
+                        // Color colD = Color::interpolate(colDL, colDR, tx);
+                        // Color col = Color::interpolate(colU, colD, ty);
+                        // DrawPixel(_x, _y, col);
+
+                    }
+                    break;
+                        default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+{
+    Vec2f vu(1,0);
+    vu = (_rot * vu);
+    Vec2f vv(0,1);
+    vv = _rot * vv;
+
+    Float_32 img_w = _image->Width*_scale.x;
+    Float_32 img_h = _image->Height*_scale.y;
+    Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
+    Float_32 org_x = _origin.x * _scale.x;
+    Float_32 org_y = _origin.y * _scale.y;
+
+    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    {
+        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        {
+            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+                continue;
+
+
+            Vec2f vp(_x-_trans.x, _y-_trans.y);
+            Float_32 _u = Dot(vu, vp);
+            Float_32 _v = Dot(vv, vp);
+
+            
+            if(_u > -org_x  && _u < img_w - org_x && _v>-org_y && _v <img_h-org_y)
+            {
+                switch (_interpolationMode)
+                {
+                    case INTERPOLATION_NEAREST:
+                    {
+                        
+                        Int_32 imgDataInd = ((_image->Width* (Int_32)( (_v/_scale.y)  +_origin.y)) + (Int_32)( (_u/_scale.x)+_origin.x));
+                        Uint_32 _pixelVal = _image->Data[imgDataInd];
+
+                        // draw if alpha is greater than 0
+                        if(_pixelVal & 0xff000000)
+                        {
+                            static const Uint_32 _maskA = 0xff000000;
+                            static const Uint_32 _maskR = 0x00ff0000;
+                            static const Uint_32 _maskG = 0x0000ff00;
+                            static const Uint_32 _maskB = 0x000000ff;
+                            
+                            Uint_32 _r = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+
+                            _pixelVal = (_pixelVal & _maskA) | _r | _g | _b;
+
+                            Color _pixelCol(_pixelVal);
+                            DrawPixelAlphaBlended(_x, _y, _pixelCol);
+                        }
+                    }
+                    break;
+                    case INTERPOLATION_LINEAR:
+                    {
+                        
+                        // Vec2f px(_u+_origin.x, _v+_origin.y); 
+                        
+                        // Color  colUL = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colUR = Color(_image->Data[ ((_image->Width * (Int_32)std::floor(px.y)) + (Int_32)std::ceil(px.x))]);
+                        // Color  colDL = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::floor(px.x))]);
+                        // Color  colDR = Color(_image->Data[ ((_image->Width * (Int_32)std::ceil(px.y)) + (Int_32)std::ceil(px.x))]);
+
+                        // Float_32 tx = 0;
+                        // Float_32 ty = 0;
+                        // if(std::ceil(px.x) != std::floor(px.x))
+                        //     tx = (std::ceil(px.x) - px.x) / (std::ceil(px.x) - std::floor(px.x));
+
+                        // if(std::ceil(px.y) != std::floor(px.y))
+                        //     ty = (std::ceil(px.y) - px.y) / (std::ceil(px.y) - std::floor(px.y));
+                            
+                        // Color colU = Color::interpolate(colUL, colUR, tx);
+                        // Color colD = Color::interpolate(colDL, colDR, tx);
+                        // Color col = Color::interpolate(colU, colD, ty);
+                        // DrawPixel(_x, _y, col);
+
+                    }
+                    break;
+                        default:
+                    break;
+                }
+            }
+        }
+    }
 }
 
 Int_32 Canvas::Start()

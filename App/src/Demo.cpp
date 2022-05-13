@@ -88,7 +88,7 @@ void update()
         load = 1;
         //_id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
         _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
-        _id2 = canvas.LoadImage(GetResourcePath("light.jpg"));
+        _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
     }
 
     Image* _img = canvas.GetImageById(_id1);
@@ -105,25 +105,16 @@ void update()
     //Vec2i origin{_img->Width/2, _img->Height/2};
 
     Float_32 osc = abs(sinf(rot))+0.5f;
-    Vec2f scaleA{1,1};// (2*osc,2*osc);
-    Vec2f scaleB{2,2};// (2*osc,2*osc);
+    Vec2f scaleA{2.f, 2.f};// (2*osc,2*osc);
+    Vec2f scaleB{0.2f, 0.2f};// (2*osc,2*osc);
     //Vec2f scale{0.5f,0.5f};// (2*osc,2*osc);
     
-    Vec2f origin{_img->Width/2.f, _img->Height/2.f};
-    canvas.BlitImage(_img, origin, rotMat, transA, scaleA, INTERPOLATION_NEAREST);
-    canvas.BlitImage(_img_t, origin, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
-    //canvas.BlitImage(_img, origin, rotMat, transA, scale, LINEAR);
-    //canvas.BlitImage(_img, origin, transA, scale, NEAREST);
-   //canvas.BlitImage(_img, origin, transB, scale, LINEAR);
-    //canvas.BlitImage(_img, trans, origin);
-    //canvas.DrawLine(p0.x, p0.y, p1.x, p1.y, r);
-
-    //canvas.DrawRectangle(p0.x - canvas.Width/4, p0.y - canvas.Height/4, canvas.Width/2, canvas.Height/2, r);
-
-    //canvas.DrawLine(p0.x, p0.y, p3.x, p3.y, c);
-    //printf("Frame time: %f ms\n", canvas.DeltaTime);
-
-
+    Vec2f originA{_img->Width/2.f, _img->Height/2.f};
+    Vec2f originB{_img_t->Width/2.f, _img_t->Height/2.f};
+    //canvas.BlitImage(_img, origin, rotMat, transA, scaleA, INTERPOLATION_NEAREST, false);
+    canvas.BlitImage(_img, originA, rotMat, transA, scaleA, 1.3f, INTERPOLATION_NEAREST);
+    canvas.BlitImage(_img, transB, originA);
+    canvas.BlitImageAlphaBlended(_img_t, originB, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
 }
 
 void close()

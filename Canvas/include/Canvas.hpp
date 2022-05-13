@@ -22,11 +22,11 @@ struct Canvas
     void DeleteImageById(Uint_32 _id);
 
     // image blitting function
-
-    void BlitImage(const Image* const _image, Vec2i& _pos, Vec2i& _origin);
-    //void BlitImage(const Image* const _image, Vec2i& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    //void BlitImage(const Image* const _image, Vec2i& _origin, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin);
     void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
     
 
     // drawing funcitons

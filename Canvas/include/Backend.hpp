@@ -8,7 +8,6 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
 void ProcessInput();
 Bool_8 WasWindowCrossed();
 
-void DrawPixel(int _x, int _y, Color color);
 void DrawScreen();
 void Cleanup();
 void Delay(Uint_32 ms);

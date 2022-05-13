@@ -12,6 +12,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
 
 void SetupInput();
 void ProcessInput();
+void SetVsync(VsyncMode _mode);
 Bool_8 WasWindowCrossed();
 
 

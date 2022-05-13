@@ -6,14 +6,16 @@
 #include "GraphicsUtil.hpp"
 #include "MathUtil.hpp"
 
+
 struct Canvas
 {
 
-    Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen);
+    Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode);
 
     Int_32 Run();
     void Quit();
     void SetFrameRate(Uint_32 fps);
+    void SetVsyncMode(VsyncMode _mode);
     void SetInitFunc(void (*_init) ());
     void SetUpdateFunc(void (*_update) ());
     void SetCloseFunc(void (*_close) ());
@@ -51,6 +53,8 @@ struct Canvas
     Uint_32 Height;
     Uint_32 PixelSize;
     Double_64 DeltaTime;
+    VsyncMode vsyncMode;
+
     private:
         static Image _imageDataStore[MAX_IMAGES_LOADABLE];
         static Uint_32 _nextId;

@@ -3,6 +3,14 @@
 
 #include "Platform.hpp"
 
+enum VsyncMode
+{
+    VSYNC_OFF = 0,
+    VSYNC_ON = 1,
+    VSYNC_ADAPTIVE = -1
+};
+
+
 enum ColorFormat
 {
     RGBA,

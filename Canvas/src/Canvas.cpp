@@ -26,12 +26,15 @@ const char* canvasTitle;
 Uint_32 Canvas::_nextId = 1;
 Image Canvas::_imageDataStore[MAX_IMAGES_LOADABLE];
 
-Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen) : 
+Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
     canvasTitle = _name;
     SetupInput();
     CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
+    
+    vsyncMode = _mode;
+    SetVsync(vsyncMode);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
 
@@ -704,7 +707,6 @@ Int_32 Canvas::Run()
     while(is_game_running)
     {
         ProcessInput();
-
         if(WasWindowCrossed())
             is_game_running = false;
 
@@ -716,16 +718,12 @@ Int_32 Canvas::Run()
         DrawLine(Width/2, Height/2 , Width/2, Height, Color(0xff0000ff));
 
         update();
-
         DrawScreen();
         
-        DeltaTime -= targetFrameTime;
-        while(DeltaTime < targetFrameTime)
-        {
-            duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
-            _lastTime = steady_clock::now();
-            DeltaTime += time_span / std::chrono::milliseconds(1);   // DT in ms
-        }
+           
+        duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
+        _lastTime = steady_clock::now();
+        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
 
         milSecondCounter += DeltaTime;
         frameCount++;
@@ -757,7 +755,6 @@ void Canvas::SetFrameRate(Uint_32 _fps)
 }
 
 
-
 Bool_8 Canvas::OnKeyDown(BGT_Key _key)
 {
     return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
@@ -771,5 +768,11 @@ Bool_8 Canvas::OnKeyUp(BGT_Key _key)
 Float_32 Canvas::GetKey(BGT_Key _key)
 {
     return keyVal[_key];
+}
+
+void Canvas::SetVsyncMode(VsyncMode _mode)
+{
+    vsyncMode = _mode;
+    SetVsync(_mode);
 }
 

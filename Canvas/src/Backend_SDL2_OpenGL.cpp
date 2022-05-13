@@ -260,10 +260,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
         height = _height;
         gl_context = SDL_GL_CreateContext(window);
         
-        if( SDL_GL_SetSwapInterval(0) < 0 )
-        {
-            printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
-        }
+
 
         if(glewInit() == GLEW_OK)
         {
@@ -431,5 +428,14 @@ void SetWindowTitle(const char* _title)
     SDL_SetWindowTitle(window, _title);
 }
 
+void SetVsync(VsyncMode _mode)
+{
+    if( SDL_GL_SetSwapInterval((Int_32)_mode) < 0 )
+    {
+        printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+    }
+    else
+        printf( "Vsync set to : %d\n", (Int_32)_mode);
+}
 
 #endif

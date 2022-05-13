@@ -18,7 +18,7 @@ void init()
 
 Int_32 h = 512;
 Int_32 w = 512;
-Canvas canvas("Canvas Demo", w, h, 1, false);
+Canvas canvas("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
@@ -109,8 +109,8 @@ void update()
     if(canvas.OnKeyDown(BGTK_ESCAPE))
         canvas.Quit();
 
-    
-
+    if(canvas.OnKeyDown(BGTK_V))
+        canvas.SetVsyncMode(canvas.vsyncMode == VSYNC_OFF?VSYNC_ON : VSYNC_OFF);
 }
 
 void close()
@@ -124,7 +124,6 @@ int main()
     canvas.SetUpdateFunc(update);
     canvas.SetCloseFunc(close);
 
-    canvas.SetFrameRate(120);
     canvas.Run();
 
     return 0;

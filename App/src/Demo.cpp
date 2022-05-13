@@ -84,12 +84,13 @@ void update()
     Image* _img_t = canvas.GetImageById(_id2);
 
     static Float_32 _x = 0,_y=0;
-    _x += (canvas.DeltaTime * 0.01f);
+    _x += (Float_32)(canvas.GetKey(BGTK_RIGHT)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_LEFT)*canvas.DeltaTime);
+    _y += (Float_32)(canvas.GetKey(BGTK_UP)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_DOWN)*canvas.DeltaTime);
 
     //canvas.BlitImage(_img, _x, _y);
 
     //Vec2i trans{w/2, h/2};
-    Vec2f transA{(Float_32) w*3/4 , (Float_32)h/2};
+    Vec2f transA{(Float_32) w*3/4  + _x, (Float_32)h/2 + _y};
     Vec2f transB{(Float_32) w/4, (Float_32)h/2};
     //Vec2i origin{_img->Width/2, _img->Height/2};
 
@@ -104,6 +105,12 @@ void update()
     canvas.BlitImage(_img, originA, rotMat, transA, scaleA, 1.3f, INTERPOLATION_NEAREST);
     canvas.BlitImage(_img, transB, originA);
     canvas.BlitImageAlphaBlended(_img_t, originB, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
+
+    if(canvas.OnKeyDown(BGTK_ESCAPE))
+        canvas.Quit();
+
+    
+
 }
 
 void close()
@@ -117,7 +124,7 @@ int main()
     canvas.SetUpdateFunc(update);
     canvas.SetCloseFunc(close);
 
-    canvas.SetFrameRate(60);
+    canvas.SetFrameRate(120);
     canvas.Run();
 
     return 0;

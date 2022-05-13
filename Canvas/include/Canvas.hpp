@@ -12,10 +12,16 @@ struct Canvas
     Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen);
 
     Int_32 Run();
+    void Quit();
     void SetFrameRate(Uint_32 fps);
     void SetInitFunc(void (*_init) ());
     void SetUpdateFunc(void (*_update) ());
     void SetCloseFunc(void (*_close) ());
+    
+    // key input functions
+    Bool_8 OnKeyDown(BGT_Key _key);
+    Bool_8 OnKeyUp(BGT_Key _key);
+    Float_32 GetKey(BGT_Key _key);
     
     // image loading functions
     Uint_32 LoadImage(const char* _filename);
@@ -51,6 +57,7 @@ struct Canvas
         Uint_32 _nextImagePosition = 0;
         Double_64 targetFrameTime = 0;
         Uint_32 targetFrameRate = 60;
+        Bool_8 is_game_running;
         void (*init) ();
         void (*update) ();
         void (*close) ();

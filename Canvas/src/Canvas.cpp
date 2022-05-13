@@ -15,7 +15,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Bool_8 is_game_running;
 
 #ifdef main
 #undef main
@@ -31,6 +30,7 @@ Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixe
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
     canvasTitle = _name;
+    SetupInput();
     CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
@@ -685,6 +685,11 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     }
 }
 
+void Canvas::Quit()
+{
+    is_game_running = false;
+}
+
 Int_32 Canvas::Run()
 {
     using namespace std::chrono;
@@ -750,3 +755,21 @@ void Canvas::SetFrameRate(Uint_32 _fps)
     targetFrameRate = _fps;
     targetFrameTime = (Double_64)(1000.0)/_fps;
 }
+
+
+
+Bool_8 Canvas::OnKeyDown(BGT_Key _key)
+{
+    return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
+}
+
+Bool_8 Canvas::OnKeyUp(BGT_Key _key)
+{
+    return keysReleasedThisFrame.find(_key) != keysReleasedThisFrame.end();
+}
+
+Float_32 Canvas::GetKey(BGT_Key _key)
+{
+    return keyVal[_key];
+}
+

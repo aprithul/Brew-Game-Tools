@@ -8,9 +8,9 @@ LIBRARY_PATHS = -L../Canvas/build/debug/ -L../Vendor/SDL2/lib -L../Vendor/GL/lib
 COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
 
 ifeq ($(OS),Windows_NT)
-	LINKER_FLAGS = -lsdl2 -lopengl32 -lglew32 -lCanvas
+	LINKER_FLAGS = -lsdl2 -lopengl32 -lsdl2_mixer -lglew32 -lCanvas
 else
-	LINKER_FLAGS = -framework OpenGL -lsdl2 -lglew -lCanvas
+	LINKER_FLAGS = -framework OpenGL -lsdl2 -lsdl2_mixer -lglew -lCanvas
 endif
 
 all:

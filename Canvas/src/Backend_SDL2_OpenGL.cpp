@@ -3,6 +3,7 @@
 #ifdef ENABLE_BACKEND_SDL2_OPENGL
 #include "Backend.hpp"
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_mixer.h"
 #include "glew.h"
 #include <stdio.h>
 
@@ -237,9 +238,34 @@ void SetupInput()
 // int _texWidth = 0;
 // int _texHeight = 0;
 // stbi_uc* pixelData = 0;
+
+Mix_Music *gMusic = NULL;
+void playMusic()
+{
+    //Initialize SDL_mixer
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+    {
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );    
+    }
+    else
+        printf("SDL_mixer initialized\n");
+
+    //Load music
+    gMusic = Mix_LoadMUS( "App/res/battle.ogg");
+    if( gMusic == NULL )
+    {
+        printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
+    }
+    else
+        printf("Music loaded\n");
+
+    Mix_PlayMusic(gMusic, -1);
+
+}
+
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setFullscreen)
 {
-    if(SDL_Init(SDL_INIT_EVERYTHING)==0)
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS)==0)
     {
         set_sdl_gl_attributes();
 
@@ -338,6 +364,11 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
 
         makeShaderForQuad();
         canvasBuffer = new GLuint[width * height];
+
+
+        playMusic();
+
+
     }
     else
     {
@@ -413,6 +444,11 @@ void DrawScreen()
 
 void Cleanup()
 {
+    //Free the music
+    Mix_FreeMusic( gMusic );
+    gMusic = NULL;
+    Mix_Quit();
+
     delete[] canvasBuffer;
     SDL_Quit();
     printf("SDL2_OpenGL backend cleaned up\n");

@@ -12,7 +12,8 @@ curl.exe -L https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0-wi
 powershell Expand-Archive 'glew.zip' -DestinationPath 'GLEW'
 curl.exe -L https://www.libsdl.org/release/SDL2-devel-2.0.18-mingw.tar.gz --output SDL2.tar.gz
 tar -xf SDL2.tar.gz
-
+curl.exe -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.4-mingw.tar.gz --output SDL2_Mixer.tar.gz
+tar -xf SDL2_Mixer.tar.gz
 
 cd ..
 mkdir GL
@@ -31,5 +32,10 @@ move temp\SDL2-*\x86_64-w64-mingw32\lib\* SDL2\lib
 move temp\SDL2-*\x86_64-w64-mingw32\include\SDL2 SDL2\include
 move temp\SDL2-*\x86_64-w64-mingw32\bin\* SDL2\bin
 copy SDL2\bin\SDL2.dll ..\App\build\debug\
+
+move temp\SDL2_mixer-*\x86_64-w64-mingw32\lib\* SDL2\lib
+move temp\SDL2_mixer-*\x86_64-w64-mingw32\include\SDL2\* SDL2\include\SDL2
+move temp\SDL2_mixer-*\x86_64-w64-mingw32\bin\* SDL2\bin
+copy SDL2\bin\SDL2_mixer.dll ..\App\build\debug\
 
 Remove-Item .\temp -Recurse

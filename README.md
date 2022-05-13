@@ -8,8 +8,8 @@ Keep reading for setup instructinos.
 ## Project Structure
 ```
   <Root Folder>
-    |-- Canvas (Contains files for the framework itself)<br>
-    |-- App (All user code goes here)<br>
+    |-- Canvas (Contains the framework source files)
+    |-- App (All user code goes here)
 ```
 
 ## Setup

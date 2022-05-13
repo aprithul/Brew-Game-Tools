@@ -33,17 +33,6 @@ int load = 0;
 
 void update()
 {
-
-
-    // for(int x=0; x<w; x++)
-    // {
-    //     for(int y=0; y<h; y++)
-    //     {
-    //         Color c = colors[rand()%3];
-    //         canvas.DrawPixel(x,y,c);
-    //     }
-    // }
-
     Color r = colors[0];
     Color g = colors[1];
     Color b = colors[2];
@@ -56,7 +45,7 @@ void update()
     Vec2f p1(canvas.Width/1.3,canvas.Height/2);
     
     //rot = DEG_TO_RAD*45;
-    rot -= canvas.DeltaTime * 0.0005f;
+    rot -= canvas.DeltaTime*.01f;
     rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(rot);
     rotMat(0,1) = -sinf(rot);
@@ -128,7 +117,8 @@ int main()
     canvas.SetUpdateFunc(update);
     canvas.SetCloseFunc(close);
 
-    canvas.Start();
+    canvas.SetFrameRate(60);
+    canvas.Run();
 
     return 0;
 }

@@ -685,14 +685,14 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     }
 }
 
-Int_32 Canvas::Start()
+Int_32 Canvas::Run()
 {
     using namespace std::chrono;
     init();
     is_game_running = true;
     steady_clock::time_point _lastTime = steady_clock::now();
 
-    Double_64 targetFrameTime = (Double_64)1000/60;
+    targetFrameTime = (Double_64)1000/targetFrameRate;
     Uint_32 frameCount = 0;
     Double_64 milSecondCounter = 0;
 
@@ -712,16 +712,19 @@ Int_32 Canvas::Start()
 
         update();
 
-       
         DrawScreen();
         
-        duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
-        _lastTime = steady_clock::now();
-
-        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
+        DeltaTime -= targetFrameTime;
+        while(DeltaTime < targetFrameTime)
+        {
+            duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
+            _lastTime = steady_clock::now();
+            DeltaTime += time_span / std::chrono::milliseconds(1);   // DT in ms
+        }
 
         milSecondCounter += DeltaTime;
         frameCount++;
+
         if(milSecondCounter >= 1000.0)
         {
             
@@ -739,4 +742,11 @@ Int_32 Canvas::Start()
     Cleanup();
 
     return 0;
+}
+
+
+void Canvas::SetFrameRate(Uint_32 _fps)
+{
+    targetFrameRate = _fps;
+    targetFrameTime = (Double_64)(1000.0)/_fps;
 }

@@ -11,7 +11,8 @@ struct Canvas
 
     Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen);
 
-    Int_32 Start();
+    Int_32 Run();
+    void SetFrameRate(Uint_32 fps);
     void SetInitFunc(void (*_init) ());
     void SetUpdateFunc(void (*_update) ());
     void SetCloseFunc(void (*_close) ());
@@ -48,6 +49,8 @@ struct Canvas
         static Image _imageDataStore[MAX_IMAGES_LOADABLE];
         static Uint_32 _nextId;
         Uint_32 _nextImagePosition = 0;
+        Double_64 targetFrameTime = 0;
+        Uint_32 targetFrameRate = 60;
         void (*init) ();
         void (*update) ();
         void (*close) ();

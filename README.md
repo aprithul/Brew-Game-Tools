@@ -10,6 +10,7 @@ Keep reading for setup instructinos.
   <Root Folder>
     |-- Canvas (Contains the framework source files)
     |-- App (All user code goes here)
+    |-- Vendor (Generated once you run setup, contains SDL and GLEW files)
 ```
 
 ## Setup

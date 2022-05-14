@@ -1,7 +1,7 @@
 //#include "Config.hpp"
 
 //#ifdef ENABLE_BACKEND_SDL2_OPENGL
-//#include "Backend.hpp"
+#include "Backend.hpp"
 #include "Types.hpp"
 #include "GraphicsUtil.hpp"
 

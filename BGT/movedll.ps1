@@ -1,0 +1,1 @@
+Copy-Item "build/debug/bgt.dll" -Destination "../App/build/debug/bgt.dll"

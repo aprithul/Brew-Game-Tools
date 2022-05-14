@@ -1,11 +1,17 @@
-#include "Config.hpp"
+//#include "Config.hpp"
 
-#ifdef ENABLE_BACKEND_SDL2_OPENGL
-#include "Backend.hpp"
+//#ifdef ENABLE_BACKEND_SDL2_OPENGL
+//#include "Backend.hpp"
+#include "Types.hpp"
+#include "GraphicsUtil.hpp"
+
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_mixer.h"
 #include "glew.h"
 #include <stdio.h>
+#include <unordered_map>
+#include <unordered_set>
+
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -474,4 +480,4 @@ void SetVsync(VsyncMode _mode)
         printf( "Vsync set to : %d\n", (Int_32)_mode);
 }
 
-#endif
+//#endif

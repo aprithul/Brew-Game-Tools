@@ -3,14 +3,20 @@
 
 #define MAX_IMAGES_LOADABLE 1024
 
+#ifdef EXPORT_AS_DLL
+    #define DllExport __declspec( dllexport )
+#else
+    #define DllExport
+#endif
+
 #include "GraphicsUtil.hpp"
 #include "MathUtil.hpp"
 
 
-struct Canvas
+struct DllExport BrewGameTool
 {
 
-    Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode);
+    BrewGameTool(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode);
 
     Int_32 Run();
     void Quit();
@@ -70,4 +76,4 @@ struct Canvas
 
 
 
-#endif
+#endif // ENGINE_HPP

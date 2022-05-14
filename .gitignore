@@ -36,5 +36,5 @@
 
 #sdl2 and GLEW directory
 App/build/debug/*
-Canvas/build/debug/*
+BGT/build/debug/*
 Vendor

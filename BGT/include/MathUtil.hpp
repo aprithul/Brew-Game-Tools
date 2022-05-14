@@ -13,7 +13,7 @@
 #define PI 3.14159265
 #define EPS 0.000001	// very small value
 
-#include "Platform.hpp"
+#include "Types.hpp"
 
 ///////////////////////////////////
 

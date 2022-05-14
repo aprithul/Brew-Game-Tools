@@ -1,12 +1,14 @@
 #include <iostream>
 #include <chrono>
 // user headers
-#include "Backend.hpp"
-#include "Canvas.hpp"
+//#include "Backend.hpp"
+#include "BrewGameTool.hpp"
 
 #define MATH_UTIL_IMPLEMENTATION
 #include "MathUtil.hpp"
 
+#define GRAPHICS_UTILS_IMPLEMENTATION
+#include "GraphicsUtil.hpp"
 
 #define UTILS_IMPLEMENTATION
 #include "Utils.hpp"
@@ -14,6 +16,11 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+// include backend to use
+#if defined(BACKEND_SDL2_OPENGL) || defined(DEBUG)
+    #include "Backend_SDL2_OpenGL.cpp"
+#endif
 
 
 #ifdef main
@@ -23,10 +30,10 @@
 Uint_32 canvasBufferSizeInBytes = 0;
 const char* canvasTitle;
 
-Uint_32 Canvas::_nextId = 1;
-Image Canvas::_imageDataStore[MAX_IMAGES_LOADABLE];
+Uint_32 BrewGameTool::_nextId = 1;
+Image BrewGameTool::_imageDataStore[MAX_IMAGES_LOADABLE];
 
-Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode) : 
+BrewGameTool::BrewGameTool(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
     canvasTitle = _name;
@@ -38,22 +45,22 @@ Canvas::Canvas(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixe
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
 }
 
-void Canvas::SetInitFunc(void (*_init) ())
+void BrewGameTool::SetInitFunc(void (*_init) ())
 {
     this->init = _init;
 }
 
-void Canvas::SetUpdateFunc(void (*_update) ())
+void BrewGameTool::SetUpdateFunc(void (*_update) ())
 {
     this->update = _update;
 }
 
-void Canvas::SetCloseFunc(void (*_close) ())
+void BrewGameTool::SetCloseFunc(void (*_close) ())
 {
     this->close = _close;
 }
 
-void Canvas::DrawPixel(Float_32 _x, Float_32 _y, Color color)
+void BrewGameTool::DrawPixel(Float_32 _x, Float_32 _y, Color color)
 {
     
     Int_32 _rx = _x * PixelSize;
@@ -73,7 +80,7 @@ void Canvas::DrawPixel(Float_32 _x, Float_32 _y, Color color)
     }
 }
 
-void Canvas::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
+void BrewGameTool::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
 {
      Int_32 _rx = _x * PixelSize;
     Int_32 _ry = _y * PixelSize;
@@ -93,7 +100,7 @@ void Canvas::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
     }
 }
 
-void Canvas::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
+void BrewGameTool::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
 {
     if(_x1 == _x2)
     {
@@ -191,7 +198,7 @@ Int_32 sqrd_dist(Int_32 x0, Int_32 y0, Int_32 x1, Int_32 y1)
     return ((x0 - x1)*(x0 - x1) + (y0-y1)*(y0-y1));
 }
 
-void Canvas::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
+void BrewGameTool::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
 {
     Float_32 _radius_sq = radius * radius;
     for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
@@ -221,7 +228,7 @@ void Canvas::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
     }
 }
 
-void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor)
+void BrewGameTool::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor)
 {
     Float_32 _radius_sq = radius * radius;
     for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
@@ -248,7 +255,7 @@ void Canvas::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillCol
     }
 }
 
-void Canvas::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, Color _color)
+void BrewGameTool::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, Color _color)
 {
     DrawLine(_x, _y, _x + _width, _y, _color);
     DrawLine(_x, _y, _x, _y+_height, _color);
@@ -256,7 +263,7 @@ void Canvas::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, 
     DrawLine(_x, _y + _height, _x + _width, _y + _height, _color);
 }
 
-void Canvas::PrintBuffer()
+void BrewGameTool::PrintBuffer()
 {    
     Int_32 _rWidth = Width * PixelSize;
     Int_32 _rHeight = Height * PixelSize;
@@ -276,7 +283,7 @@ void Canvas::PrintBuffer()
 
 }
 
-Uint_32 Canvas::LoadImage(const char* _filename)
+Uint_32 BrewGameTool::LoadImage(const char* _filename)
 {
     Image& _image = _imageDataStore[_nextImagePosition];
     stbi_set_flip_vertically_on_load(true);
@@ -292,7 +299,7 @@ Uint_32 Canvas::LoadImage(const char* _filename)
             Utils_Swap_uc( &_imageData[_i*4], &_imageData[_i*4 + 2] );
         }
 
-        _image.Id = Canvas::_nextId++;
+        _image.Id = BrewGameTool::_nextId++;
         _image.Data = (Uint_32*)_imageData;
         _nextImagePosition++;
         return _image.Id;
@@ -300,7 +307,7 @@ Uint_32 Canvas::LoadImage(const char* _filename)
     return 0;
 }
 
-Image* const Canvas::GetImageById(Uint_32 _id)
+Image* const BrewGameTool::GetImageById(Uint_32 _id)
 {
     if(_id> 0)
     {
@@ -314,7 +321,7 @@ Image* const Canvas::GetImageById(Uint_32 _id)
     return nullptr;
 }
 
-void Canvas::DeleteImageById(Uint_32 _id)
+void BrewGameTool::DeleteImageById(Uint_32 _id)
 {
     if(_id> 0 )
     {
@@ -339,7 +346,7 @@ void Canvas::DeleteImageById(Uint_32 _id)
 
 }
 
-void Canvas::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
+void BrewGameTool::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
 {
     for(Float_32 _i =0; _i< _image->Width; _i++)
     {
@@ -353,7 +360,7 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
     }
 }
 
-void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -370,7 +377,7 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
     {
         for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
         {
-            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+            if(_x<0 || _x>BrewGameTool::Width || _y<0 || _y>BrewGameTool::Height)
                 continue;
 
 
@@ -432,9 +439,7 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
 
 }
 
-
-
-void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -451,7 +456,7 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
     {
         for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
         {
-            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+            if(_x<0 || _x>BrewGameTool::Width || _y<0 || _y>BrewGameTool::Height)
                 continue;
 
 
@@ -521,9 +526,7 @@ void Canvas::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, 
     }
 }
 
-
-
-void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -540,7 +543,7 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     {
         for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
         {
-            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+            if(_x<0 || _x>BrewGameTool::Width || _y<0 || _y>BrewGameTool::Height)
                 continue;
 
 
@@ -600,7 +603,7 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     }
 }
 
-void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -617,7 +620,7 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     {
         for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
         {
-            if(_x<0 || _x>Canvas::Width || _y<0 || _y>Canvas::Height)
+            if(_x<0 || _x>BrewGameTool::Width || _y<0 || _y>BrewGameTool::Height)
                 continue;
 
 
@@ -688,12 +691,12 @@ void Canvas::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Ma
     }
 }
 
-void Canvas::Quit()
+void BrewGameTool::Quit()
 {
     is_game_running = false;
 }
 
-Int_32 Canvas::Run()
+Int_32 BrewGameTool::Run()
 {
     using namespace std::chrono;
     init();
@@ -748,29 +751,29 @@ Int_32 Canvas::Run()
 }
 
 
-void Canvas::SetFrameRate(Uint_32 _fps)
+void BrewGameTool::SetFrameRate(Uint_32 _fps)
 {
     targetFrameRate = _fps;
     targetFrameTime = (Double_64)(1000.0)/_fps;
 }
 
 
-Bool_8 Canvas::OnKeyDown(BGT_Key _key)
+Bool_8 BrewGameTool::OnKeyDown(BGT_Key _key)
 {
     return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
 }
 
-Bool_8 Canvas::OnKeyUp(BGT_Key _key)
+Bool_8 BrewGameTool::OnKeyUp(BGT_Key _key)
 {
     return keysReleasedThisFrame.find(_key) != keysReleasedThisFrame.end();
 }
 
-Float_32 Canvas::GetKey(BGT_Key _key)
+Float_32 BrewGameTool::GetKey(BGT_Key _key)
 {
     return keyVal[_key];
 }
 
-void Canvas::SetVsyncMode(VsyncMode _mode)
+void BrewGameTool::SetVsyncMode(VsyncMode _mode)
 {
     vsyncMode = _mode;
     SetVsync(_mode);

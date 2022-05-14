@@ -1,7 +1,6 @@
-#include "Canvas.hpp"
-#include "Platform.hpp"
+#include "BrewGameTool.hpp"
+#include "Types.hpp"
 #include "stdio.h"
-#include "MathUtil.hpp"
 #include <random>
 
 #ifdef DEBUG
@@ -11,6 +10,13 @@
     #define GetResourcePath(x) ("../../res/" x)
 #endif
 
+#define MATH_UTIL_IMPLEMENTATION
+#include "MathUtil.hpp"
+
+#define GRAPHICS_UTILS_IMPLEMENTATION
+#include "GraphicsUtil.hpp"
+
+
 void init()
 {
     printf("Initialized\n");
@@ -18,7 +24,7 @@ void init()
 
 Int_32 h = 512;
 Int_32 w = 512;
-Canvas canvas("Canvas Demo", w, h, 1, false, VSYNC_ON);
+BrewGameTool canvas("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 

@@ -1,8 +1,9 @@
-#include "Config.hpp"
+//#include "Config.hpp"
 
-#ifdef ENABLE_BACKEND_DUMMY
+//#ifdef ENABLE_BACKEND_DUMMY
 
-#include "Backend.hpp"
+//#include "Backend.hpp"
+#include "Types.hpp"
 
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height)
 {
@@ -29,4 +30,4 @@ void Cleanup()
 
 }
 
-#endif
+//#endif

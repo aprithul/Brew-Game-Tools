@@ -1,8 +1,8 @@
 mkdir App\build
 mkdir App\build\debug
 
-mkdir Canvas\build
-mkdir Canvas\build/debug
+mkdir BGT\build
+mkdir BGT\build/debug
 
 mkdir Vendor
 mkdir Vendor\temp

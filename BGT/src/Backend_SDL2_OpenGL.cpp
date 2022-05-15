@@ -6,8 +6,14 @@
 #include "GraphicsUtil.hpp"
 
 #include "SDL2/SDL.h"
-//#include "SDL2/SDL_mixer.h"
+#include "SDL2/SDL_mixer.h"
+
+#ifdef __APPLE__
+#include "GL/glew.h"
+#else
 #include "glew.h"
+#endif
+
 #include <stdio.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -244,10 +250,11 @@ void SetupInput()
 // int _texWidth = 0;
 // int _texHeight = 0;
 // stbi_uc* pixelData = 0;
-/*
+
 Mix_Music *gMusic = NULL;
 void playMusic()
 {
+    printf("Playing music\n");
     //Initialize SDL_mixer
     if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
     {
@@ -257,7 +264,7 @@ void playMusic()
         printf("SDL_mixer initialized\n");
 
     //Load music
-    gMusic = Mix_LoadMUS( "App/res/battle.ogg");
+    gMusic = Mix_LoadMUS( "../../res/battle.ogg");
     if( gMusic == NULL )
     {
         printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
@@ -268,7 +275,7 @@ void playMusic()
     Mix_PlayMusic(gMusic, -1);
 
 }
-*/
+
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setFullscreen)
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS)==0)
@@ -372,7 +379,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
         canvasBuffer = new GLuint[width * height];
 
 
-        //playMusic();
+        playMusic();
 
 
     }
@@ -450,12 +457,26 @@ void DrawScreen()
 
 void Cleanup()
 {
+    
+    printf("Cleaning up backend\n");
     //Free the music
-    //Mix_FreeMusic( gMusic );
-    //gMusic = NULL;
-    //Mix_Quit();
+    Mix_FreeMusic( gMusic );
+    printf("Freed music audio\n");
 
+    gMusic = NULL;
+    Mix_Quit();
+    printf("Mix quit\n");
+    //Mix_CloseAudio();
+    
     delete[] canvasBuffer;
+    printf("Canvas buffer deletd\n");
+
+    glDeleteProgram(shaderProgram);
+    glDeleteTextures(1, &canvasTexture);
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(window);
+    
+
     SDL_Quit();
     printf("SDL2_OpenGL backend cleaned up\n");
 }

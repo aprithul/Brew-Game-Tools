@@ -709,10 +709,10 @@ Int_32 BrewGameTool::Run()
 
     while(is_game_running)
     {
+
         ProcessInput();
         if(WasWindowCrossed())
             is_game_running = false;
-
         // clear canvasBuffer
         memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
 

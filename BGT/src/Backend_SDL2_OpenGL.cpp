@@ -6,7 +6,7 @@
 #include "GraphicsUtil.hpp"
 
 #include "SDL2/SDL.h"
-#include "SDL2/SDL_mixer.h"
+//#include "SDL2/SDL_mixer.h"
 #include "glew.h"
 #include <stdio.h>
 #include <unordered_map>
@@ -244,7 +244,7 @@ void SetupInput()
 // int _texWidth = 0;
 // int _texHeight = 0;
 // stbi_uc* pixelData = 0;
-
+/*
 Mix_Music *gMusic = NULL;
 void playMusic()
 {
@@ -268,7 +268,7 @@ void playMusic()
     Mix_PlayMusic(gMusic, -1);
 
 }
-
+*/
 void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setFullscreen)
 {
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS)==0)
@@ -372,7 +372,7 @@ void CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _setF
         canvasBuffer = new GLuint[width * height];
 
 
-        playMusic();
+        //playMusic();
 
 
     }
@@ -451,9 +451,9 @@ void DrawScreen()
 void Cleanup()
 {
     //Free the music
-    Mix_FreeMusic( gMusic );
-    gMusic = NULL;
-    Mix_Quit();
+    //Mix_FreeMusic( gMusic );
+    //gMusic = NULL;
+    //Mix_Quit();
 
     delete[] canvasBuffer;
     SDL_Quit();

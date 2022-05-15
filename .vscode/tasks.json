@@ -1,9 +1,14 @@
 {
     "tasks": [
         {
-            "type": "cppbuild",
+            "type": "process",
             "label": "Build BGT library",
-            "command": "mingw32-make",
+            "windows":{
+                "command": "mingw32-make"
+            },
+            "osx":{
+                "command": "make"
+            },
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}/BGT/"
@@ -17,7 +22,12 @@
         {               
             "type": "shell", 
             "label": "Notify", 
-            "command": "${workspaceFolder}/BGT/movedll.ps1",
+            "windows":{
+                "command": "${workspaceFolder}/BGT/movedll.ps1"
+            },
+            "osx":{
+                "command": "install_name_tool -id \"@executable_path/../../../BGT/build/debug/libbgt.dylib\" build/debug/libbgt.dylib"
+            },
             "options": {
                 "cwd": "${workspaceFolder}/BGT/"
             },
@@ -26,9 +36,14 @@
             ]
         },
         {
-            "type": "cppbuild",
+            "type": "process",
             "label": "Build Demo",
-            "command": "mingw32-make",
+            "windows":{
+                "command": "mingw32-make"
+            },
+            "osx":{
+                "command": "make"
+            },
             "args": [],
             "options": {
                 "cwd": "${workspaceFolder}/App/"

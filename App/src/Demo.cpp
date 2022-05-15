@@ -3,12 +3,7 @@
 #include "stdio.h"
 #include <random>
 
-#ifdef DEBUG
-     //#define respath 
-     #define GetResourcePath(x) ("App/res/" x)
-#else
-    #define GetResourcePath(x) ("../../res/" x)
-#endif
+#define GetResourcePath(x) ("../../res/" x)
 
 #define MATH_UTIL_IMPLEMENTATION
 #include "MathUtil.hpp"

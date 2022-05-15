@@ -4,13 +4,14 @@ BUILD_DIR = build/debug
 CC = clang++
 OBJ_NAME = game
 INCLUDE_PATHS = -Iinclude -I../BGT/include
-LIBRARY_PATHS = -L../BGT/build/debug/
 LINKER_FLAGS = -lbgt
 
 ifeq ($(OS),Windows_NT)
 	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g
+	LIBRARY_PATHS = -L../BGT/build/debug/
 else
 	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
+	LIBRARY_PATHS = -L../BGT/build/debug/
 endif
 
 all:

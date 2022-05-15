@@ -21,8 +21,20 @@ bgt:
 	$(CC) -DBACKEND_SDL2_OPENGL -DEXPORT_AS_DLL $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
 
 else
-	LINKER_FLAGS = -framework OpenGL -lsdl2 -lsdl2_mixer -lglew
+	LINKER_FLAGS = -framework OpenGL -lsdl2 -lglew
 	COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g -arch arm64
+	
+all: bgt
+	$(CC) -dynamiclib -o $(BUILD_DIR)/libbgt.dylib $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
+
+clean:
+	rm -r -f $(BUILD_DIR)/*
+
+bgt:
+	$(CC) -DBACKEND_SDL2_OPENGL $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
+
+
+
 endif
 
 

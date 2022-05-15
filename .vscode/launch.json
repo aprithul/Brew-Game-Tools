@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/App/build/debug/game",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/App/build/debug/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb",

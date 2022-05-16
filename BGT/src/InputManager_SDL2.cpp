@@ -1,14 +1,14 @@
-#include "InputBackend.hpp"
+#include "InputManager.hpp"
 #include "SDL2/SDL.h"
 #include <unordered_map>
 #include <unordered_set>
+#include <stdio.h>
 
 std::unordered_map<SDL_Keycode, BGT_Key> sdlToBgtKeymap;
 std::unordered_map<BGT_Key, Float_32, std::hash<Int_32>> keyVal;
 std::unordered_set<BGT_Key, std::hash<Int_32>> keysPressedThisFrame;
 std::unordered_set<BGT_Key, std::hash<Int_32>> keysReleasedThisFrame;
 Bool_8 windowCrossed = false;
-
 
 void mapSdlkToBgtk()
 {
@@ -101,7 +101,7 @@ void mapSdlkToBgtk()
     sdlToBgtKeymap[SDLK_F12] = BGTK_F12;
 }
 
-void IB_SetupInput()
+InputManager::InputManager()
 {
     if(SDL_Init(SDL_INIT_EVENTS)==0)
     {
@@ -112,7 +112,7 @@ void IB_SetupInput()
 
 }
 
-void IB_ProcessInput()
+void InputManager::ProcessInput()
 {
     keysPressedThisFrame.clear();
     keysReleasedThisFrame.clear();
@@ -149,27 +149,27 @@ void IB_ProcessInput()
     }   
 }
 
-Bool_8 IB_WasWindowCrossed()
+Bool_8 InputManager::WasWindowCrossed()
 {
     return windowCrossed;
 }
 
-Bool_8 IB_OnKeyDown(BGT_Key _key)
+Bool_8 InputManager::OnKeyDown(BGT_Key _key)
 {
     return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
 }
 
-Bool_8 IB_OnKeyUp(BGT_Key _key)
+Bool_8 InputManager::OnKeyUp(BGT_Key _key)
 {
     return keysReleasedThisFrame.find(_key) != keysReleasedThisFrame.end();
 }
 
-Float_32 IB_GetKey(BGT_Key _key)
+Float_32 InputManager::GetKey(BGT_Key _key)
 {
     return keyVal[_key];
 }
 
-void IB_Cleanup()
+InputManager::~InputManager()
 {
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     printf("Input events backend cleaned");

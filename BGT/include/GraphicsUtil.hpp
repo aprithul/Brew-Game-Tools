@@ -39,7 +39,6 @@ struct Color
 struct Image // 192 bytes
 {
     Uint_32* Data;
-    Uint_32 Id = 0; // id 0 is invalid. valid id starts from 1
     Int_32 Width;
     Int_32 Height;
     Int_32 Diagonal;

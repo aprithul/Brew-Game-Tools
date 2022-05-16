@@ -9,6 +9,7 @@ void RB_DrawScreen();
 void RB_Cleanup();
 void RB_Delay(Uint_32 ms);
 void RB_SetWindowTitle(const char* _title);
+
 extern Uint_32* canvasBuffer;
 
 #endif

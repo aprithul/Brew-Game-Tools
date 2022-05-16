@@ -34,9 +34,6 @@ GLuint canvasTexture;
 
 Int_32 width;
 Int_32 height;
-Uint_32* canvasBuffer;
-
-
 
 void set_sdl_gl_attributes()
 {

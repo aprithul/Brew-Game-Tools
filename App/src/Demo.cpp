@@ -12,11 +12,12 @@
 #include "GraphicsUtil.hpp"
 
 Uint_32 mMusicId = 0;
-
+Uint_32 _id1  = 0;
+Uint_32 _id2  = 0;
 
 Int_32 h = 512;
 Int_32 w = 512;
-BrewGameTool canvas("Canvas Demo", w, h, 1, false, VSYNC_ON);
+BrewGameTool canvas;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
 
@@ -31,6 +32,12 @@ int load = 0;
 
 void init()
 {
+    canvas.SetupRenderer("Canvas Demo", w, h, 1, false, VSYNC_ON);
+    canvas.SetupAudio(44100, 2, 2048);
+    canvas.SetupInput();
+
+    _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
+    _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
     mMusicId = canvas.LoadMusic(GetResourcePath("battle.OGG"));
     canvas.PlayMusic(mMusicId, true);
     printf("Initialized\n");
@@ -73,19 +80,6 @@ void update()
     p1 = rotMat * p1;
     p1 += p0;
 
-    // canvas.DrawFilledCircle(p0.x, p0.y, canvas.Width/4, red);
-    // canvas.DrawCircle(p0.x, p0.y, canvas.Width/4, blue);
-
-    static Uint_32 _id1  = 0;
-    static Uint_32 _id2  = 0;
-    if(!load)
-    {
-        load = 1;
-        //_id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
-        _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
-        _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
-
-    }
 
     Image* _img = canvas.GetImageById(_id1);
     Image* _img_t = canvas.GetImageById(_id2);
@@ -126,7 +120,7 @@ void update()
         else
             canvas.ResumeMusic();
     }
-    
+
     if(canvas.OnKeyDown(BGTK_S))
     {
         canvas.StopMusic();

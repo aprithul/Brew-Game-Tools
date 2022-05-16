@@ -11,11 +11,8 @@
 #define GRAPHICS_UTILS_IMPLEMENTATION
 #include "GraphicsUtil.hpp"
 
+Uint_32 mMusicId = 0;
 
-void init()
-{
-    printf("Initialized\n");
-}
 
 Int_32 h = 512;
 Int_32 w = 512;
@@ -31,6 +28,14 @@ Mat3x3 transMat;
 
 int load = 0;
 
+
+void init()
+{
+    mMusicId = canvas.LoadMusic(GetResourcePath("battle.OGG"));
+    canvas.PlayMusic(mMusicId, true);
+    printf("Initialized\n");
+
+}
 
 void update()
 {
@@ -79,6 +84,7 @@ void update()
         //_id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
         _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
         _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
+
     }
 
     Image* _img = canvas.GetImageById(_id1);
@@ -112,11 +118,24 @@ void update()
 
     if(canvas.OnKeyDown(BGTK_V))
         canvas.SetVsyncMode(canvas.vsyncMode == VSYNC_OFF?VSYNC_ON : VSYNC_OFF);
+
+    if(canvas.OnKeyDown(BGTK_M))
+    {
+        if(canvas.IsPlayingMusic())
+            canvas.PauseMusic();
+        else
+            canvas.ResumeMusic();
+    }
+    
+    if(canvas.OnKeyDown(BGTK_S))
+    {
+        canvas.StopMusic();
+    }
 }
 
 void close()
 {
-    printf("Closed\n");
+    printf("App stopped receiving service!\n");
 }
 
 int main()

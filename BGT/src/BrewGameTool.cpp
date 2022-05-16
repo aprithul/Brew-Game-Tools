@@ -13,15 +13,10 @@
 #define UTILS_IMPLEMENTATION
 #include "Utils.hpp"
 
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-// include backend to use
-#if defined(BACKEND_SDL2_OPENGL) || defined(DEBUG)
-    #include "Backend_SDL2_OpenGL.cpp"
-#endif
-
+#include "Backend_SDL2.cpp"
 
 #ifdef main
 #undef main
@@ -33,16 +28,82 @@ const char* canvasTitle;
 Uint_32 BrewGameTool::_nextId = 1;
 Image BrewGameTool::_imageDataStore[MAX_IMAGES_LOADABLE];
 
+// Lifetime
 BrewGameTool::BrewGameTool(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode) : 
     Width(_width), Height(_height), PixelSize(_pixelSize), DeltaTime(0)
 {
     canvasTitle = _name;
-    SetupInput();
-    CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
+    IB_SetupInput();
+    AB_Init();
+    RB_CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
     
     vsyncMode = _mode;
-    SetVsync(vsyncMode);
+    RB_SetVsync(vsyncMode);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
+}
+
+void BrewGameTool::Quit()
+{
+    is_game_running = false;
+}
+
+Int_32 BrewGameTool::Run()
+{
+    using namespace std::chrono;
+    is_game_running = true;
+    steady_clock::time_point _lastTime = steady_clock::now();
+
+    targetFrameTime = (Double_64)1000/targetFrameRate;
+    Uint_32 frameCount = 0;
+    Double_64 milSecondCounter = 0;
+
+    init();
+    while(is_game_running)
+    {
+
+        IB_ProcessInput();
+        if(IB_WasWindowCrossed())
+            is_game_running = false;
+        // clear canvasBuffer
+        memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
+
+         // draw axis
+        DrawLine(Width/2, Height/2, Width, Height/2,Color(0xff00ff00));
+        DrawLine(Width/2, Height/2 , Width/2, Height, Color(0xff0000ff));
+
+        update();
+        RB_DrawScreen();
+        
+           
+        duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
+        _lastTime = steady_clock::now();
+        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
+
+        milSecondCounter += DeltaTime;
+        frameCount++;
+
+        if(milSecondCounter >= 1000.0)
+        {
+            
+            //printf("FPS: %d\n", frameCount);
+            char buffer[64];
+            sprintf(buffer, "%s | %d x %d x %d | FPS: %d", canvasTitle, Width, Height, PixelSize, frameCount);
+            RB_SetWindowTitle(buffer);
+            milSecondCounter -= 1000.0;
+            frameCount = 0;
+        }
+
+    }
+    close();
+    
+    // cleanup input, audio and renderer
+    IB_Cleanup();
+    AB_Cleanup();
+    RB_Cleanup();
+    CleanupBackend();
+
+    printf("All services cleaned up, quitting program.");
+    return 0;
 }
 
 void BrewGameTool::SetInitFunc(void (*_init) ())
@@ -60,6 +121,7 @@ void BrewGameTool::SetCloseFunc(void (*_close) ())
     this->close = _close;
 }
 
+// drawing
 void BrewGameTool::DrawPixel(Float_32 _x, Float_32 _y, Color color)
 {
     
@@ -691,63 +753,10 @@ void BrewGameTool::BlitImageAlphaBlended(const Image* const _image, Vec2f& _orig
     }
 }
 
-void BrewGameTool::Quit()
+void BrewGameTool::SetVsyncMode(VsyncMode _mode)
 {
-    is_game_running = false;
-}
-
-Int_32 BrewGameTool::Run()
-{
-    using namespace std::chrono;
-    init();
-    is_game_running = true;
-    steady_clock::time_point _lastTime = steady_clock::now();
-
-    targetFrameTime = (Double_64)1000/targetFrameRate;
-    Uint_32 frameCount = 0;
-    Double_64 milSecondCounter = 0;
-
-    while(is_game_running)
-    {
-
-        ProcessInput();
-        if(WasWindowCrossed())
-            is_game_running = false;
-        // clear canvasBuffer
-        memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
-
-         // draw axis
-        DrawLine(Width/2, Height/2, Width, Height/2,Color(0xff00ff00));
-        DrawLine(Width/2, Height/2 , Width/2, Height, Color(0xff0000ff));
-
-        update();
-        DrawScreen();
-        
-           
-        duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
-        _lastTime = steady_clock::now();
-        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
-
-        milSecondCounter += DeltaTime;
-        frameCount++;
-
-        if(milSecondCounter >= 1000.0)
-        {
-            
-            //printf("FPS: %d\n", frameCount);
-            char buffer[64];
-            sprintf(buffer, "%s | %d x %d x %d | FPS: %d", canvasTitle, Width, Height, PixelSize, frameCount);
-            SetWindowTitle(buffer);
-            milSecondCounter -= 1000.0;
-            frameCount = 0;
-        }
-
-    }
-
-    close();
-    Cleanup();
-
-    return 0;
+    vsyncMode = _mode;
+    RB_SetVsync(_mode);
 }
 
 
@@ -756,26 +765,54 @@ void BrewGameTool::SetFrameRate(Uint_32 _fps)
     targetFrameRate = _fps;
     targetFrameTime = (Double_64)(1000.0)/_fps;
 }
+//
 
-
+// Input
 Bool_8 BrewGameTool::OnKeyDown(BGT_Key _key)
 {
-    return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
+    return IB_OnKeyDown(_key);
 }
 
 Bool_8 BrewGameTool::OnKeyUp(BGT_Key _key)
 {
-    return keysReleasedThisFrame.find(_key) != keysReleasedThisFrame.end();
+    return IB_OnKeyUp(_key);
 }
 
 Float_32 BrewGameTool::GetKey(BGT_Key _key)
 {
-    return keyVal[_key];
+    return IB_GetKey(_key);
 }
 
-void BrewGameTool::SetVsyncMode(VsyncMode _mode)
+
+
+// Music
+
+Uint_32 BrewGameTool::LoadMusic(const char* _filename)
 {
-    vsyncMode = _mode;
-    SetVsync(_mode);
+    return AB_LoadMusic(_filename);
 }
 
+void BrewGameTool::PlayMusic(Uint_32 _music, Bool_8 doLoop)
+{
+    AB_PlayMusic(_music, doLoop);
+}
+
+void BrewGameTool::PauseMusic()
+{
+    AB_PauseMusic();
+}
+
+void BrewGameTool::ResumeMusic()
+{
+    AB_ResumeMusic();
+}
+
+Bool_8 BrewGameTool::IsPlayingMusic()
+{
+    return AB_IsPlayingMusic();
+}
+
+void BrewGameTool::StopMusic()
+{
+    AB_StopMusic();
+}

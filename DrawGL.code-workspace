@@ -81,7 +81,10 @@
 			"concepts": "cpp",
 			"xfacet": "cpp",
 			"xlocinfo": "cpp",
-			"xstddef": "cpp"
+			"xstddef": "cpp",
+			"list": "cpp",
+			"unordered_set": "cpp",
+			"xhash": "cpp"
 		}
 	}
 }

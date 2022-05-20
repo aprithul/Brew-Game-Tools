@@ -2,20 +2,32 @@ SRC_DIR = src
 SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp)
 BUILD_DIR = build/debug
 CC = clang++
-OBJ_NAME = game
 INCLUDE_PATHS = -Iinclude -I../BGT/include
+LIBRARY_PATHS = -L../BGT/build/debug/
 LINKER_FLAGS = -lbgt
+DEPENDENCIES = $(SRC_FILES) ../BGT/build/debug/*.o
 
 ifeq ($(OS),Windows_NT)
 	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g
-	LIBRARY_PATHS = -L../BGT/build/debug/
-else
-	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
-	LIBRARY_PATHS = -L../BGT/build/debug/
-endif
+	OBJ_NAME = game.exe
 
-all:
+all:$(BUILD_DIR)/$(OBJ_NAME)
+
+$(BUILD_DIR)/$(OBJ_NAME):$(DEPENDENCIES)
 	$(CC) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SRC_FILES) -o $(BUILD_DIR)/$(OBJ_NAME)
 
 clean:
 	rm -r -f $(BUILD_DIR)/*
+else
+	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
+	OBJ_NAME = game
+	
+all:$(BUILD_DIR)/$(OBJ_NAME)
+
+$(BUILD_DIR)/$(OBJ_NAME):$(DEPENDENCIES)
+	$(CC) $(COMPILER_FLAGS) $(LINKER_FLAGS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(SRC_FILES) -o $(BUILD_DIR)/$(OBJ_NAME)
+
+clean:
+	rm -r -f $(BUILD_DIR)/*
+endif
+

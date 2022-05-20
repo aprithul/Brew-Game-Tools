@@ -4,8 +4,10 @@
 #include "RenderingBackend.hpp"
 #include "Types.hpp"
 #include "GraphicsUtil.hpp"
-
+#include <unordered_map>
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
+#include "Utils.hpp"
 
 #ifdef __APPLE__
 #include "GL/glew.h"
@@ -34,6 +36,9 @@ GLuint canvasTexture;
 
 Int_32 width;
 Int_32 height;
+Uint_32 nextFontId = 0;
+std::unordered_map<Uint_32, TTF_Font*> fonts;
+
 
 void set_sdl_gl_attributes()
 {
@@ -244,12 +249,17 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
 
         makeShaderForQuad();
         canvasBuffer = new GLuint[width * height];
-
     }
     else
+        printf("Failed to setup Video\n");
+
+
+    if(TTF_Init() == 0)
     {
-        printf("Failed to setup video\n");
+        printf("TTF font system initialized\n");
     }
+    else
+        printf("Failed to setup TTF Font system.\n");
 }
 
 void RB_DrawScreen()
@@ -283,6 +293,13 @@ void RB_Cleanup()
     
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     printf("SDL2_OpenGL backend cleaned\n");
+    
+    for(auto& _font : fonts)
+    {
+        TTF_CloseFont(_font.second);
+    }
+    
+    TTF_Quit();
 }
 
 void Delay(Uint_32 ms)
@@ -305,4 +322,87 @@ void RB_SetVsync(VsyncMode _mode)
         printf( "Vsync set to : %d\n", (Int_32)_mode);
 }
 
+Uint_32 RB_LoadFont(const char* _filename)
+{
+    TTF_Font* _font = TTF_OpenFont(_filename, 12);
+    nextFontId++;
+    fonts[nextFontId] = _font;
+    return nextFontId;
+}
+
+void RB_DeleteFont(Uint_32 _font)
+{
+    auto it = fonts.find(_font);
+    if( it != fonts.end())
+    {
+        TTF_CloseFont(it->second);
+        fonts.erase(it);
+    }
+    else
+        printf("Font not found\n");
+}
+
+void RB_GetTextBitmap(const char* _text, Uint_32 _font, Uint_32* textBmp, Int_32* w, Int_32* h)
+{
+    //printf("Getting bitS\n");
+    auto it = fonts.find(_font);
+    SDL_Color fg = {255,255,255,255};
+    SDL_Color bg = {0,0,0,255};
+    if(it != fonts.end())
+    {
+        //SDL_Surface* renderedSurface = TTF_RenderText_Solid(it->second, _text, fg);
+        SDL_Surface* renderedSurface = TTF_RenderText_Solid(it->second, _text, fg);
+        int bpp = renderedSurface->format->BytesPerPixel;
+
+        auto pixels = (char*)renderedSurface->pixels;
+        //memcpy(textBmp, (Uint_32*)(renderedSurface->pixels), renderedSurface->h*renderedSurface->pitch);
+        (*w) = renderedSurface->pitch/bpp;
+        (*h) = renderedSurface->h;
+        //std::cout<<renderedSurface->format->format<<std::endl;
+
+
+        int l =0;
+        for(int i=0; i<renderedSurface->h; i++)
+        {
+            for(int j=0; j<renderedSurface->pitch; j+=bpp)
+            {
+
+                char px = pixels[(i*renderedSurface->pitch)+j];
+ 
+                if( px > 0)
+                    px = 0xffff0000;
+                //Utils_Swap_uc( (unsigned char*)&px, (unsigned char*)&px+3);
+                textBmp[l++] = px;// | 0xffff0000;
+                //printf("%d ",px);
+
+
+                // for(int k =0; k<4; k++)
+                // {
+                //     //if(px>0)
+                //     //    px = 0xff;
+
+                //     //printf("%hhu", px);
+                // }
+                
+
+                //textBmp[(i*renderedSurface->pitch)+j] = ;
+                //if(pixels[(i*renderedSurface->pitch)+j] != 0)
+                //char c = pixels[(i*renderedSurface->pitch)+j];
+                //printf("%hhu", c);
+            }
+
+            //printf("\n");
+        }
+        
+        
+        SDL_FreeSurface(renderedSurface);
+
+        
+        
+    }
+}
+
+void RB_SetFontSize(Uint_32 _size)
+{
+}
 //#endif

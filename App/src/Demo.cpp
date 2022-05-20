@@ -15,8 +15,8 @@ Uint_32 mMusicId = 0;
 Uint_32 _id1  = 0;
 Uint_32 _id2  = 0;
 
-Int_32 h = 512;
-Int_32 w = 512;
+Int_32 w = 480;
+Int_32 h = 320;
 BrewGameTool canvas;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
@@ -28,18 +28,24 @@ Mat3x3 sclMat;
 Mat3x3 transMat;
 
 int load = 0;
-
+Uint_32 _font;
+Uint_32 iA;
 
 void init()
 {
-    canvas.SetupRenderer("Canvas Demo", w, h, 1, false, VSYNC_ON);
+    canvas.SetupRenderer("Brew Game Tools", w, h, 1, false, VSYNC_ON);
     canvas.SetupAudio(44100, 2, 2048);
     canvas.SetupInput();
+    iA = canvas.LoadImage(GetResourcePath("A.bmp"));
 
     _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
     _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
     mMusicId = canvas.LoadMusic(GetResourcePath("battle.OGG"));
-    canvas.PlayMusic(mMusicId, true);
+
+    //canvas.PlayMusic(mMusicId, true);
+    _font = canvas.LoadFont(GetResourcePath("arial.ttf"));
+
+
     printf("Initialized\n");
 
 }
@@ -83,7 +89,7 @@ void update()
 
     Image* _img = canvas.GetImageById(_id1);
     Image* _img_t = canvas.GetImageById(_id2);
-
+    Image* _a = canvas.GetImageById(iA);
     static Float_32 _x = 0,_y=0;
     _x += (Float_32)(canvas.GetKey(BGTK_RIGHT)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_LEFT)*canvas.DeltaTime);
     _y += (Float_32)(canvas.GetKey(BGTK_UP)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_DOWN)*canvas.DeltaTime);
@@ -103,10 +109,11 @@ void update()
     Vec2f originA{_img->Width/2.f, _img->Height/2.f};
     Vec2f originB{_img_t->Width/2.f, _img_t->Height/2.f};
     //canvas.BlitImage(_img, origin, rotMat, transA, scaleA, INTERPOLATION_NEAREST, false);
-    canvas.BlitImage(_img, originA, rotMat, transA, scaleA, 1.3f, INTERPOLATION_NEAREST);
-    canvas.BlitImage(_img, transB, originA);
-    canvas.BlitImageAlphaBlended(_img_t, originB, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
-
+    //canvas.BlitImage(_img, originA, rotMat, transA, scaleA, 1.3f, INTERPOLATION_NEAREST);
+    //canvas.BlitImage(_img, transB, originA);
+    //canvas.BlitImageAlphaBlended(_img_t, originB, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
+    Vec2f og(0,0);
+    canvas.BlitImage(_a, transB, og);
     if(canvas.OnKeyDown(BGTK_ESCAPE))
         canvas.Quit();
 
@@ -125,6 +132,9 @@ void update()
     {
         canvas.StopMusic();
     }
+
+    canvas.DrawText("H", _font, {100,100});
+
 }
 
 void close()

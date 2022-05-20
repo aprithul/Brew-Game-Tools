@@ -232,6 +232,27 @@ void BrewGameTool::SetFrameRate(Uint_32 _fps)
 }
 //  Drawing
 
+Uint_32 BrewGameTool::LoadFont(const char* _filename)
+{
+    return renderer->LoadFont(_filename);
+}
+
+void BrewGameTool::DeleteFont(Uint_32 _font)
+{
+    renderer->DeleteFont(_font);
+}
+
+void BrewGameTool::DrawText(const char* _text, Uint_32 _font, Vec2f _location)
+{
+    renderer->DrawText(_text, _font, _location);
+}
+
+void BrewGameTool::SetFontSize(Uint_32 _size)
+{
+    renderer->SetFontSize(_size);
+}
+
+
 
 
 // Input

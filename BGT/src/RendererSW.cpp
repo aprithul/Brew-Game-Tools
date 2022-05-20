@@ -5,6 +5,7 @@
 // because rendering backend needs them
 Uint_32* canvasBuffer;
 Uint_32 canvasBufferSizeInBytes = 0;
+Image textImg;
 
 // include backend to use
 #if defined(RENDERING_BACKEND_SDL2_OPENGL) || defined(DEBUG)
@@ -17,6 +18,12 @@ Renderer::Renderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _
     std::strcpy(windowTitle, _name);
     RB_CreateWindow(_name, Width*PixelSize, Height*PixelSize, _setFullscreen);
     canvasBufferSizeInBytes = Width*PixelSize*Height*PixelSize*sizeof(Uint_32);
+    
+    textImg.Height = 1024;
+    textImg.Width = 1024;
+    textImg.Data = (Uint_32*)std::malloc(textImg.Height*textImg.Width);
+
+
 }
 
 // drawing
@@ -239,6 +246,24 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
         
     }
 }
+
+void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
+{
+    for(Float_32 _i =0; _i< _image->Width; _i++)
+    {
+        for (Float_32 _j = 0; _j < _image->Height; _j++)
+        {
+            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width*_j + _i)];
+            if(_pixelVal & 0xff000000)
+            {
+                Color _pixelCol(_pixelVal);
+                DrawPixel(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
+            }
+        }
+        
+    }
+}
+
 
 void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
@@ -599,6 +624,30 @@ void Renderer::SetFrameRate(Uint_32 _fps)
 void Renderer::SetWindowTitle(const char* _title)
 {
     RB_SetWindowTitle(_title);
+}
+
+
+// Text rendering
+Uint_32 Renderer::LoadFont(const char* _filename)
+{
+    return RB_LoadFont(_filename);
+}
+
+void Renderer::DeleteFont(Uint_32 _font)
+{
+    RB_DeleteFont(_font);
+}
+
+void Renderer::DrawText(const char* _text, Uint_32 _font, Vec2f _location)
+{
+    RB_GetTextBitmap(_text, _font, textImg.Data, &textImg.Width, &textImg.Height);
+    Vec2f _origin(textImg.Width/2, textImg.Height/2);
+    BlitImageAlphaBlended(&textImg, _location, _origin);
+}
+
+void Renderer::SetFontSize(Uint_32 _size)
+{
+    RB_SetFontSize(_size);
 }
 
 Renderer::~Renderer()

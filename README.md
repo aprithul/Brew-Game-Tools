@@ -8,7 +8,7 @@ Keep reading for setup instructinos.
 ## Project Structure
 ```
   <Root Folder>
-    |-- Canvas (Contains the framework source files)
+    |-- BGT (Contains the framework source files)
     |-- App (All user code goes here)
     |-- Vendor (Generated once you run setup, contains SDL and GLEW files)
 ```

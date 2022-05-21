@@ -1,4 +1,5 @@
 SRC_DIR = src
+INC_DIR = include
 BUILD_DIR = build/debug
 CC = clang++
 INCLUDE_PATHS = -Iinclude -I../Vendor/SDL2/include -I../Vendor/GL/include
@@ -15,7 +16,7 @@ all: $(BUILD_DIR)/bgt.o
 clean:
 	rm -r -f $(BUILD_DIR)/*
 
-$(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
+$(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp $(INC_DIR)/*.hpp
 	$(CC) -DBACKEND_SDL2_OPENGL -DEXPORT_AS_DLL $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
 	$(CC) -shared -o $(BUILD_DIR)/bgt.dll $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
 

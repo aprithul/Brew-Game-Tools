@@ -324,7 +324,7 @@ void RB_SetVsync(VsyncMode _mode)
 
 Uint_32 RB_LoadFont(const char* _filename)
 {
-    TTF_Font* _font = TTF_OpenFont(_filename, 12);
+    TTF_Font* _font = TTF_OpenFont(_filename, 32);
     nextFontId++;
     fonts[nextFontId] = _font;
     return nextFontId;
@@ -342,26 +342,60 @@ void RB_DeleteFont(Uint_32 _font)
         printf("Font not found\n");
 }
 
-void RB_GetTextBitmap(const char* _text, Uint_32 _font, Uint_32* textBmp, Int_32* w, Int_32* h)
+void RB_GetTextBitmap(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Uint_32* textBmp, Int_32* w, Int_32* h)
 {
-    //printf("Getting bitS\n");
+
     auto it = fonts.find(_font);
-    SDL_Color fg = {255,255,255,255};
-    SDL_Color bg = {0,0,0,255};
+
+    SDL_Color fg;
+    _col.RetrieveComponenets(&fg.r, &fg.g, &fg.b, &fg.a);
+
     if(it != fonts.end())
     {
-        //SDL_Surface* renderedSurface = TTF_RenderText_Solid(it->second, _text, fg);
-        SDL_Surface* renderedSurface = TTF_RenderText_Solid(it->second, _text, fg);
-        int bpp = renderedSurface->format->BytesPerPixel;
+        if(_size > 0)
+            TTF_SetFontSize(it->second, _size);
 
-        auto pixels = (char*)renderedSurface->pixels;
+        SDL_Surface* renderedSurface = TTF_RenderText_Blended(it->second, _text, fg);
+        int bpp = renderedSurface->format->BytesPerPixel;
+        unsigned char* pixels = (unsigned char*)renderedSurface->pixels;
+        int l =0;
+        
+
+        (*w) = renderedSurface->pitch/bpp;
+        (*h) = renderedSurface->h;
+
+        for(int _r = 0; _r<*h; _r++)
+        {
+            memcpy(&textBmp[((renderedSurface->pitch/bpp)*_r)], &(pixels[(renderedSurface->pitch*(*h-_r-1))]), renderedSurface->pitch);
+        }
+
+        /*
+        for(int i=0; i<renderedSurface->h; i++)
+        {
+            for(int j=0; j<renderedSurface->pitch; j+=bpp)
+            {
+                //bgra
+                Uint_32 _a = 0x000000ff & ((Uint_32)pixels[(i*renderedSurface->pitch)+j]);
+                Uint_32 _r = 0x0000ff00 & ((Uint_32)(pixels[(i*renderedSurface->pitch)+j+1])) << 8;
+                Uint_32 _g = 0x00ff0000 & ((Uint_32)(pixels[(i*renderedSurface->pitch)+j+2])) << 16;
+                Uint_32 _b = 0xff000000 & ((Uint_32)(pixels[(i*renderedSurface->pitch)+j+3])) << 24;
+                
+                textBmp[l++] = _a | _r | _g | _b;
+               // printf("%u ",textBmp[l-1]);
+                
+            }
+
+            //printf("\n");
+        }
+
+       // printf("Done'");
+
+
         //memcpy(textBmp, (Uint_32*)(renderedSurface->pixels), renderedSurface->h*renderedSurface->pitch);
         (*w) = renderedSurface->pitch/bpp;
         (*h) = renderedSurface->h;
         //std::cout<<renderedSurface->format->format<<std::endl;
 
-
-        int l =0;
         for(int i=0; i<renderedSurface->h; i++)
         {
             for(int j=0; j<renderedSurface->pitch; j+=bpp)
@@ -394,7 +428,8 @@ void RB_GetTextBitmap(const char* _text, Uint_32 _font, Uint_32* textBmp, Int_32
             //printf("\n");
         }
         
-        
+        */
+       // printf("--------------------------------------------------\n");
         SDL_FreeSurface(renderedSurface);
 
         

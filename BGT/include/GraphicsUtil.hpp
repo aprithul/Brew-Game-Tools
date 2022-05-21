@@ -28,11 +28,12 @@ struct Color
 {
     Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory);
     Color(Uint_32 argb);
+    void RetrieveComponenets(Byte_8* r, Byte_8* g, Byte_8* b, Byte_8* a);
     Uint_32 Value;
+    ColorFormat formatInMemory;
 
     static Color interpolate(const Color& a, const Color& b, Float_32 t);
     static Color alphaBlend(const Color& bg, const Color& ov);
-
 };
 
 
@@ -53,6 +54,7 @@ struct Image // 192 bytes
 
 Color::Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory)
 {
+    formatInMemory = _formatInMemory;
     switch (_formatInMemory)
     {
         case RGBA:
@@ -78,6 +80,7 @@ Color::Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory
 
 Color::Color( Uint_32 argb)
 {
+    formatInMemory = ColorFormat::ARGB;
     Value = argb;
 }
 
@@ -119,5 +122,38 @@ Color Color::alphaBlend(const Color& bg, const Color& ov)
 
     return Color(interpolated);
 }
+
+void Color::RetrieveComponenets(Byte_8* r, Byte_8* g, Byte_8* b, Byte_8* a)
+{
+    switch (formatInMemory)
+    {
+        case RGBA:
+        {
+            *a = (Value>>24) & 0x000000ff;
+            *b = (Value>>16)  & 0x000000ff;
+            *g = (Value>>8)  & 0x000000ff;
+            *r =  Value  & 0x000000ff;
+            printf("%hx, %hx, %hx, %hx\n", *a, *b, *g, *r);
+        }   
+            break;
+        case BGRA:
+        {
+            *a = (Value>>24) & 0x000000ff;
+            *r = (Value>>16)  & 0x000000ff;
+            *g = (Value>>8)  & 0x000000ff;
+            *b =  Value  & 0x000000ff;
+        }
+            break;
+        case ARGB:
+        {
+            *b = (Value>>24) & 0x000000ff;
+            *g = (Value>>16)  & 0x000000ff;
+            *r = (Value>>8)  & 0x000000ff;
+            *a =  Value  & 0x000000ff;
+        }
+            break;
+    }
+}
+
 
 #endif

@@ -36,7 +36,7 @@ public:
     Uint_32 LoadFont(const char* _filename);
     void DeleteFont(Uint_32 _font);
     void GetTextBmp(const char* _text, Uint_32 _font);
-    void DrawText(const char* _text, Uint_32 _font, Vec2f _location);
+    void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location);
     void SetFontSize(Uint_32 _size);
 
     void Clear();

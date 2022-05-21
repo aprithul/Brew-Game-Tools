@@ -5,7 +5,7 @@ CC = clang++
 INCLUDE_PATHS = -Iinclude -I../BGT/include
 LIBRARY_PATHS = -L../BGT/build/debug/
 LINKER_FLAGS = -lbgt
-DEPENDENCIES = $(SRC_FILES) ../BGT/build/debug/*.o
+DEPENDENCIES = $(SRC_FILES) ../BGT/build/debug/*.o ../BGT/include/*.hpp
 
 ifeq ($(OS),Windows_NT)
 	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g

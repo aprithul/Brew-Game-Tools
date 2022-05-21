@@ -242,9 +242,9 @@ void BrewGameTool::DeleteFont(Uint_32 _font)
     renderer->DeleteFont(_font);
 }
 
-void BrewGameTool::DrawText(const char* _text, Uint_32 _font, Vec2f _location)
+void BrewGameTool::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location)
 {
-    renderer->DrawText(_text, _font, _location);
+    renderer->DrawText(_text, _font, _size, _col, _location);
 }
 
 void BrewGameTool::SetFontSize(Uint_32 _size)

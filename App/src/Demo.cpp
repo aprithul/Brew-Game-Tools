@@ -133,7 +133,17 @@ void update()
         canvas.StopMusic();
     }
 
-    canvas.DrawText("H", _font, {100,100});
+    static Uint_32 fSize = 32;
+    if(canvas.OnKeyDown(BGTK_UP))
+    {
+        fSize += 8;
+    }
+    if(canvas.OnKeyDown(BGTK_DOWN))
+    {
+        fSize -= 8;
+    }
+
+    canvas.DrawText("Hello!", _font, fSize, Color(0,0,0xff,0xff, ColorFormat::BGRA), {100,100});
 
 }
 

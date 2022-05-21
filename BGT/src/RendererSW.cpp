@@ -638,9 +638,9 @@ void Renderer::DeleteFont(Uint_32 _font)
     RB_DeleteFont(_font);
 }
 
-void Renderer::DrawText(const char* _text, Uint_32 _font, Vec2f _location)
+void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location)
 {
-    RB_GetTextBitmap(_text, _font, textImg.Data, &textImg.Width, &textImg.Height);
+    RB_GetTextBitmap(_text, _font, _size, _col, textImg.Data, &textImg.Width, &textImg.Height);
     Vec2f _origin(textImg.Width/2, textImg.Height/2);
     BlitImageAlphaBlended(&textImg, _location, _origin);
 }

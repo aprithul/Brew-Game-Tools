@@ -1,6 +1,4 @@
-
-
-https://user-images.githubusercontent.com/8151229/169681128-e07dee4c-47ba-4f53-a4f4-88f59a37703a.mp4
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/8151229/169681153-ff8e2b25-d8b9-4b4a-81c1-3a19a932ae0c.gif)
 
 # Brew-Game-Tools
 Brew-Game-Tools is a small 2D game framwork written in C++ with the main goal being simplicity. 

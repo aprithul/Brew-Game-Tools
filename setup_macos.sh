@@ -1,3 +1,5 @@
+xcode-select --install
+
 mkdir App/build
 mkdir App/build/debug
 mkdir App/src
@@ -17,6 +19,7 @@ mkdir Vendor/GL/include
 
 brew install SDL2
 brew install sdl2_mixer
+brew install sdl2_ttf
 ln -s /opt/homebrew/include/SDL2 Vendor/SDL2/include
 ln -s /opt/homebrew/lib Vendor/SDL2/
 

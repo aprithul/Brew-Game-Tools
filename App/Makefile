@@ -19,7 +19,7 @@ $(BUILD_DIR)/$(OBJ_NAME):$(DEPENDENCIES)
 clean:
 	rm -r -f $(BUILD_DIR)/*
 else
-	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g -arch arm64
+	COMPILER_FLAGS = -std=c++11 -Wall -O0 -g
 	OBJ_NAME = game
 	
 all:$(BUILD_DIR)/$(OBJ_NAME)

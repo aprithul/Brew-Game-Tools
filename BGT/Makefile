@@ -23,7 +23,7 @@ $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp $(INC_DIR)/*.hpp
 else
 
 LINKER_FLAGS = -framework OpenGL -lsdl2 -lsdl2_mixer -lsdl2_ttf -lglew
-COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g -arch arm64
+COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/GL/lib
 
 all: $(BUILD_DIR)/bgt.o

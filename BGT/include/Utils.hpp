@@ -2,6 +2,7 @@
 #define UTILS_HPP
 
 void Swap(float* a, float* b);
+void Swap(int* a, int* b);
 void Swap(unsigned int* a, unsigned int* b);
 void Swap(unsigned char* a, unsigned char* b);
 float Clamp(float _val, float _min, float _max);

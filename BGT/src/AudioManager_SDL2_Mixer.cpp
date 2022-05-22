@@ -3,6 +3,7 @@
 #include "SDL2/SDL_mixer.h"
 #include <stdio.h>
 #include <unordered_map>
+#include "Utils.hpp"
 
 std::unordered_map<Uint_32, Mix_Music*> loadedMusic;
 std::unordered_map<Uint_32, Mix_Chunk*> loadedChunk;
@@ -59,7 +60,7 @@ void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
     if(loadedMusic.find(musicId) != loadedMusic.end())
         Mix_PlayMusic( loadedMusic[musicId], doLoop? -1 : 1); // -1 == play infinite times
     else
-        printf("Music with id : %d not found\n");
+        printf("Music with id : %u not found\n", musicId);
 }
 
 void AudioManager::SetMusicVolume(Float_32 _volume)
@@ -110,7 +111,7 @@ void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
      if(loadedChunk.find(_soundEffect) != loadedChunk.end())
         Mix_PlayChannel(-1, loadedChunk[_soundEffect], 0); // -1 == play infinite times
     else
-        printf("Sound effect with id : %d not found\n");
+        printf("Sound effect with id : %u not found\n", _soundEffect);
 }
 
 

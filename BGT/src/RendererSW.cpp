@@ -8,7 +8,7 @@ Uint_32 canvasBufferSizeInBytes = 0;
 Image textImg;
 
 // include backend to use
-#if defined(RENDERING_BACKEND_SDL2_OPENGL) || defined(DEBUG)
+#if defined(RENDERING_BACKEND_SDL2_OPENGL) || defined(_DEBUG)
     #include "RenderingBackend_SDL2_OpenGL.cpp"
 #endif
 

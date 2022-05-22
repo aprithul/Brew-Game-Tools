@@ -57,6 +57,11 @@ void BrewGameTool::Quit()
     is_game_running = false;
 }
 
+void BrewGameTool::SetNextFrameClearColor(Color _color)
+{
+    clearColor = _color;
+}
+
 Int_32 BrewGameTool::Run()
 {
     using namespace std::chrono;
@@ -74,7 +79,7 @@ Int_32 BrewGameTool::Run()
         if(inputManager->WasWindowCrossed())
             is_game_running = false;
 
-        renderer->ClearSlow(Color(0xffffff00));
+        renderer->ClearSlow(clearColor);
         //renderer->ClearFast(0x80);
         update(); // app update
         renderer->Draw();
@@ -160,17 +165,17 @@ Uint_32 BrewGameTool::LoadImage(const char* _filename)
     _image.Diagonal = sqrtf(_image.Width*_image.Width + _image.Height*_image.Height);
     if(_imageData)
     {
-        _nextId++;
+        nextId++;
         // bgra
         // change byte order so that [r][g][b][a] becomes [b][g][r][a]
         Uint_32 _img_data_size = _image.Width * _image.Height;
         for(int _i=0; _i<_img_data_size; _i++)
         {
-            Utils_Swap_uc( &_imageData[_i*4], &_imageData[_i*4 + 2] );
+            Swap( &_imageData[_i*4], &_imageData[_i*4 + 2] );
         }
         _image.Data = (Uint_32*)_imageData;
-        _imageDataStore[_nextId] = _image;
-        return _nextId;
+        _imageDataStore[nextId] = _image;
+        return nextId;
     }
     return 0;
 }

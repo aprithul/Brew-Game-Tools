@@ -26,6 +26,7 @@ enum Interpolation
 
 struct Color
 {
+    Color();
     Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory);
     Color(Uint_32 argb);
     void RetrieveComponenets(Byte_8* r, Byte_8* g, Byte_8* b, Byte_8* a);
@@ -51,6 +52,12 @@ struct Image // 192 bytes
 #ifdef GRAPHICS_UTILS_IMPLEMENTATION
 #undef GRAPHICS_UTILS_IMPLEMENTATION
 
+
+Color::Color()
+{
+    formatInMemory = ColorFormat::ARGB;
+    Value = 0x00000000;
+}
 
 Color::Color(Byte_8 r, Byte_8 g, Byte_8 b, Byte_8 a, ColorFormat _formatInMemory)
 {

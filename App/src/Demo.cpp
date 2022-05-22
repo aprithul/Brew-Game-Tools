@@ -112,13 +112,14 @@ void update()
 
     static Float_32 oscAcu = 0;
     Float_32 osc = abs(sinf(rot*0.2))+0.5f;
-    oscAcu += osc*0.05f;
+    oscAcu += osc*0.007f;
 
     static Vec2f _textScale = {1,1};
     _textScale.x = osc;
     _textScale.y = osc;
     
     bgt.DrawText("Brew Game Tools!", _font, 36, colors[ ((Int_32)oscAcu)%3], {w/2.f,h-(h/4.f)}, 0 , _textScale);
+    bgt.SetNextFrameClearColor(colors[ ((Int_32)oscAcu+1)%3]);
     //bgt.DrawText("Brew Game Tools!", _font, 38, colors[ ((Int_32)oscAcu+1)%3], {w/2.f,h-(h/3.9f)}, 0 , _textScale);
 
 
@@ -141,7 +142,7 @@ void update()
 
 void close()
 {
-    printf("App stopped receiving service!\n");
+    printf("All BGT services closed.\n");
 }
 
 int main()

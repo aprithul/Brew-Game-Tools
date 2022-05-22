@@ -25,7 +25,7 @@ struct DllExport BrewGameTool
     void SetupRenderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode);
     void SetupAudio(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize);
     void SetupInput();
-
+    void SetNextFrameClearColor(Color _col);
 
     Int_32 Run();
     void Quit();
@@ -92,7 +92,8 @@ struct DllExport BrewGameTool
 
     private:
         //static Image _imageDataStore[MAX_IMAGES_LOADABLE];
-        Uint_32 _nextId;
+        Uint_32 nextId;
+        Color clearColor;
         std::unordered_map<Uint_32, Image> _imageDataStore;
         Bool_8 is_game_running;
         void (*init) ();

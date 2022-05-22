@@ -29,7 +29,6 @@ Renderer::Renderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _
 // drawing
 void Renderer::DrawPixel(Float_32 _x, Float_32 _y, Color color)
 {
-    
     Int_32 _rx = _x * PixelSize;
     Int_32 _ry = _y * PixelSize;
     Int_32 _rWidth = Width * PixelSize;
@@ -73,8 +72,8 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
     {
         if(_y2 < _y1)
         {
-            Utils_Swap_i(&_x1, &_x2);
-            Utils_Swap_i(&_y1, &_y2);
+            Swap(&_x1, &_x2);
+            Swap(&_y1, &_y2);
         }
 
         for(int _yi = _y1, _xi = _x1; _yi <= _y2; _yi++)
@@ -86,8 +85,8 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
     {
         if(_x2 < _x1)
         {
-            Utils_Swap_i(&_x1, &_x2);
-            Utils_Swap_i(&_y1, &_y2);
+            Swap(&_x1, &_x2);
+            Swap(&_y1, &_y2);
         }
 
         for(int _xi = _x1,_yi = _y1; _xi <= _x2; _xi++)
@@ -103,8 +102,8 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
         {
             if(_x2 < _x1)
             {
-                Utils_Swap_i(&_x1, &_x2);
-                Utils_Swap_i(&_y1, &_y2);
+                Swap(&_x1, &_x2);
+                Swap(&_y1, &_y2);
             }
 
             Int_32 _inc = 1;
@@ -130,8 +129,8 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
         {
             if(_y2 < _y1)
             {
-                Utils_Swap_i(&_x1, &_x2);
-                Utils_Swap_i(&_y1, &_y2);
+                Swap(&_x1, &_x2);
+                Swap(&_y1, &_y2);
             }
             _m = (Float_32)(_x1 - _x2) / (_y1 - _y2);
 
@@ -412,9 +411,9 @@ void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3&
                             static const Uint_32 _maskG = 0x0000ff00;
                             static const Uint_32 _maskB = 0x000000ff;
                             
-                            Uint_32 _r = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
-                            Uint_32 _g = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
-                            Uint_32 _b = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+                            Uint_32 _r = (Uint_32)Clamp(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)Clamp(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)Clamp(((_pixelVal & _maskB))*brightness, 0, 0xFF);
 
                             _pixelVal = 0xff000000 | _r | _g | _b;
 
@@ -604,9 +603,9 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, c
                             static const Uint_32 _maskG = 0x0000ff00;
                             static const Uint_32 _maskB = 0x000000ff;
                             
-                            Uint_32 _r = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
-                            Uint_32 _g = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
-                            Uint_32 _b = (Uint_32)Utils_Clamp_f(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+                            Uint_32 _r = (Uint_32)Clamp(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)Clamp(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)Clamp(((_pixelVal & _maskB))*brightness, 0, 0xFF);
 
                             _pixelVal = (_pixelVal & _maskA) | _r | _g | _b;
 

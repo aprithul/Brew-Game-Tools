@@ -353,13 +353,12 @@ void RB_GetTextBitmap(const char* _text, Uint_32 _font, Int_32 _size, Color _col
 
     if(it != fonts.end())
     {
+        
         if(_size > 0)
             TTF_SetFontSize(it->second, _size);
         SDL_Surface* renderedSurface = TTF_RenderText_Blended(it->second, _text, fg);
         int bpp = renderedSurface->format->BytesPerPixel;
         unsigned char* pixels = (unsigned char*)renderedSurface->pixels;
-        int l =0;
-        
 
         (*w) = renderedSurface->pitch/bpp;
         (*h) = renderedSurface->h;

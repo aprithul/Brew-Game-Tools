@@ -14,7 +14,7 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "C:/mingw/bin/clang++.exe",
+            "compilerPath": "${workspaceFolder}/Vendor/mingw/llvm-mingw-ucrt-x86_64/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-clang-x64",

@@ -4,7 +4,7 @@
             "type": "process",
             "label": "Build BGT library",
             "windows":{
-                "command": "mingw32-make"
+                "command": "../Vendor/mingw/llvm-mingw-ucrt-x86_64/bin/mingw32-make.exe"
             },
             "osx":{
                 "command": "make"
@@ -39,7 +39,7 @@
             "type": "process",
             "label": "Build Demo",
             "windows":{
-                "command": "mingw32-make"
+                "command": "../Vendor/mingw/llvm-mingw-ucrt-x86_64/bin/mingw32-make.exe"
             },
             "osx":{
                 "command": "make"

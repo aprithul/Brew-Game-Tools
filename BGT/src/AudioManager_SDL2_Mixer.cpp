@@ -64,7 +64,7 @@ void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
 
 void AudioManager::SetMusicVolume(Float_32 _volume)
 {
-    _volume = Utils_Clamp_f(_volume, 0, 1);
+    _volume = Clamp(_volume, 0, 1);
     Int_32 _volumeI = (Int_32)(_volume*255);
     Mix_VolumeMusic(_volumeI);
 }
@@ -107,7 +107,6 @@ Uint_32 AudioManager::LoadSoundEffect(const char* _filename)
 
 void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
 {
-    
      if(loadedChunk.find(_soundEffect) != loadedChunk.end())
         Mix_PlayChannel(-1, loadedChunk[_soundEffect], 0); // -1 == play infinite times
     else
@@ -117,7 +116,7 @@ void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
 
 void AudioManager::SetSoundEffectVolume(Float_32 _volume)
 {
-    _volume = Utils_Clamp_f(_volume, 0, 1);
+    _volume = Clamp(_volume, 0, 1);
     Int_32 _volumeI = (Int_32)(_volume*255);
     Mix_Volume(-1, _volumeI);
 }

@@ -47,18 +47,26 @@ struct DllExport BrewGameTool
 
 
     Uint_32 LoadMusic(const char* _filename);
+    Uint_32 LoadSoundEffect(const char* _filename);
+    
     void PlayMusic(Uint_32 _music, Bool_8 doLoop);
     void PauseMusic();
     void ResumeMusic();
     Bool_8 IsPlayingMusic();
     void StopMusic();
+    void SetMusicVolume(Float_32 _volume);
+
+    void PlaySoundEffect(Uint_32 _effect);
+    void SetSoundEffectVolume(Float_32 _volume);
     
+    void SetMasterVolume(Float_32 _volume);
+
     // image blitting function
-    void BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin);
-    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
-    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin);
+    void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
     
     
     // drawing funcitons
@@ -73,6 +81,7 @@ struct DllExport BrewGameTool
     Uint_32 LoadFont(const char* _filename);
     void DeleteFont(Uint_32 _font);
     void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location);
+    void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale);
     void SetFontSize(Uint_32 _size);
 
     Uint_32 Width;

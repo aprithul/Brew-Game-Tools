@@ -325,6 +325,7 @@ void RB_SetVsync(VsyncMode _mode)
 Uint_32 RB_LoadFont(const char* _filename)
 {
     TTF_Font* _font = TTF_OpenFont(_filename, 32);
+
     nextFontId++;
     fonts[nextFontId] = _font;
     return nextFontId;
@@ -354,7 +355,6 @@ void RB_GetTextBitmap(const char* _text, Uint_32 _font, Int_32 _size, Color _col
     {
         if(_size > 0)
             TTF_SetFontSize(it->second, _size);
-
         SDL_Surface* renderedSurface = TTF_RenderText_Blended(it->second, _text, fg);
         int bpp = renderedSurface->format->BytesPerPixel;
         unsigned char* pixels = (unsigned char*)renderedSurface->pixels;

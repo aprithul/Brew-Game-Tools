@@ -5,7 +5,9 @@
 #include <unordered_map>
 
 std::unordered_map<Uint_32, Mix_Music*> loadedMusic;
+std::unordered_map<Uint_32, Mix_Chunk*> loadedChunk;
 Uint_32 nextMusicId = 0;
+Uint_32 nextChunkId = 0;
 
 AudioManager::AudioManager(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize)
 {
@@ -60,6 +62,13 @@ void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
         printf("Music with id : %d not found\n");
 }
 
+void AudioManager::SetMusicVolume(Float_32 _volume)
+{
+    _volume = Utils_Clamp_f(_volume, 0, 1);
+    Int_32 _volumeI = (Int_32)(_volume*255);
+    Mix_VolumeMusic(_volumeI);
+}
+
 void AudioManager::PauseMusic()
 {
     Mix_PauseMusic();
@@ -78,4 +87,37 @@ Bool_8 AudioManager::IsPlayingMusic()
 void AudioManager::StopMusic()
 {
     Mix_HaltMusic();
+}
+
+Uint_32 AudioManager::LoadSoundEffect(const char* _filename)
+{
+    
+
+    Mix_Chunk* _chunk = Mix_LoadWAV(_filename);
+    if(_chunk)
+    {
+        nextChunkId++;
+        loadedChunk[nextChunkId] = _chunk;
+    }
+    else
+        printf( "Failed to load sound effect %s ! SDL_mixer Error: %s\n", _filename, Mix_GetError());
+    
+    return nextChunkId;
+}
+
+void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
+{
+    
+     if(loadedChunk.find(_soundEffect) != loadedChunk.end())
+        Mix_PlayChannel(-1, loadedChunk[_soundEffect], 0); // -1 == play infinite times
+    else
+        printf("Sound effect with id : %d not found\n");
+}
+
+
+void AudioManager::SetSoundEffectVolume(Float_32 _volume)
+{
+    _volume = Utils_Clamp_f(_volume, 0, 1);
+    Int_32 _volumeI = (Int_32)(_volume*255);
+    Mix_Volume(-1, _volumeI);
 }

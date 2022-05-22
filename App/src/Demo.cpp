@@ -12,17 +12,16 @@
 #include "GraphicsUtil.hpp"
 
 Uint_32 mMusicId = 0;
+Uint_32 soundEffectId = 0;
 Uint_32 _id1  = 0;
 Uint_32 _id2  = 0;
 
 Int_32 w = 480;
 Int_32 h = 320;
-BrewGameTool canvas;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
-
-Color colors[3] = { Color(0xffff0000), Color(0xff00ff00), Color(0xff0000ff)};
+BrewGameTool bgt;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Float_32 rot = 0;
-Mat3x3 rotMat;
+
 Mat3x3 rotMat_t;
 Mat3x3 sclMat;
 Mat3x3 transMat;
@@ -31,20 +30,31 @@ int load = 0;
 Uint_32 _font;
 Uint_32 iA;
 
+Uint_32 zombieSprites[10];
+
 void init()
 {
-    canvas.SetupRenderer("Brew Game Tools", w, h, 1, false, VSYNC_ON);
-    canvas.SetupAudio(44100, 2, 2048);
-    canvas.SetupInput();
-    iA = canvas.LoadImage(GetResourcePath("A.bmp"));
+    bgt.SetupRenderer("Brew Game Tools", w, h, 1, false, VSYNC_ON);
+    bgt.SetupAudio(44100, 2, 2048);
+    bgt.SetupInput();
 
-    _id1 = canvas.LoadImage(GetResourcePath("lighto.bmp"));
-    _id2 = canvas.LoadImage(GetResourcePath("zombie_t.png"));
-    mMusicId = canvas.LoadMusic(GetResourcePath("battle.OGG"));
+    _id1 = bgt.LoadImage(GetResourcePath("spin.png"));
+    mMusicId = bgt.LoadMusic(GetResourcePath("battle.OGG"));
+    soundEffectId = bgt.LoadSoundEffect(GetResourcePath("coin.wav"));
 
-    //canvas.PlayMusic(mMusicId, true);
-    _font = canvas.LoadFont(GetResourcePath("arial.ttf"));
+    bgt.PlayMusic(mMusicId, true);
+    _font = bgt.LoadFont(GetResourcePath("arial.ttf"));
 
+    zombieSprites[0] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_000.png"));
+    zombieSprites[1] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_001.png"));
+    zombieSprites[2] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_002.png"));
+    zombieSprites[3] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_003.png"));
+    zombieSprites[4] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_004.png"));
+    zombieSprites[5] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_005.png"));
+    zombieSprites[6] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_006.png"));
+    zombieSprites[7] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_007.png"));
+    zombieSprites[8] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_008.png"));
+    zombieSprites[9] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_009.png"));
 
     printf("Initialized\n");
 
@@ -52,99 +62,81 @@ void init()
 
 void update()
 {
-    Color r = colors[0];
-    Color g = colors[1];
-    Color b = colors[2];
+    static Color red(0xff, 0, 0, 0xff, BGRA);
+    static Color blue(0, 0, 0xff, 0xff, BGRA);
+    static Color green(0, 0xff, 0, 0xff, BGRA);
+    static Color colors[3] = {red, blue, green};
 
-    Color red(0xff, 0,0,0xff, BGRA);
-    Color blue(0, 0,0xff,0xff, BGRA);
-    Color green(0, 0,0xff,0xff, BGRA);
-
-    Vec2f p0(canvas.Width/2,canvas.Height/2);
-    Vec2f p1(canvas.Width/1.3,canvas.Height/2);
+    rot -= bgt.DeltaTime*.01f;
     
-    //rot = DEG_TO_RAD*45;
-    rot -= canvas.DeltaTime*.01f;
-    rotMat = Mat3x3::Identity();
-    rotMat(0,0) = cosf(rot);
-    rotMat(0,1) = -sinf(rot);
-    rotMat(1,0) = sinf(rot);
-    rotMat(1,1) = cosf(rot);
-    
-    rotMat_t = Mat3x3::Identity();
-    rotMat_t(0,0) = cosf(rot*0.5f);
-    rotMat_t(0,1) = -sinf(rot*0.5f);
-    rotMat_t(1,0) = sinf(rot*0.5f);
-    rotMat_t(1,1) = cosf(rot*0.5f);
-
-    sclMat = Mat3x3::Identity();
-    sclMat(0,0) = 2;
-    sclMat(1,1) = 2;
-
-
-    p1 -= p0;
-    p1 = rotMat * p1;
-    p1 += p0;
-
-
-    Image* _img = canvas.GetImageById(_id1);
-    Image* _img_t = canvas.GetImageById(_id2);
-    Image* _a = canvas.GetImageById(iA);
     static Float_32 _x = 0,_y=0;
-    _x += (Float_32)(canvas.GetKey(BGTK_RIGHT)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_LEFT)*canvas.DeltaTime);
-    _y += (Float_32)(canvas.GetKey(BGTK_UP)*canvas.DeltaTime) - (Float_32)(canvas.GetKey(BGTK_DOWN)*canvas.DeltaTime);
+    static Float_32 zombieSpeed = 150;
+    _x += (Float_32)(bgt.GetKey(BGTK_RIGHT)*zombieSpeed*(bgt.DeltaTime/1000)) - (Float_32)(bgt.GetKey(BGTK_LEFT)*zombieSpeed*(bgt.DeltaTime/1000));
 
-    //canvas.BlitImage(_img, _x, _y);
-
-    //Vec2i trans{w/2, h/2};
-    Vec2f transA{(Float_32) w*3/4  + _x, (Float_32)h/2 + _y};
-    Vec2f transB{(Float_32) w/4, (Float_32)h/2};
-    //Vec2i origin{_img->Width/2, _img->Height/2};
-
-    Float_32 osc = abs(sinf(rot))+0.5f;
-    Vec2f scaleA{2.f, 2.f};// (2*osc,2*osc);
-    Vec2f scaleB{0.2f, 0.2f};// (2*osc,2*osc);
-    //Vec2f scale{0.5f,0.5f};// (2*osc,2*osc);
+    static Vec2f transB{(Float_32) w*3/4, (Float_32)h/2};
+    static Vec2f scaleA{2.f, 2.f};
+    static Vec2f scaleB{0.3f, 0.3f};
+    static Vec2f originA{bgt.GetImageById(_id1)->Width/2.f, bgt.GetImageById(_id1)->Height/2.f};
     
-    Vec2f originA{_img->Width/2.f, _img->Height/2.f};
-    Vec2f originB{_img_t->Width/2.f, _img_t->Height/2.f};
-    //canvas.BlitImage(_img, origin, rotMat, transA, scaleA, INTERPOLATION_NEAREST, false);
-    //canvas.BlitImage(_img, originA, rotMat, transA, scaleA, 1.3f, INTERPOLATION_NEAREST);
-    //canvas.BlitImage(_img, transB, originA);
-    //canvas.BlitImageAlphaBlended(_img_t, originB, rotMat_t, transB, scaleB, INTERPOLATION_NEAREST);
-    Vec2f og(0,0);
-    canvas.BlitImage(_a, transB, og);
-    if(canvas.OnKeyDown(BGTK_ESCAPE))
-        canvas.Quit();
+    
+    //bgt.BlitImage(_id1,  originA, rot, transA, scaleB, INTERPOLATION_NEAREST);
+    
 
-    if(canvas.OnKeyDown(BGTK_V))
-        canvas.SetVsyncMode(canvas.vsyncMode == VSYNC_OFF?VSYNC_ON : VSYNC_OFF);
+    static Float_32 animTime = 0;
+    animTime += (bgt.DeltaTime*8);
 
-    if(canvas.OnKeyDown(BGTK_M))
+    Uint_32 zombieId = zombieSprites[((Int_32)(animTime/1000))%10];
+    Vec2f originB{bgt.GetImageById(zombieId)->Width/2.f, bgt.GetImageById(zombieId)->Height/2.f};
+
+    
+
+    
+    if(bgt.OnKeyDown(BGTK_ESCAPE))
+        bgt.Quit();
+
+    if(bgt.OnKeyDown(BGTK_V))
+        bgt.SetVsyncMode(bgt.vsyncMode == VSYNC_OFF?VSYNC_ON : VSYNC_OFF);
+
+    if(bgt.OnKeyDown(BGTK_M))
     {
-        if(canvas.IsPlayingMusic())
-            canvas.PauseMusic();
+        if(bgt.IsPlayingMusic())
+            bgt.PauseMusic();
         else
-            canvas.ResumeMusic();
+            bgt.ResumeMusic();
     }
 
-    if(canvas.OnKeyDown(BGTK_S))
+    if(bgt.OnKeyDown(BGTK_S))
     {
-        canvas.StopMusic();
+        bgt.StopMusic();
     }
 
-    static Uint_32 fSize = 32;
-    if(canvas.OnKeyDown(BGTK_UP))
-    {
-        fSize += 8;
-    }
-    if(canvas.OnKeyDown(BGTK_DOWN))
-    {
-        fSize -= 8;
-    }
+    static Float_32 oscAcu = 0;
+    Float_32 osc = abs(sinf(rot*0.2))+0.5f;
+    oscAcu += osc*0.05f;
 
-    canvas.DrawText("Hello!", _font, fSize, Color(0,0,0xff,0xff, ColorFormat::BGRA), {100,100});
+    static Vec2f _textScale = {1,1};
+    _textScale.x = osc;
+    _textScale.y = osc;
+    
+    bgt.DrawText("Brew Game Tools!", _font, 36, colors[ ((Int_32)oscAcu)%3], {w/2.f,h-(h/4.f)}, 0 , _textScale);
+    //bgt.DrawText("Brew Game Tools!", _font, 38, colors[ ((Int_32)oscAcu+1)%3], {w/2.f,h-(h/3.9f)}, 0 , _textScale);
 
+
+    Vec2f transA{(Float_32) w/2  + _x, (Float_32)h/3};
+    if(bgt.OnKeyDown(BGTK_LEFT))
+        scaleB.x = -.3f;
+    if(bgt.OnKeyDown(BGTK_RIGHT))
+        scaleB.x = .3f;
+
+    bgt.DrawImage(zombieId,  originB, 0, transA, scaleB, INTERPOLATION_NEAREST);
+
+    if(bgt.OnKeyDown(BGTK_T))
+        bgt.PlaySoundEffect(soundEffectId);
+
+    static Float_32 _vol = 1.f;
+    Float_32 dts = (bgt.DeltaTime/1000);
+    _vol = _vol + bgt.GetKey(BGTK_UP)*dts - bgt.GetKey(BGTK_DOWN)*dts;
+    bgt.SetMasterVolume(_vol);
 }
 
 void close()
@@ -154,11 +146,11 @@ void close()
 
 int main()
 {
-    canvas.SetInitFunc(init);
-    canvas.SetUpdateFunc(update);
-    canvas.SetCloseFunc(close);
+    bgt.SetInitFunc(init);
+    bgt.SetUpdateFunc(update);
+    bgt.SetCloseFunc(close);
 
-    canvas.Run();
+    bgt.Run();
 
     return 0;
 }

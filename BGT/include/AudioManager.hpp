@@ -16,6 +16,13 @@ public:
     void ResumeMusic();
     Bool_8 IsPlayingMusic();
     void StopMusic();
+    void SetMusicVolume(Float_32 _volume);
+
+
+    Uint_32 LoadSoundEffect(const char* _filename);
+    void PlaySoundEffect(Uint_32 _soundEffect);
+    void SetSoundEffectVolume(Float_32 _volume);
+
 };
 
 #endif // Audio source

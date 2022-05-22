@@ -233,7 +233,7 @@ void Renderer::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height
 
 
 
-void Renderer::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
+void Renderer::BlitImage(const Image* const _image, Vec2f _pos, Vec2f _origin)
 {
     for(Float_32 _i =0; _i< _image->Width; _i++)
     {
@@ -247,7 +247,7 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
     }
 }
 
-void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _pos, Vec2f& _origin)
+void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _pos, Vec2f _origin)
 {
     for(Float_32 _i =0; _i< _image->Width; _i++)
     {
@@ -265,12 +265,21 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _pos, Vec
 }
 
 
-void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
     Vec2f vv(0,1);
     vv = _rot * vv;
+
+    Bool_8 flipHorizontal = _scale.x >= 0 ? 0 : 1;
+    Int_32 flipSignH = flipHorizontal?1:-1;
+    Bool_8 flipVertical = _scale.y >= 0 ? 0 : 1;
+    Int_32 flipSignV = flipVertical?1:-1;
+
+
+    _scale.x = abs(_scale.x);
+    _scale.y = abs(_scale.y);
 
     Float_32 img_w = _image->Width*_scale.x;
     Float_32 img_h = _image->Height*_scale.y;
@@ -278,9 +287,11 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot
     Float_32 org_x = _origin.x * _scale.x;
     Float_32 org_y = _origin.y * _scale.y;
 
-    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    Float_32 sX = _trans.x-(img_d/2);
+    Float_32 sY = _trans.y-(img_d/2);
+    for(Float_32 _x = sX; _x <= _trans.x+(img_d/2); _x++)
     {
-        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        for(Float_32 _y = sY; _y <= _trans.y+(img_d/2); _y++)
         {
             if(_x<0 || _x> Width || _y<0 || _y> Height)
                 continue;
@@ -305,7 +316,13 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot
                         if(_pixelVal & 0xff000000)
                         {
                             Color _pixelCol(_pixelVal);
-                            DrawPixel(_x, _y, _pixelCol);
+
+                            // explanation of weird looking equation:
+                            // sX, sY : position where we start iterating from in the canvas.
+                            // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
+                            // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
+                            // otherwise we move towards right/top and have flipSign* positive.
+                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -344,18 +361,26 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot
 
 }
 
-void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
     Vec2f vv(0,1);
     vv = _rot * vv;
 
+    Bool_8 flipHorizontal = _scale.x >= 0 ? 0 : 1;
+    Int_32 flipSignH = flipHorizontal?1:-1;
+    Bool_8 flipVertical = _scale.y >= 0 ? 0 : 1;
+    Int_32 flipSignV = flipVertical?1:-1;
+
     Float_32 img_w = _image->Width*_scale.x;
     Float_32 img_h = _image->Height*_scale.y;
     Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
     Float_32 org_x = _origin.x * _scale.x;
     Float_32 org_y = _origin.y * _scale.y;
+
+    Float_32 sX = _trans.x-(img_d/2);
+    Float_32 sY = _trans.y-(img_d/2);
 
     for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
     {
@@ -394,7 +419,13 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot
                             _pixelVal = 0xff000000 | _r | _g | _b;
 
                             Color _pixelCol(_pixelVal);
-                            DrawPixel(_x, _y, _pixelCol);
+                            
+                            // explanation of weird looking equation:
+                            // sX, sY : position where we start iterating from in the canvas.
+                            // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
+                            // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
+                            // otherwise we move towards right/top and have flipSign* positive.
+                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -431,18 +462,26 @@ void Renderer::BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot
     }
 }
 
-void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
     Vec2f vv(0,1);
     vv = _rot * vv;
+    
+    Bool_8 flipHorizontal = _scale.x >= 0 ? 0 : 1;
+    Int_32 flipSignH = flipHorizontal?1:-1;
+    Bool_8 flipVertical = _scale.y >= 0 ? 0 : 1;
+    Int_32 flipSignV = flipVertical?1:-1;
 
     Float_32 img_w = _image->Width*_scale.x;
     Float_32 img_h = _image->Height*_scale.y;
     Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
     Float_32 org_x = _origin.x * _scale.x;
     Float_32 org_y = _origin.y * _scale.y;
+
+    Float_32 sX = _trans.x-(img_d/2);
+    Float_32 sY = _trans.y-(img_d/2);
 
     for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
     {
@@ -471,7 +510,12 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, 
                         if(_pixelVal & 0xff000000)
                         {
                             Color _pixelCol(_pixelVal);
-                            DrawPixelAlphaBlended(_x, _y, _pixelCol);
+                            // explanation of weird looking equation:
+                            // sX, sY : position where we start iterating from in the canvas.
+                            // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
+                            // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
+                            // otherwise we move towards right/top and have flipSign* positive.
+                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -508,18 +552,26 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, 
     }
 }
 
-void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
     Vec2f vv(0,1);
     vv = _rot * vv;
 
+    Bool_8 flipHorizontal = _scale.x >= 0 ? 0 : 1;
+    Int_32 flipSignH = flipHorizontal?1:-1;
+    Bool_8 flipVertical = _scale.y >= 0 ? 0 : 1;
+    Int_32 flipSignV = flipVertical?1:-1;
+
     Float_32 img_w = _image->Width*_scale.x;
     Float_32 img_h = _image->Height*_scale.y;
     Float_32 img_d = std::sqrt(img_w*img_w + img_h*img_h);
     Float_32 org_x = _origin.x * _scale.x;
     Float_32 org_y = _origin.y * _scale.y;
+
+    Float_32 sX = _trans.x-(img_d/2);
+    Float_32 sY = _trans.y-(img_d/2);
 
     for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
     {
@@ -559,7 +611,12 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, 
                             _pixelVal = (_pixelVal & _maskA) | _r | _g | _b;
 
                             Color _pixelCol(_pixelVal);
-                            DrawPixelAlphaBlended(_x, _y, _pixelCol);
+                            // explanation of weird looking equation:
+                            // sX, sY : position where we start iterating from in the canvas.
+                            // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
+                            // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
+                            // otherwise we move towards right/top and have flipSign* positive.
+                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -597,9 +654,20 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, 
 }
 
 
-void Renderer::Clear()
+void Renderer::ClearFast(unsigned char grayBrightness)
 {
-    memset(canvasBuffer, 0xff, canvasBufferSizeInBytes);
+    memset(canvasBuffer, grayBrightness, canvasBufferSizeInBytes);
+}
+
+void Renderer::ClearSlow(Color _col)
+{
+    for(int _r = 0; _r < Height*PixelSize; _r++)
+    {
+        for(int  _c = 0; _c < Width*PixelSize; _c++)
+        {
+            canvasBuffer[(_r*Width*PixelSize)+_c] = _col.Value;
+        }
+    }
 }
 
 void Renderer::Draw()
@@ -643,6 +711,19 @@ void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _c
     RB_GetTextBitmap(_text, _font, _size, _col, textImg.Data, &textImg.Width, &textImg.Height);
     Vec2f _origin(textImg.Width/2, textImg.Height/2);
     BlitImageAlphaBlended(&textImg, _location, _origin);
+}
+
+void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale)
+{
+    Mat3x3 rotMat = Mat3x3::Identity();
+    rotMat(0,0) = cosf(_rot);
+    rotMat(0,1) = -sinf(_rot);
+    rotMat(1,0) = sinf(_rot);
+    rotMat(1,1) = cosf(_rot);
+
+    RB_GetTextBitmap(_text, _font, _size, _col, textImg.Data, &textImg.Width, &textImg.Height);
+    Vec2f _origin(textImg.Width/2, textImg.Height/2);
+    BlitImageAlphaBlended(&textImg, _origin, rotMat, _location, _scale, INTERPOLATION_NEAREST);
 }
 
 void Renderer::SetFontSize(Uint_32 _size)

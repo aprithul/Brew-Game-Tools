@@ -15,12 +15,12 @@ public:
     Renderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode);
     ~Renderer();
     
-    void BlitImage(const Image* const _image, Vec2f& _pos, Vec2f& _origin);
-    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _pos, Vec2f& _origin);
-    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void BlitImage(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
-    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void BlitImageAlphaBlended(const Image* const _image, Vec2f& _origin, Mat3x3& _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2f _pos, Vec2f _origin);
+    void BlitImageAlphaBlended(const Image* const _image, Vec2f _pos, Vec2f _origin);
+    void BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode);
+    void BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode);
+    void BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 brightness, Interpolation _interpolationMode);
 
 
     // drawing funcitons
@@ -37,9 +37,11 @@ public:
     void DeleteFont(Uint_32 _font);
     void GetTextBmp(const char* _text, Uint_32 _font);
     void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location);
+    void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale);
     void SetFontSize(Uint_32 _size);
 
-    void Clear();
+    void ClearFast(unsigned char grayBrightness);
+    void ClearSlow(Color _col);
     void Draw();
     void SetVsyncMode(VsyncMode _mode);
     void SetFrameRate(Uint_32 _fps);

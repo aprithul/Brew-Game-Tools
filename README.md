@@ -1,3 +1,7 @@
+
+
+https://user-images.githubusercontent.com/8151229/169681128-e07dee4c-47ba-4f53-a4f4-88f59a37703a.mp4
+
 # Brew-Game-Tools
 Brew-Game-Tools is a small 2D game framwork written in C++ with the main goal being simplicity. 
 It uses a software renderer that let's you draw directly to the display window. Underneath, the renderer uses an SDL2 backed OpenGL texture. This texture is mapped to a quad and rendered every frame. That being said, it's setup in a way so that it's still relatively simple to use a different framework or graphics API. All one has to do is to implement the backend interface.

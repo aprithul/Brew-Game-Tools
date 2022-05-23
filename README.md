@@ -59,17 +59,17 @@ This should download the necessariy files and prepare the work environment for y
   src/App.cpp file is the entry point of the application. Put your initialization code in init(), per-frame code in update() and cleanup code in close(). Of course, you can add more cpp/hpp files to the project. Place them in App/src and App/include folders. If you want to make any change to the framework, you can do so as well as the whole source is provided with the project. Everything is linked dynamically, that includes linking to the framework (bgt) and linking to the SDL2 library.<pr>
   
   <b>2. I want to use 'x' graphics/audio/input library/framewark.</b><br>
-  The framework is setup in a way so that it's relatively simple to implement a different graphics graphics, audio, input or windowing backend. Dependencies between the framework and SDL/OpenGL are kept to a minimum and all one has to do is to implement the desired backends. Implement either or all of AudioManager.hpp, InputManager.hpp and Renderer.hpp interfaces and include them in a Backend.cpp (similar to Backend_SDL2.cpp) file.<p>
+  The framework is setup in a way so that it's relatively simple to implement a different graphics, audio, input or windowing backend. Dependencies between the framework and SDL/OpenGL are kept to a minimum and all one has to do is to implement the desired backends. Implement either or all of AudioManager.hpp, InputManager.hpp and Renderer.hpp interfaces and include them in a Backend.cpp (similar to Backend_SDL2.cpp) file.<p>
       
   <b>3. I want to use a different compiler.</b><br>
-  A different compiler may be used by changing the makefiles' CC variable and the directory of mingw32-make.exe in tasks.json file (later required on windows only).<p>
+  A different compiler may be used by changing the makefiles' CC variable and the directory of mingw32-make.exe in tasks.json file (later change required on windows only).<p>
     
   <b>4. Why didn't you use SDL_gfx for shape drawing?</b><br>
-  I wasn't aware of its existance when I started writing this framework. With most of my personal projects, the goal is for me to learn as much as I can. Ultimately I think, implementing the drawing library myself gave presented with a great opportunity to me.<p>
+  I wasn't aware of its existance when I started writing this framework. With most of my personal projects, the goal was for me to learn as much as I could. Ultimately I think, implementing the drawing library myself was a great learning experience. Also, if I had used SDL_gfx, changing to a different backends might become harder as one would need to reimplement all shape drawing functions or use a third party one.<p>
     
   <b>5. What are the future plans?</b><br>
-  A few things I have in mind are: better animation support, Basic 2D physics support, multi-threaded renderer.<p>
+  A few things I currently have in mind: better animation support, Basic 2D physics support, multi-threaded renderer.<p>
   
   <b>6. Why another framework? Don't we have too many already?</b><br>
-    My main goal with BGT was to make a framework that is very easy make 2d prototypes in. More specifically, I wanted the features that I always end up wanting while prototyping a new idea, for example ease of setup and directly drawing pixels. While things like SDL2 and many other frameworks are simple to use, everytime you create a new project, you are required to go through a bunch of setup process. This framework doesn't provide a ton of different features but does the most essential ones for my use case. If it also ends up being useful to you, that's great.
+    My main goal with BGT was to make a framework that is very easy to make 2d prototypes in. More specifically, I wanted the features that I always end up missing while prototyping a new idea, for example ease of setup (I tend to try out a ton of different ideas) and directly drawing pixels to the screen. While tools like SDL2 are easy to use, everytime you create a new project, you are required to go through a bunch of setup process. BGT doesn't provide a ton of different features but does the ones that are essential to me. If it also ends up being useful to you, that's great.
    

@@ -21,8 +21,9 @@ Setting up is super simple. You just have to run the appropriate setup file and 
 ### Dependencies
 You need to have:
 <p>
-  <b>Visual-Studio-Code</b><br>
-  <b>Windows</b>: Windows 10 with powershell 5+<br>
+  1. <b>Visual-Studio-Code</b><br>
+  2. <b>Windows</b>: Windows 10 with powershell 5+<br>
+  OR<br>
   <b>OSX</b>: Homebrew (Get from here if you don't have it already : https://brew.sh/)<br>
   
 ### Setting up a new project

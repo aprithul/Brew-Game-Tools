@@ -33,9 +33,10 @@ AudioManager::~AudioManager()
         Mix_FreeMusic(_music.second);
         _music.second = nullptr;
     }
-
+    Mix_HaltMusic();
+    Mix_HaltChannel(-1);
     Mix_Quit();
-    Mix_CloseAudio();
+    //Mix_CloseAudio();
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
     printf("SDL2_mixer audio backend cleaned\n");
     

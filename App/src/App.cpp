@@ -39,7 +39,7 @@ void init()
     bgt.SetupInput();
 
     _id1 = bgt.LoadImage(GetResourcePath("spin.png"));
-    mMusicId = bgt.LoadMusic(GetResourcePath("battle.OGG"));
+    mMusicId = bgt.LoadMusic(GetResourcePath("battle.wav"));
     soundEffectId = bgt.LoadSoundEffect(GetResourcePath("coin.wav"));
 
     bgt.PlayMusic(mMusicId, true);

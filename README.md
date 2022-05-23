@@ -4,9 +4,7 @@
 Brew Game Tools (or BGT) is a small 2D game framwork written in C++ with the main goal being simplicity. 
 It uses a software renderer that let's you draw directly to the display window. Underneath, the renderer uses an SDL2 backed OpenGL texture. This texture is mapped to a quad and rendered every frame. Additionally, it uses the clang++ compiler.
 
-I've tested it to work on Windows 10 and MacOS. Build is handled through Make. You can use any IDE but using vs-code will make your life much easier since the 
-
-comes with a pre-configured vs-code workspace.<br><br>
+I've tested it to work on Windows 10 and MacOS. Build is handled through Make. The setup process automatically creates a starter project with all the required libraries and settings. You can probably use any IDE but using VS-Code will make your life way easier since the setup process generates a VS-Code workspace project.<br><br>
 Keep reading for setup instructinos.
 
 ## Project Structure
@@ -52,7 +50,7 @@ You need to have:
     1. <b>CodeLLDB</b><br>
     2. <b>C/C++</b> by Microsoft.<br>
   
-<p>The included Visual-Studio-Code workspace is already setup to make getting started as simple as possible. With the extensions installed, you can now open the workspace included in the root of the project, then hit F5 (or Fn + F5) to compile and run the application.<br>
+<p>Now open the project.code-workspace file in VS-Code. This will launch the project. With the extensions installed, you can now hit F5 (or Fn + F5) to compile and run your first BGT application.<br>
 
 ## FAQ
   <b>1. Where do add my own code?</b><br>

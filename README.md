@@ -29,7 +29,7 @@ You need to have:
 ### Setting up a new project
 <p>
   1. Clone this repo whereever you want to.<br>
-  2. If you are on windows: run the 'setup_windows.ps1' file by double clicking.<br>
+  2. <b>If you are on windows:</b> run the 'setup_windows.ps1' file by double clicking.<br>
   Note: You may first need to change PowerShell's execution policy to be able to run the script. To do that, open PowerShell as administrator and execute the following command:
   
   ```
@@ -37,7 +37,7 @@ You need to have:
   ```
   Press [Y] and [Enter] to submit the changes. Once you're done with the setup, you may revert it back to 'Restricted'.
  
-  3. If you are on MacOS: Open a terminal,navigate to the cloned repo. First make the setup_macos.sh file executable by running:
+  3. <b>If you are on MacOS:</b> Open a terminal,navigate to the cloned repo. First make the setup_macos.sh file executable by running:
   
   ```
   chmod 755 setup_macos.sh

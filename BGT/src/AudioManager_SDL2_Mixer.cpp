@@ -68,7 +68,7 @@ void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
 void AudioManager::SetMusicVolume(Float_32 _volume)
 {
     _volume = Clamp(_volume, 0, 1);
-    Int_32 _volumeI = (Int_32)(_volume*255);
+    Int_32 _volumeI = (Int_32)(_volume*128);
     Mix_VolumeMusic(_volumeI);
 }
 
@@ -120,6 +120,6 @@ void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
 void AudioManager::SetSoundEffectVolume(Float_32 _volume)
 {
     _volume = Clamp(_volume, 0, 1);
-    Int_32 _volumeI = (Int_32)(_volume*255);
+    Int_32 _volumeI = (Int_32)(_volume*128);
     Mix_Volume(-1, _volumeI);
 }

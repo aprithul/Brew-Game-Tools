@@ -44,6 +44,7 @@ void init()
 
     bgt.PlayMusic(mMusicId, true);
     _font = bgt.LoadFont(GetResourcePath("Boxy-Bold.ttf"));
+    bgt.SetMasterVolume(0);
 
     zombieSprites[0] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_000.png"));
     zombieSprites[1] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_001.png"));
@@ -134,7 +135,7 @@ void update()
     if(bgt.OnKeyDown(BGTK_T))
         bgt.PlaySoundEffect(soundEffectId);
 
-    static Float_32 _vol = 1.f;
+    static Float_32 _vol = 0.1f;
     Float_32 dts = (bgt.DeltaTime/1000);
     _vol = _vol + bgt.GetKey(BGTK_UP)*dts - bgt.GetKey(BGTK_DOWN)*dts;
     bgt.SetMasterVolume(_vol);

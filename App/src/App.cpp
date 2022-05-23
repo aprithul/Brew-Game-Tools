@@ -16,8 +16,8 @@ Uint_32 soundEffectId = 0;
 Uint_32 _id1  = 0;
 Uint_32 _id2  = 0;
 
-Int_32 w = 480;
-Int_32 h = 320;
+Int_32 w = 600;
+Int_32 h = 330;
 BrewGameTool bgt;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Float_32 rot = 0;
@@ -43,7 +43,7 @@ void init()
     soundEffectId = bgt.LoadSoundEffect(GetResourcePath("coin.wav"));
 
     bgt.PlayMusic(mMusicId, true);
-    _font = bgt.LoadFont(GetResourcePath("arial.ttf"));
+    _font = bgt.LoadFont(GetResourcePath("Boxy-Bold.ttf"));
 
     zombieSprites[0] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_000.png"));
     zombieSprites[1] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_001.png"));
@@ -111,7 +111,7 @@ void update()
     }
 
     static Float_32 oscAcu = 0;
-    Float_32 osc = abs(sinf(rot*0.2))+0.5f;
+    Float_32 osc = abs(sinf(rot*0.1))+0.2f;
     oscAcu += osc*0.007f;
 
     static Vec2f _textScale = {1,1};

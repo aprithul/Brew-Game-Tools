@@ -35,14 +35,20 @@ You need to have:
   Note: You may first need to change PowerShell's execution policy to be able to run the script. To do that, open PowerShell as administrator and execute the following command:<br>
   ```Set-ExecutionPolicy Unrestricted```<br>
   Press [Y] and [Enter] to submit the changes. Once you're done with the setup, you may revert it back to 'Restricted'.<br>
-  3. <b>If you are on MacOS:</b><br>
-  Open a terminal,navigate to the cloned repository. First make the setup_macos.sh file executable by running:<br>
-  ```chmod 755 setup_macos.sh```<br>
+  3. <b>If you are on an Intel Mac:</b><br>
+  Open a terminal,navigate to the cloned repository. First make the setup_macos_Intel.sh file executable by running:<br>
+  ```chmod 755 setup_macos_Intel.sh```<br>
   Then, you can execute the script:<br>
-  ```./setup_macos.sh```<br>
+  ```./setup_macos_Intel.sh```<br>
+  This should download the necessary files and prepare the work environment for you.<br>
+  4. <b>If you are on an Apple Silicon Mac:</b><br>
+  Open a terminal,navigate to the cloned repository. First make the setup_macos_Apple_Silicon.sh file executable by running:<br>
+  ```chmod 755 setup_macos_Apple_Silicon.sh```<br>
+  Then, you can execute the script:<br>
+  ```./setup_macos_Apple_Silicon.sh```<br>
   This should download the necessary files and prepare the work environment for you.<br>
   
-  4. Install the following VS-code extensions: <br>
+  5. Install the following VS-code extensions: <br>
     1. <b>CodeLLDB</b><br>
     2. <b>C/C++</b> by Microsoft.<br>
   

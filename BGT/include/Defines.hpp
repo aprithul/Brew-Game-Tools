@@ -1,0 +1,5 @@
+#define RENDERER_SW
+#define RENDERING_BACKEND_SDL2_OPENGL 
+#define AUDIO_MANAGER_SDL2_MIXER 
+#define INPUT_Manager_SDL2
+#define _DEBUG

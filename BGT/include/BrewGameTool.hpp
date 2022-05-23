@@ -9,6 +9,7 @@
     #define DllExport
 #endif
 
+#include "Defines.hpp"
 #include "Renderer.hpp"
 #include "AudioManager.hpp"
 #include "InputManager.hpp"

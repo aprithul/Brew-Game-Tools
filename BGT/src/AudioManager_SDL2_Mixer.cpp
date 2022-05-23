@@ -38,6 +38,7 @@ AudioManager::~AudioManager()
     Mix_CloseAudio();
     SDL_QuitSubSystem(SDL_INIT_AUDIO);
     printf("SDL2_mixer audio backend cleaned\n");
+    
 }
 
 

@@ -17,13 +17,13 @@ clean:
 	rm -r -f $(BUILD_DIR)/*
 
 $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp $(INC_DIR)/*.hpp
-	$(CC) -DBACKEND_SDL2_OPENGL -DEXPORT_AS_DLL $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
+	$(CC) -DEXPORT_AS_DLL $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
 	$(CC) -shared -o $(BUILD_DIR)/bgt.dll $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
 
 else
 
 LINKER_FLAGS = -framework OpenGL -lsdl2 -lsdl2_mixer -lsdl2_ttf -lglew
-COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g
+COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g -arch arm64
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/GL/lib
 
 all: $(BUILD_DIR)/bgt.o
@@ -32,7 +32,7 @@ clean:
 	rm -r -f $(BUILD_DIR)/*
 
 $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
-	$(CC) -DRENDERER_SW -DRENDERING_BACKEND_SDL2_OPENGL -DAUDIO_MANAGER_SDL2_MIXER -DINPUT_Manager_SDL2 $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
+	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
 	$(CC) -dynamiclib -o $(BUILD_DIR)/libbgt.dylib $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
 
 

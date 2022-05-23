@@ -14,9 +14,9 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "${workspaceFolder}/Vendor/mingw/llvm-mingw-ucrt-x86_64/bin/g++",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
+            "compilerPath": "${workspaceFolder}/Vendor/mingw/llvm-mingw-ucrt-x86_64/bin/clang++",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
             "intelliSenseMode": "windows-clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
         }

@@ -1,4 +1,4 @@
-![ezgif com-gif-maker](https://user-images.githubusercontent.com/8151229/169681153-ff8e2b25-d8b9-4b4a-81c1-3a19a932ae0c.gif)
+![df658864db6ded7b48d11d854c1de603](https://user-images.githubusercontent.com/8151229/169726159-d70c5323-072f-4379-80ab-7247dc127b91.gif)
 
 # Brew-Game-Tools
 Brew Game Tools (or BGT) is a small 2D game framwork written in C++ with the main goal being simplicity. 

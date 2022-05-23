@@ -21,6 +21,7 @@ Setting up is super simple. You just have to run the appropriate setup file and 
 ### Dependencies
 You need to have:
 <p>
+  <b>Visual-Studio-Code</b><br>
   <b>Windows</b>: Windows 10 with powershell 5+<br>
   <b>OSX</b>: Homebrew (Get from here if you don't have it already : https://brew.sh/)<br>
   
@@ -44,9 +45,13 @@ You need to have:
   ```
   ./setup_macos.sh
   ```
-  
 This should download the necessariy files and prepare the work environment for you.<br>
-<p>It's highly advised that the user installs Visual-Studio-Code with the C/C++ and CodeLLDB extensions. The included Visual-Studio-Code workspace is already setup to make getting started as simple as possible. With the extensions installed, you can now open the workspace included in the root of the project and hit F5 (or Fn + F5) to compile and run the application.<br>
+  
+  4. Install the following VS-code extensions: <br>
+    1. <b>CodeLLDB</b><br>
+    2. <b>C/C++</b> by Microsoft.<br>
+  
+<p>The included Visual-Studio-Code workspace is already setup to make getting started as simple as possible. With the extensions installed, you can now open the workspace included in the root of the project, then hit F5 (or Fn + F5) to compile and run the application.<br>
 
 ## FAQ
   <b>1. Where do add my own code?</b><br>
@@ -64,6 +69,6 @@ This should download the necessariy files and prepare the work environment for y
   <b>5. What are the future plans?</b><br>
   A few things I have in mind are: better animation support, Basic 2D physics support, multi-threaded renderer.<p>
   
-  <b>6. Why another framework? Don't we have enough already?</b><br>
+  <b>6. Why another framework? Don't we have too many already?</b><br>
     My main goal with BGT was to make a framework that is very easy make 2d prototypes in. More specifically, I wanted the features that I always end up wanting while prototyping a new idea, for example ease of setup and directly drawing pixels. While things like SDL2 and many other frameworks are simple to use, everytime you create a new project, you are required to go through a bunch of setup process. This framework doesn't provide a ton of different features but does the most essential ones for my use case. If it also ends up being useful to you, that's great.
    

@@ -4,7 +4,9 @@
 Brew Game Tools (or BGT) is a small 2D game framwork written in C++ with the main goal being simplicity. 
 It uses a software renderer that let's you draw directly to the display window. Underneath, the renderer uses an SDL2 backed OpenGL texture. This texture is mapped to a quad and rendered every frame. Additionally, it uses the clang++ compiler.
 
-I've tested it to work on Windows 10 and MacOS. Build is handled through Make. You can use any IDE but using vs-code will make your life much easier since the repo comes with a pre-configured vs-code workspace.<br><br>
+I've tested it to work on Windows 10 and MacOS. Build is handled through Make. You can use any IDE but using vs-code will make your life much easier since the 
+
+comes with a pre-configured vs-code workspace.<br><br>
 Keep reading for setup instructinos.
 
 ## Project Structure
@@ -27,26 +29,18 @@ You need to have:
   <b>OSX</b>: Homebrew (Get from here if you don't have it already : https://brew.sh/)<br>
   
 ### Setting up a new project
-<p>
-  1. Clone this repo whereever you want to.<br>
-  2. <b>If you are on windows:</b> run the 'setup_windows.ps1' file by double clicking.<br>
-  Note: You may first need to change PowerShell's execution policy to be able to run the script. To do that, open PowerShell as administrator and execute the following command:
-  
-  ```
-  Set-ExecutionPolicy Unrestricted
-  ```
-  Press [Y] and [Enter] to submit the changes. Once you're done with the setup, you may revert it back to 'Restricted'.
- 
-  3. <b>If you are on MacOS:</b> Open a terminal,navigate to the cloned repo. First make the setup_macos.sh file executable by running:
-  
-  ```
-  chmod 755 setup_macos.sh
-  ```
-  Then, you can execute it:
-  ```
-  ./setup_macos.sh
-  ```
-This should download the necessariy files and prepare the work environment for you.<br>
+  1. Clone this repository to your computer.<br>
+  2. <b>If you are on Windows:</b><br>
+  Run the 'setup_windows.ps1' file by double clicking.<br>
+  Note: You may first need to change PowerShell's execution policy to be able to run the script. To do that, open PowerShell as administrator and execute the following command:<br>
+  ```Set-ExecutionPolicy Unrestricted```<br>
+  Press [Y] and [Enter] to submit the changes. Once you're done with the setup, you may revert it back to 'Restricted'.<br>
+  3. <b>If you are on MacOS:</b><br>
+  Open a terminal,navigate to the cloned repository. First make the setup_macos.sh file executable by running:<br>
+  ```chmod 755 setup_macos.sh```<br>
+  Then, you can execute the script:<br>
+  ```./setup_macos.sh```<br>
+  This should download the necessary files and prepare the work environment for you.<br>
   
   4. Install the following VS-code extensions: <br>
     1. <b>CodeLLDB</b><br>

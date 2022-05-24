@@ -53,7 +53,7 @@ You need to have:
 <p>Now open the project.code-workspace file in VS-Code. This will launch the project. With the extensions installed, you can now hit F5 (or Fn + F5) to compile and run your first BGT application.<br>
 
 ## FAQ
-  <b>1. Where do add my own code?</b><br>
+  <b>1. Where to add my own code?</b><br>
   src/App.cpp file is the entry point of the application. Put your initialization code in init(), per-frame code in update() and cleanup code in close(). Of course, you can add more cpp/hpp files to the project. Place them in App/src and App/include folders. If you want to make any change to the framework, you can do so as well as the whole source is provided with the project. Everything is linked dynamically, that includes linking to the framework (bgt) and linking to the SDL2 library.<pr>
   
   <b>2. I want to use 'x' graphics/audio/input library/framewark.</b><br>

@@ -69,5 +69,8 @@ You need to have:
   A few things I currently have in mind: better animation support, Basic 2D physics support, multi-threaded renderer.<p>
   
   <b>6. Why another framework? Don't we have too many already?</b><br>
-    My main goal with BGT was to make a framework that is very easy to make 2d prototypes in. More specifically, I wanted the features that I always end up missing while prototyping a new idea, for example ease of setup (I tend to try out a ton of different ideas) and directly drawing pixels to the screen. While tools like SDL2 are easy to use, everytime you create a new project, you are required to go through a bunch of setup process. BGT doesn't provide a ton of different features but does the ones that are essential to me. If it also ends up being useful to you, that's great.
+    My main goal with BGT was to make a framework that is very easy to make 2d prototypes in. More specifically, I wanted the features that I always end up missing while prototyping a new idea, for example ease of setup (I tend to try out a ton of different ideas) and directly drawing pixels to the screen. While tools like SDL2 are easy to use, everytime you create a new project, you are required to go through a bunch of setup process. BGT doesn't provide a ton of different features but does the ones that are essential to me. If it also ends up being useful to you, that's great.<p>
+  
+  <b>7. I can't set it up the project / the project fails to compile / I want xyz feature.</b><br>
+    I've tested it to work on only a few systems, so bugs are very much possible. Please let me know about it by posting an issue.
    

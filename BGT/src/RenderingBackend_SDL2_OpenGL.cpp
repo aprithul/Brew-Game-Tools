@@ -159,7 +159,7 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
         int w = 0;
         int h = 0;
         SDL_GetWindowSize(window, &w, &h);
-        printf("%d - %d\n", w, h);
+        //printf("%d - %d\n", w, h);
         // SDL_DisplayMode _displayMode;
         // SDL_GetDesktopDisplayMode(0, &_displayMode);
 
@@ -175,7 +175,7 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
 
         if(glewInit() == GLEW_OK)
         {
-            printf("Canvas created with OpenGL context : %s\n", (const char*)glGetString(GL_VERSION));
+            printf("Drawing canvas created with OpenGL context : %s\n", (const char*)glGetString(GL_VERSION));
         }
         else
         {
@@ -300,11 +300,6 @@ void RB_Cleanup()
     }
     
     TTF_Quit();
-}
-
-void Delay(Uint_32 ms)
-{
-    SDL_Delay(ms);
 }
 
 void RB_SetWindowTitle(const char* _title)

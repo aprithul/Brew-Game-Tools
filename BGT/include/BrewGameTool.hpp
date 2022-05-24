@@ -96,7 +96,7 @@ struct DllExport BrewGameTool
         Uint_32 nextId;
         Color clearColor;
         std::unordered_map<Uint_32, Image> _imageDataStore;
-        Bool_8 is_game_running;
+        Bool_8 isGameRunning;
         void (*init) ();
         void (*update) ();
         void (*close) ();

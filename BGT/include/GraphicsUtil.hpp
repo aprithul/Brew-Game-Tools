@@ -2,6 +2,7 @@
 #define GRAPHICS_UTIL_HPP
 
 #include "Types.hpp"
+#include <vector>
 
 enum VsyncMode
 {
@@ -47,11 +48,79 @@ struct Image // 192 bytes
     Int_32 Channels;
 };
 
+
+struct Animation
+{
+    Animation();
+    void AddFrame(Uint_32 _frame);
+    Int_32 GetCurrentFrame();
+    void Play();
+    void Pause();
+    void Update(Double_64 _deltaTime);
+    void SetSpeed(Double_64 _frameDelta);
+    Bool_8 IsPlaying();
+
+    private:
+        std::vector<Uint_32> frames;
+        Double_64 nextFrameDelta;
+        Bool_8 isPlaying;
+        Double_64 timeAccum;
+        Int_32 currentFrameInd;
+
+};
+
 #endif
 
 #ifdef GRAPHICS_UTILS_IMPLEMENTATION
 #undef GRAPHICS_UTILS_IMPLEMENTATION
 
+Animation::Animation():nextFrameDelta(INT_MAX), isPlaying(false), timeAccum(0), currentFrameInd(0)
+{
+
+}
+
+void Animation::SetSpeed(Double_64 _frameDelta)
+{
+    nextFrameDelta = _frameDelta;
+}
+
+void Animation::AddFrame(Uint_32 _frame)
+{
+    frames.push_back(_frame);
+}
+
+void Animation::Play()
+{
+    isPlaying = true;
+}
+
+void Animation::Pause()
+{
+    isPlaying = false;
+}
+
+void Animation::Update(Double_64 _deltaTime)
+{
+    if(isPlaying)
+    {
+        timeAccum += _deltaTime;
+        if(timeAccum > nextFrameDelta)
+        {
+            timeAccum -= nextFrameDelta;
+            currentFrameInd = (currentFrameInd+1)%frames.size();
+        }
+    }
+}
+
+Int_32 Animation::GetCurrentFrame()
+{
+    return frames[currentFrameInd];
+}
+
+Bool_8 Animation::IsPlaying()
+{
+    return isPlaying;
+}
 
 Color::Color()
 {

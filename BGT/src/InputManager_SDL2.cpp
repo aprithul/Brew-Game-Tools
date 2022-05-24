@@ -172,7 +172,7 @@ Float_32 InputManager::GetKey(BGT_Key _key)
 InputManager::~InputManager()
 {
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
-    printf("Input events backend cleaned");
+    printf("Input events backend cleaned\n");
     
 }
 

@@ -30,7 +30,7 @@ int load = 0;
 Uint_32 _font;
 Uint_32 iA;
 
-Uint_32 zombieSprites[10];
+Animation zombieAnim;
 
 void init()
 {
@@ -46,18 +46,20 @@ void init()
     _font = bgt.LoadFont(GetResourcePath("Boxy-Bold.ttf"));
     bgt.SetMasterVolume(0);
 
-    zombieSprites[0] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_000.png"));
-    zombieSprites[1] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_001.png"));
-    zombieSprites[2] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_002.png"));
-    zombieSprites[3] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_003.png"));
-    zombieSprites[4] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_004.png"));
-    zombieSprites[5] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_005.png"));
-    zombieSprites[6] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_006.png"));
-    zombieSprites[7] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_007.png"));
-    zombieSprites[8] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_008.png"));
-    zombieSprites[9] = bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_009.png"));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_000.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_001.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_002.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_003.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_004.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_005.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_006.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_007.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_008.png")));
+    zombieAnim.AddFrame(bgt.LoadImage(GetResourcePath("ZombieOGA/ZombieOGA/Walk/__Zombie01_Walk_009.png")));
 
-    printf("Initialized\n");
+    zombieAnim.SetSpeed(0.1);
+    zombieAnim.Play();
+    printf("App initialized\n");
 
 }
 
@@ -68,25 +70,27 @@ void update()
     static Color green(0, 0xff, 0, 0xff, BGRA);
     static Color colors[3] = {red, blue, green};
 
-    rot -= bgt.DeltaTime*.01f;
+    rot -= bgt.DeltaTime;
     
     static Float_32 _x = 0,_y=0;
     static Float_32 zombieSpeed = 150;
-    _x += (Float_32)(bgt.GetKey(BGTK_RIGHT)*zombieSpeed*(bgt.DeltaTime/1000)) - (Float_32)(bgt.GetKey(BGTK_LEFT)*zombieSpeed*(bgt.DeltaTime/1000));
+    _x += (Float_32)(bgt.GetKey(BGTK_RIGHT)*zombieSpeed*(bgt.DeltaTime)) - (Float_32)(bgt.GetKey(BGTK_LEFT)*zombieSpeed*(bgt.DeltaTime));
 
     static Vec2f transB{(Float_32) w*3/4, (Float_32)h/2};
     static Vec2f scaleA{2.f, 2.f};
     static Vec2f scaleB{0.3f, 0.3f};
     static Vec2f originA{bgt.GetImageById(_id1)->Width/2.f, bgt.GetImageById(_id1)->Height/2.f};
     
-    
+
+    zombieAnim.Update(bgt.DeltaTime);
+       
     //bgt.BlitImage(_id1,  originA, rot, transA, scaleB, INTERPOLATION_NEAREST);
     
 
     static Float_32 animTime = 0;
     animTime += (bgt.DeltaTime*8);
 
-    Uint_32 zombieId = zombieSprites[((Int_32)(animTime/1000))%10];
+    Uint_32 zombieId = zombieAnim.GetCurrentFrame();
     Vec2f originB{bgt.GetImageById(zombieId)->Width/2.f, bgt.GetImageById(zombieId)->Height/2.f};
 
     
@@ -109,6 +113,14 @@ void update()
     if(bgt.OnKeyDown(BGTK_S))
     {
         bgt.StopMusic();
+    }
+
+    if(bgt.OnKeyDown(BGTK_A))
+    {
+        if(zombieAnim.IsPlaying())
+            zombieAnim.Pause();
+        else
+            zombieAnim.Play();
     }
 
     static Float_32 oscAcu = 0;
@@ -135,7 +147,7 @@ void update()
     if(bgt.OnKeyDown(BGTK_T))
         bgt.PlaySoundEffect(soundEffectId);
 
-    static Float_32 _vol = 0.1f;
+    static Float_32 _vol = 0.05f;
     Float_32 dts = (bgt.DeltaTime/1000);
     _vol = _vol + bgt.GetKey(BGTK_UP)*dts - bgt.GetKey(BGTK_DOWN)*dts;
     bgt.SetMasterVolume(_vol);
@@ -143,7 +155,7 @@ void update()
 
 void close()
 {
-    printf("All BGT services closed.\n");
+    printf("App closed.\n");
 }
 
 int main()

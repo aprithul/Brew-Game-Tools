@@ -28,8 +28,9 @@
 //Image BrewGameTool::_imageDataStore[MAX_IMAGES_LOADABLE];
 
 // Lifetime
-BrewGameTool::BrewGameTool()
+BrewGameTool::BrewGameTool():DeltaTime(0),nextId(0)
 {
+    printf("BGT instance created.\n");
 }
 
 void BrewGameTool::SetupRenderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode)
@@ -39,22 +40,28 @@ void BrewGameTool::SetupRenderer(const char* _name, Uint_32 _width, Uint_32 _hei
     PixelSize = _pixelSize;
 
     renderer = new Renderer(_name, _width, _height, _pixelSize, _setFullscreen, _mode);
+    printf("Renderer created.\n");
+    
 }
 
 void BrewGameTool::SetupAudio(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize)
 {
     audioManager = new AudioManager(_frequency, _channels, _chunkSize);
+    printf("Audio manager created.\n");
+
 }
 
 void BrewGameTool::SetupInput()
 {
     inputManager = new InputManager();
+    printf("Input manager created.\n");
+
 }
 
 
 void BrewGameTool::Quit()
 {
-    is_game_running = false;
+    isGameRunning = false;
 }
 
 void BrewGameTool::SetNextFrameClearColor(Color _color)
@@ -65,19 +72,21 @@ void BrewGameTool::SetNextFrameClearColor(Color _color)
 Int_32 BrewGameTool::Run()
 {
     using namespace std::chrono;
-    is_game_running = true;
-    steady_clock::time_point _lastTime = steady_clock::now();
 
+    printf("App started\n");
     //targetFrameTime = (Double_64)1000/targetFrameRate;
     Uint_32 frameCount = 0;
-    Double_64 milSecondCounter = 0;
+    Double_64 secondCounter = 0;
 
     init(); // app init
-    while(is_game_running)
+    isGameRunning = true;
+
+    steady_clock::time_point _lastTime = steady_clock::now();
+    while(isGameRunning)
     {
         inputManager->ProcessInput();
         if(inputManager->WasWindowCrossed())
-            is_game_running = false;
+            isGameRunning = false;
 
         renderer->ClearSlow(clearColor);
         //renderer->ClearFast(0x80);
@@ -86,28 +95,25 @@ Int_32 BrewGameTool::Run()
            
         duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
         _lastTime = steady_clock::now();
-        DeltaTime = time_span / std::chrono::milliseconds(1);   // DT in ms
+        DeltaTime = time_span / std::chrono::milliseconds(1) / 1000;   // DT in seconds
 
-        milSecondCounter += DeltaTime;
+        secondCounter += DeltaTime;
         frameCount++;
 
-        if(milSecondCounter >= 1000.0)
+        if(secondCounter >= 1)
         {
             
             //printf("FPS: %d\n", frameCount);
             char buffer[64];
             sprintf(buffer, "%s | %d x %d x %d | FPS: %d", renderer->windowTitle, Width, Height, PixelSize, frameCount);
             renderer->SetWindowTitle(buffer);
-            milSecondCounter -= 1000.0;
+            secondCounter -= 1.0;
             frameCount = 0;
         }
 
     }
     close();
-    
-    
 
-    printf("All services cleaned up, quitting program.\n");
     return 0;
 }
 

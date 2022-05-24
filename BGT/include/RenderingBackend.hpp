@@ -7,7 +7,6 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
 void RB_SetVsync(VsyncMode _mode);
 void RB_DrawScreen();
 void RB_Cleanup();
-void RB_Delay(Uint_32 ms);
 void RB_SetWindowTitle(const char* _title);
 
 Uint_32 RB_LoadFont(const char* _filename);

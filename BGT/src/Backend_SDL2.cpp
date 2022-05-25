@@ -1,5 +1,5 @@
 #include "Backend.hpp"
-#include "SDL2/SDL.h"
+#include "SDL/SDL.h"
 
 
 #if defined(AUDIO_MANAGER_SDL2_MIXER) || defined(_DEBUG)

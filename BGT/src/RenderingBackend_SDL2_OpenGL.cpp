@@ -5,14 +5,14 @@
 #include "Types.hpp"
 #include "GraphicsUtil.hpp"
 #include <unordered_map>
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_ttf.h"
+#include "SDL/SDL.h"
+//#include "SDL2/SDL_ttf.h"
 #include "Utils.hpp"
 
 #ifdef __APPLE__
 #include "GL/glew.h"
 #else
-#include "glew.h"
+//#include "glew.h"
 #endif
 
 #include <stdio.h>

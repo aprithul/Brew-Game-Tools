@@ -1,4 +1,335 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
-'make.exe' is not recognized as an internal or external command,
-operable program or batch file.
+# GNU Make version 3.79.1, by Richard Stallman and Roland McGrath.
+# Built for mingw32
+# Copyright (C) 1988, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 2000
+# 	Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
 
+# Report bugs to <bug-make@gnu.org>.
+
+ 
+
+# Make data base, printed on Tue May 24 23:31:19 2022
+
+# Variables
+
+# environment
+LC_ALL = C
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# environment
+PROMPT = $P$G
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+LOGONSERVER = \\DESKTOP-A0SJA6K
+# environment
+K2PDFOPT_CUSTOM1 = 2-column paper;-mode 2col;
+# automatic
+@F = $(notdir $@)
+# environment
+COMSPEC = C:\WINDOWS\system32\cmd.exe
+# environment
+USERNAME = cobre
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+SUFFIXES := 
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+VULKAN_SDK = C:\VulkanSDK\1.3.204.1
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+NUMBER_OF_PROCESSORS = 16
+# environment
+OS = Windows_NT
+# environment
+HOMEPATH = \Users\cobre
+# environment
+VBOX_MSI_INSTALL_PATH = C:\Program Files\Oracle\VirtualBox\
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_lang 
+uagePackSupport":true}
+# default
+CURDIR := d:/Brew-Game-Tools
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
++F = $(notdir $+)
+# environment
+VSCODE_PID = 33740
+# environment
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-f6da7fc9-e68f-4d97-8615-ff837760e336-sock
+# environment
+CUDA_PATH_V11_1 = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1
+# automatic
+%F = $(notdir $%)
+# environment
+TMP = C:\Users\cobre\AppData\Local\Temp
+# environment
+CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+PROCESSOR_ARCHITECTURE = x86
+# environment
+NVCUDASAMPLES11_1_ROOT = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.1
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+USERDOMAIN_ROAMINGPROFILE = DESKTOP-A0SJA6K
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
+# environment
+K2PDFOPT_CUSTOM2 = Trim Margins;-mode fw;
+# environment
+NVTOOLSEXT_PATH = C:\Program Files\NVIDIA Corporation\NvToolsExt\
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+SYSTEMROOT = C:\WINDOWS
+# environment
+KINECTSDK20_DIR = C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# default
+SHELL := sh.exe
+# environment
+K2PDFOPT_WINPOS = 451 159 1211 788
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+LOCALAPPDATA = C:\Users\cobre\AppData\Local
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# default
+MAKE_VERSION := 3.79.1
+# environment
+MAKELEVEL := 0
+# environment
+VSCODE_LOG_STACK = false
+# environment
+HOMEDRIVE = C:
+# environment
+Path = C:\VulkanSDK\1.3.204.1\Bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\libnvvp;C:\Program Files\Alacritty\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\msys64\mingw64\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Common Files\Adobe\AGL;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\nodejs\;C:\Users\cobre\AppData\Local\Programs\Python\Python38\Scripts\;C:\Program Files (x86)\Vim\vim81\;D:\TensorFlow\venv\Scripts;C:\ProgramData\chocolatey\bin;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2020.2.1\;C:\python\python368\Scripts;C:\Program Files\dotnet\;C:\pspsdk\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\cobre\AppData\Local\Programs\Python\Python37;D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin;D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin\python\openpose\Release;C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin;C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin;C:\mingw\bin\;C:\Users\cobre\AppData\Local\Microsoft\WindowsApps;C:\Users\cobre\AppData\Roaming\npm;C:\msys64\mingw64\bin;C:\Users\cobre\.dotnet\tools;C:\Users\cobre\AppData\Local\Programs\Python\Python37\python.exe;C:\Users\cobre\AppData\Local\Programs\Python\Python37\Scripts;C:\Program Files\CMake\bin
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\cobre\AppData\Roaming\Code\CachedData\c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+# environment
+USERDOMAIN = DESKTOP-A0SJA6K
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+MFLAGS = -Rrqp
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+SESSIONNAME = Console
+# environment
+ONEDRIVE = C:\Users\cobre\OneDrive
+# environment
+VK_SDK_PATH = C:\VulkanSDK\1.3.204.1
+# environment
+ONEDRIVECONSUMER = C:\Users\cobre\OneDrive
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_33740_FFLPXMEHVTFQUSID
+# environment
+COMPUTERNAME = DESKTOP-A0SJA6K
+# environment
+CHOCOLATEYTOOLSLOCATION = C:\tools
+# environment
+LANG = C
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
+# environment
+TEMP = C:\Users\cobre\AppData\Local\Temp
+# environment
+PROCESSOR_LEVEL = 23
+# environment
+USERPROFILE = C:\Users\cobre
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+VSCODE_CWD = C:\Program Files\Microsoft VS Code
+# environment
+APPDATA = C:\Users\cobre\AppData\Roaming
+# automatic
+?F = $(notdir $?)
+# environment
+PROCESSOR_REVISION = 0101
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# automatic
+<F = $(notdir $<)
+# environment
+PSMODULEPATH = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+# environment
+PUBLIC = C:\Users\Public
+# environment
+CHOCOLATEYLASTPATHUPDATE = 132320632831636176
+# environment
+K2PDFOPT_CUSTOM0 = Last Settings;-dev k2 -wrap- -o C:\Users\cobre\Downloads\%b_k2opt -col 1 -ws 0.2;-f2p -1
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+PROGRAMDATA = C:\ProgramData
+# environment
+SYSTEMDRIVE = C:
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# automatic
+*F = $(notdir $*)
+# automatic
+^F = $(notdir $^)
+# environment
+WINDIR = C:\WINDOWS
+# environment
+VSCODE_LOG_NATIVE = false
+# default
+MAKECMDGOALS := all
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\9938cf4737093a0347aeee5c9d1a3c9a-1.67.2-main-sock
+# default
+MAKEFILES := 
+# default
+MAKE_COMMAND := make.exe
+# environment
+PATH = C:\VulkanSDK\1.3.204.1\Bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\libnvvp;C:\Program Files\Alacritty\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\msys64\mingw64\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Common Files\Adobe\AGL;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\nodejs\;C:\Users\cobre\AppData\Local\Programs\Python\Python38\Scripts\;C:\Program Files (x86)\Vim\vim81\;D:\TensorFlow\venv\Scripts;C:\ProgramData\chocolatey\bin;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2020.2.1\;C:\python\python368\Scripts;C:\Program Files\dotnet\;C:\pspsdk\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\cobre\AppData\Local\Programs\Python\Python37;D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin;D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin\python\openpose\Release;C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin;C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin;C:\mingw\bin\;C:\Users\cobre\AppData\Local\Microsoft\WindowsApps;C:\Users\cobre\AppData\Roaming\npm;C:\msys64\mingw64\bin;C:\Users\cobre\.dotnet\tools;C:\Users\cobre\AppData\Local\Programs\Python\Python37\python.exe;C:\Users\cobre\AppData\Local\Programs\Python\Python37\Scripts;C:\Program Files\CMake\bin
+# environment
+PROCESSOR_IDENTIFIER = AMD64 Family 23 Model 1 Stepping 1, AuthenticAMD
+# environment
+ASL.LOG = Destination=file
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# 99 variables in 523 hash buckets.
+# average of 0.2 variables per bucket, max 3 in one bucket.
+
+# Directories
+
+# C:\Windows\system32 (key C:/Windows/system32, mtime 1653419734): 3104 files, no impossibilities.
+# C:\Program Files\Alacritty\ (key C:/Program Files/Alacritty/, mtime 1587589692): could not be opened.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\bin (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.1/bin, mtime 1606416261): 43 files, no impossibilities.
+# C:\Program Files\Git\cmd (key C:/Program Files/Git/cmd, mtime 1592419580): 8 files, no impossibilities.
+# C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR (key C:/Program Files/NVIDIA Corporation/NVIDIA NvDLISR, mtime 1589322071): 5 files, no impossibilities.
+# C:\Users\cobre\.dotnet\tools: could not be stat'd.
+# C:\Users\cobre\AppData\Roaming\npm (key C:/Users/cobre/AppData/Roaming/npm, mtime 1567534817): 2 files, no impossibilities.
+# C:\WINDOWS (key C:/WINDOWS, mtime 1587589739): 119 files, no impossibilities.
+# C:\Program Files\CMake\bin (key C:/Program Files/CMake/bin, mtime 1629854192): 7 files, no impossibilities.
+# C:\Program Files\Microsoft VS Code\bin (key C:/Program Files/Microsoft VS Code/bin, mtime 1653020533): 4 files, no impossibilities.
+# C:\WINDOWS\System32\Wbem (key C:/WINDOWS/System32/Wbem, mtime 1646827843): 154 files, no impossibilities.
+# C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\: could not be stat'd.
+# C:\Program Files (x86)\Common Files\Adobe\AGL (key C:/Program Files (x86)/Common Files/Adobe/AGL, mtime 1553887073): 5 files, no impossibilities.
+# C:\Users\cobre\AppData\Local\Programs\Python\Python37\Scripts (key C:/Users/cobre/AppData/Local/Programs/Python/Python37/Scripts, mtime 1618968074): 44 files, no impossibilities.
+# C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin (key C:/Program Files/Azure Kinect SDK v1.4.1/sdk/windows-desktop/amd64/release/bin, mtime 1618805422): 7 files, no impossibilities.
+# D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin (key D:/Deep Learning/openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended/openpose/bin, mtime 1605671522): 140 files, no impossibilities.
+# D:\TensorFlow\venv\Scripts: could not be stat'd.
+# C:\Users\cobre\AppData\Local\Programs\Python\Python38\Scripts\: could not be stat'd.
+# C:\Program Files\nodejs\ (key C:/Program Files/nodejs/, mtime 1567534827): could not be opened.
+# C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.1\libnvvp (key C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.1/libnvvp, mtime 1606416219): 14 files, no impossibilities.
+# C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\ (key C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/, mtime 1554146282): could not be opened.
+# C:\Users\cobre\AppData\Local\Programs\Python\Python37\python.exe (key C:/Users/cobre/AppData/Local/Programs/Python/Python37/python.exe, mtime 1562643378): could not be opened.
+# C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common (key C:/Program Files (x86)/NVIDIA Corporation/PhysX/Common, mtime 1513105865): 10 files, no impossibilities.
+# D:\Deep Learning\openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended\openpose\bin\python\openpose\Release (key D:/Deep Learning/openpose-1.7.0-binaries-win64-gpu-python3.7-flir-3d_recommended/openpose/bin/python/openpose/Release, mtime 1605597011): 5 files, no impossibilities.
+# C:\Windows (key C:/Windows, mtime 1587589739): 119 files, no impossibilities.
+# . (key d:/Brew-Game-Tools, mtime 1653447194): 11 files, no impossibilities.
+# C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1653079279): could not be opened.
+# C:\Program Files (x86)\Common Files\Oracle\Java\javapath (key C:/Program Files (x86)/Common Files/Oracle/Java/javapath, mtime 1585871784): 5 files, no impossibilities.
+# C:\mingw\bin\ (key C:/mingw/bin/, mtime 1653249487): could not be opened.
+# C:\Windows\System32\Wbem (key C:/Windows/System32/Wbem, mtime 1646827843): 154 files, no impossibilities.
+# C:\Program Files (x86)\Vim\vim81\ (key C:/Program Files (x86)/Vim/vim81/, mtime 1573862693): could not be opened.
+# C:\Program Files\NVIDIA Corporation\Nsight Compute 2020.2.1\ (key C:/Program Files/NVIDIA Corporation/Nsight Compute 2020.2.1/, mtime 1606415788): could not be opened.
+# C:\msys64\mingw64\bin: could not be stat'd.
+# C:\pspsdk\bin (key C:/pspsdk/bin, mtime 1653446386): 72 files, no impossibilities.
+# C:\ProgramData\chocolatey\bin (key C:/ProgramData/chocolatey/bin, mtime 1587589507): 13 files, no impossibilities.
+# C:\WINDOWS\System32\WindowsPowerShell\v1.0\ (key C:/WINDOWS/System32/WindowsPowerShell/v1.0/, mtime 1616120918): could not be opened.
+# C:\Users\cobre\AppData\Local\Programs\Python\Python37 (key C:/Users/cobre/AppData/Local/Programs/Python/Python37, mtime 1618467857): 24 files, no impossibilities.
+# C:\WINDOWS\System32\OpenSSH\: could not be stat'd.
+# C:\VulkanSDK\1.3.204.1\Bin (key C:/VulkanSDK/1.3.204.1/Bin, mtime 1648712782): 49 files, no impossibilities.
+# C:\WINDOWS\system32 (key C:/WINDOWS/system32, mtime 1653419734): 3104 files, no impossibilities.
+# C:\Windows\System32\WindowsPowerShell\v1.0\ (key C:/Windows/System32/WindowsPowerShell/v1.0/, mtime 1616120918): could not be opened.
+# C:\python\python368\Scripts: could not be stat'd.
+# C:\Users\cobre\AppData\Local\Microsoft\WindowsApps (key C:/Users/cobre/AppData/Local/Microsoft/WindowsApps, mtime 1646189008): 19 files, no impossibilities.
+
+# 7241 files, no impossibilities in 43 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Pattern-specific variable values
+
+# No pattern-specific variable values.
+
+# Files
+
+# Not a target:
+Makefile:
+#  A default or MAKEFILES makefile.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+GNUmakefile:
+#  A default or MAKEFILES makefile.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+makefile:
+#  A default or MAKEFILES makefile.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+all:
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+# 6 files in 1007 hash buckets.
+# average 0.006 files per bucket, max 1 files in one bucket.
+
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# 
+make.exe: *** No rule to make target `all'.  Stop.
+
+ No general (`VPATH' variable) search path.
+
+# Finished Make data base on Tue May 24 23:31:19 2022
+
+ 

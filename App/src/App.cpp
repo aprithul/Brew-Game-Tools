@@ -16,8 +16,8 @@ Uint_32 soundEffectId = 0;
 Uint_32 _id1  = 0;
 Uint_32 _id2  = 0;
 
-Int_32 w = 600;
-Int_32 h = 330;
+Int_32 w = 480;
+Int_32 h = 272;
 BrewGameTool bgt;//("Canvas Demo", w, h, 1, false, VSYNC_ON);
 
 Float_32 rot = 0;

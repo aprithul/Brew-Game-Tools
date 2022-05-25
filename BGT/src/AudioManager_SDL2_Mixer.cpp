@@ -1,6 +1,6 @@
 #include "AudioManager.hpp"
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_mixer.h"
+#include "SDL/SDL.h"
+#include "SDL/SDL_mixer.h"
 #include <stdio.h>
 #include <unordered_map>
 #include "Utils.hpp"

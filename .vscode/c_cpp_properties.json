@@ -19,6 +19,22 @@
             "cppStandard": "c++11",
             "intelliSenseMode": "windows-clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "PSP",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:\\pspsdk\\bin\\psp-c++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x86"
         }
     ],
     "version": 4

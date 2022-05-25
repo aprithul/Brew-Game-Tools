@@ -128,7 +128,7 @@ DEF_STATIC Vec2f Cross(Float_32 s, const Vec2f& v);
 #ifdef MATH_UTIL_IMPLEMENTATION
 #undef MATH_UTIL_IMPLEMENTATION
 
-#include <cmath>
+#include <math.h>
 
 ////////////////////////////////////////////////
 // Vec2f

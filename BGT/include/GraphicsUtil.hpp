@@ -4,6 +4,8 @@
 #include "Types.hpp"
 #include <vector>
 
+#define INT_MAX 2147483647
+
 enum VsyncMode
 {
     VSYNC_OFF = 0,
@@ -74,7 +76,7 @@ struct Animation
 #ifdef GRAPHICS_UTILS_IMPLEMENTATION
 #undef GRAPHICS_UTILS_IMPLEMENTATION
 
-Animation::Animation():nextFrameDelta(INT_MAX), isPlaying(false), timeAccum(0), currentFrameInd(0)
+Animation::Animation():nextFrameDelta(), isPlaying(false), timeAccum(0), currentFrameInd(0)
 {
 
 }

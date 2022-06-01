@@ -88,8 +88,8 @@ Int_32 BrewGameTool::Run()
         if(inputManager->WasWindowCrossed())
             isGameRunning = false;
 
-        renderer->ClearSlow(clearColor);
-        //renderer->ClearFast(0x80);
+        //renderer->ClearSlow(clearColor);
+        renderer->ClearFast(0x80);
         update(); // app update
         renderer->Draw();
            

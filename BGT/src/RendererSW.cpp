@@ -23,11 +23,41 @@ Renderer::Renderer(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _
     textImg.Width = 1024;
     textImg.Data = (Uint_32*)std::malloc(textImg.Height*textImg.Width);
 
+    if(PixelSize == 1)
+    {
+        drawPixelFptr = &Renderer::DrawPixel1x;
+        drawPixelAlphaBlendedFptr = &Renderer::DrawPixelAlphaBlended1x;
+    }
+    else
+    {
+        drawPixelFptr = &Renderer::DrawPixel;
+        drawPixelAlphaBlendedFptr = &Renderer::DrawPixelAlphaBlended;
+    }
+
 
 }
 
 // drawing
-void Renderer::DrawPixel(Float_32 _x, Float_32 _y, Color color)
+
+void Renderer::DrawPixel1x(Int_32 _x, Int_32 _y, const Color& color)
+{
+    if(_x <0 || _x > Width || _y < 0 || _y > Height)
+        return;
+
+    canvasBuffer[(Width*_y)+_x] = color.Value;
+}
+
+void Renderer::DrawPixelAlphaBlended1x(Int_32 _x, Int_32 _y, const Color& color)
+{
+    if(_x <0 || _x > Width || _y < 0 || _y > Height)
+        return;
+
+    Color sColor = canvasBuffer[(Width*_y)+_x];
+    canvasBuffer[(Width*_y)+_x] = Color::alphaBlend(sColor, color).Value;
+}
+
+
+void Renderer::DrawPixel(Int_32 _x, Int_32 _y, const Color& color)
 {
     Int_32 _rx = _x * PixelSize;
     Int_32 _ry = _y * PixelSize;
@@ -46,7 +76,7 @@ void Renderer::DrawPixel(Float_32 _x, Float_32 _y, Color color)
     }
 }
 
-void Renderer::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
+void Renderer::DrawPixelAlphaBlended(Int_32 _x, Int_32 _y, const Color& color)
 {
      Int_32 _rx = _x * PixelSize;
     Int_32 _ry = _y * PixelSize;
@@ -66,7 +96,7 @@ void Renderer::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color color)
     }
 }
 
-void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
+void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,const Color& _color)
 {
     if(_x1 == _x2)
     {
@@ -78,7 +108,8 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
 
         for(int _yi = _y1, _xi = _x1; _yi <= _y2; _yi++)
         {
-            DrawPixel(_xi, _yi, _color);
+            (this->*drawPixelFptr)(_xi, _yi, _color);
+            //Renderer::drawPixelFptr(_xi, _yi, _color);
         }
     }
     else if(_y1 == _y2)
@@ -91,7 +122,7 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
 
         for(int _xi = _x1,_yi = _y1; _xi <= _x2; _xi++)
         {
-            DrawPixel(_xi, _yi, _color);
+            (this->*drawPixelFptr)(_xi, _yi, _color);
         }
     }
     else
@@ -115,7 +146,7 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
 
             for(Int_32 _xi = _x1, _yi = _y1; _xi <= _x2; _xi++)
             {
-                DrawPixel(_xi, _yi, _color);
+                (this->*drawPixelFptr)(_xi, _yi, _color);
 
                 _error += _m;
                 if(_error >= 0.5f)
@@ -143,7 +174,7 @@ void Renderer::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _c
 
             for(Int_32 _yi = _y1, _xi = _x1; _yi <= _y2; _yi++)
             {
-                DrawPixel(_xi, _yi, _color);
+                (this->*drawPixelFptr)(_xi, _yi, _color);
 
                 _error += _m;
                 if(_error >= 0.5f)
@@ -164,22 +195,22 @@ Int_32 sqrd_dist(Int_32 x0, Int_32 y0, Int_32 x1, Int_32 y1)
     return ((x0 - x1)*(x0 - x1) + (y0-y1)*(y0-y1));
 }
 
-void Renderer::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
+void Renderer::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,const Color& color)
 {
     Float_32 _radius_sq = radius * radius;
     for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
     {
-        DrawPixel(_x +_xi, _y + _yi, color);
-        DrawPixel( _x + _yi, _y +_xi, color);
+        (this->*drawPixelFptr)(_x +_xi, _y + _yi, color);
+        (this->*drawPixelFptr)( _x + _yi, _y +_xi, color);
 
-        DrawPixel(_x -_xi, _y + _yi, color);
-        DrawPixel(_x + _yi,_y -_xi,  color);
+        (this->*drawPixelFptr)(_x -_xi, _y + _yi, color);
+        (this->*drawPixelFptr)(_x + _yi,_y -_xi,  color);
 
-        DrawPixel(_x +_xi, _y - _yi, color);
-        DrawPixel(_x - _yi, _y +_xi, color);
+        (this->*drawPixelFptr)(_x +_xi, _y - _yi, color);
+        (this->*drawPixelFptr)(_x - _yi, _y +_xi, color);
 
-        DrawPixel(_x -_xi, _y - _yi, color);
-        DrawPixel(_x - _yi, _y -_xi, color);
+        (this->*drawPixelFptr)(_x -_xi, _y - _yi, color);
+        (this->*drawPixelFptr)(_x - _yi, _y -_xi, color);
 
         Int_32 _nxi = _xi + 1;
         Int_32 _nyi = _yi - 1;
@@ -194,7 +225,7 @@ void Renderer::DrawCircle(Int_32 _x, Int_32 _y, Int_32 radius,Color color)
     }
 }
 
-void Renderer::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillColor)
+void Renderer::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, const Color& fillColor)
 {
     Float_32 _radius_sq = radius * radius;
     for(Int_32 _xi = 0, _yi = radius; _xi <= _yi; _xi++)
@@ -221,7 +252,7 @@ void Renderer::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 radius, Color fillC
     }
 }
 
-void Renderer::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, Color _color)
+void Renderer::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, const Color& _color)
 {
     DrawLine(_x, _y, _x + _width, _y, _color);
     DrawLine(_x, _y, _x, _y+_height, _color);
@@ -240,7 +271,7 @@ void Renderer::BlitImage(const Image* const _image, Vec2f _pos, Vec2f _origin)
         {
             Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width*_j + _i)];
             Color _pixelCol(_pixelVal);
-            DrawPixel(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
+            (this->*drawPixelFptr)(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
         }
         
     }
@@ -256,7 +287,7 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _pos, Vec2
             if(_pixelVal & 0xff000000)
             {
                 Color _pixelCol(_pixelVal);
-                DrawPixel(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
+                (this->*drawPixelAlphaBlendedFptr)(_pos.x - _origin.x +_i, _pos.y - _origin.y +_j, _pixelCol);
             }
         }
         
@@ -321,7 +352,7 @@ void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3&
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            (this->*drawPixelFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -411,9 +442,9 @@ void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3&
                             static const Uint_32 _maskG = 0x0000ff00;
                             static const Uint_32 _maskB = 0x000000ff;
                             
-                            Uint_32 _r = (Uint_32)Clamp(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
-                            Uint_32 _g = (Uint_32)Clamp(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
-                            Uint_32 _b = (Uint_32)Clamp(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+                            Uint_32 _r = (Uint_32)ClampF(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)ClampF(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)ClampF(((_pixelVal & _maskB))*brightness, 0, 0xFF);
 
                             _pixelVal = 0xff000000 | _r | _g | _b;
 
@@ -424,7 +455,7 @@ void Renderer::BlitImage(const Image* const _image, Vec2f _origin, const Mat3x3&
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            (this->*drawPixelFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -514,7 +545,7 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, c
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            (this->*drawPixelAlphaBlendedFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -603,9 +634,9 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, c
                             static const Uint_32 _maskG = 0x0000ff00;
                             static const Uint_32 _maskB = 0x000000ff;
                             
-                            Uint_32 _r = (Uint_32)Clamp(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
-                            Uint_32 _g = (Uint_32)Clamp(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
-                            Uint_32 _b = (Uint_32)Clamp(((_pixelVal & _maskB))*brightness, 0, 0xFF);
+                            Uint_32 _r = (Uint_32)ClampF(((_pixelVal & _maskR)>>16)*brightness, 0, 0xFF)<<16;
+                            Uint_32 _g = (Uint_32)ClampF(((_pixelVal & _maskG)>>8)*brightness, 0, 0xFF)<<8;
+                            Uint_32 _b = (Uint_32)ClampF(((_pixelVal & _maskB))*brightness, 0, 0xFF);
 
                             _pixelVal = (_pixelVal & _maskA) | _r | _g | _b;
 
@@ -615,7 +646,7 @@ void Renderer::BlitImageAlphaBlended(const Image* const _image, Vec2f _origin, c
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            DrawPixel(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            (this->*drawPixelAlphaBlendedFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
                         }
                     }
                     break;
@@ -658,7 +689,7 @@ void Renderer::ClearFast(unsigned char grayBrightness)
     memset(canvasBuffer, grayBrightness, canvasBufferSizeInBytes);
 }
 
-void Renderer::ClearSlow(Color _col)
+void Renderer::ClearSlow(const Color& _col)
 {
     for(int _r = 0; _r < Height*PixelSize; _r++)
     {
@@ -705,14 +736,14 @@ void Renderer::DeleteFont(Uint_32 _font)
     RB_DeleteFont(_font);
 }
 
-void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location)
+void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, const Color& _col, Vec2f _location)
 {
     RB_GetTextBitmap(_text, _font, _size, _col, textImg.Data, &textImg.Width, &textImg.Height);
     Vec2f _origin(textImg.Width/2, textImg.Height/2);
     BlitImageAlphaBlended(&textImg, _location, _origin);
 }
 
-void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale)
+void Renderer::DrawText(const char* _text, Uint_32 _font, Int_32 _size, const Color& _col, Vec2f _location, Float_32 _rot, Vec2f _scale)
 {
     Mat3x3 rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(_rot);

@@ -7,6 +7,7 @@ typedef unsigned int Uint_32;
 typedef bool Bool_8;
 typedef unsigned char Byte_8;
 typedef double Double_64;
+typedef short Short_16;
 
 
 enum BGT_Key

@@ -5,7 +5,8 @@ void Swap(float* a, float* b);
 void Swap(int* a, int* b);
 void Swap(unsigned int* a, unsigned int* b);
 void Swap(unsigned char* a, unsigned char* b);
-float Clamp(float _val, float _min, float _max);
+float ClampF(float _val, float _min, float _max);
+int ClampI(int _val, int _min, int _max);
 
 #endif
 
@@ -40,7 +41,7 @@ void Swap(unsigned char* a, unsigned char* b)
     *b = _temp;
 }
 
-float Clamp(float val, float min, float max )
+float ClampF(float val, float min, float max )
 {
     if(val < min )
         return min;
@@ -48,6 +49,11 @@ float Clamp(float val, float min, float max )
         return max;
 
     return val;
+}
+
+int ClampI(int _val, int _min, int _max)
+{
+    return _val<=_min?_min:(_val>=_max?_max:_val);
 }
 
 

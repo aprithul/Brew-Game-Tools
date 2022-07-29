@@ -11,6 +11,9 @@
 #define GRAPHICS_UTILS_IMPLEMENTATION
 #include "GraphicsUtil.hpp"
 
+#define SSTRING_IMPLEMENTATION
+#include "sstring.hpp"
+
 Uint_32 mMusicId = 0;
 Uint_32 soundEffectId = 0;
 Uint_32 _id1  = 0;
@@ -122,6 +125,8 @@ void update()
             zombieAnim.Play();
     }
 
+
+    
     //static Float_32 oscAcu = 0;
     //Float_32 osc = abs(sinf(rot*0.1))+0.2f;
     //oscAcu += osc*0.007f;

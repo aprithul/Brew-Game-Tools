@@ -11,12 +11,6 @@
 #define GRAPHICS_UTILS_IMPLEMENTATION
 #include "GraphicsUtil.hpp"
 
-#define SSTRING_IMPLEMENTATION
-#include "sstring.hpp"
-
-#define HSTRING_IMPLEMENTATION
-#include "hstring.hpp"
-
 Uint_32 mMusicId = 0;
 Uint_32 soundEffectId = 0;
 Uint_32 _id1  = 0;
@@ -148,6 +142,7 @@ void update()
         scaleB.x = .3f;
 
     bgt.DrawImage(zombieId,  originB, 0, transA, scaleB, INTERPOLATION_NEAREST);
+
 
     /*
     if(bgt.OnKeyDown(BGTK_T))

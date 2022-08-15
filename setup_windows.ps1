@@ -1,4 +1,4 @@
-mkdir App\build
+ mkdir App\build
 mkdir App\build\debug
 
 mkdir BGT\build
@@ -32,6 +32,7 @@ mkdir SDL2\bin
 
 move temp\GLEW\glew-*\lib\Release\x64\* GL\lib
 move temp\GLEW\glew-*\include\GL\* GL\include
+move temp\GLEW\glew-*\bin\Release\x64\glew32.dll ..\App\build\debug\
 
 move temp\SDL2-*\x86_64-w64-mingw32\lib\* SDL2\lib
 move temp\SDL2-*\x86_64-w64-mingw32\include\SDL2 SDL2\include
@@ -48,6 +49,8 @@ move temp\SDL2_ttf-*\x86_64-w64-mingw32\include\SDL2\* SDL2\include\SDL2
 move temp\SDL2_ttf-*\x86_64-w64-mingw32\bin\* SDL2\bin
 copy SDL2\bin\SDL2_ttf.dll ..\App\build\debug\
 
-move mingw/llvm-mingw-* mingw/llvm-mingw-ucrt-x86_64
+move mingw\llvm-mingw-* mingw\llvm-mingw-ucrt-x86_64
+copy mingw\llvm-mingw-ucrt-x86_64\bin\libc++.dll ..\App\build\debug\
+copy mingw\llvm-mingw-ucrt-x86_64\bin\libunwind.dll ..\App\build\debug\
 
 Remove-Item .\temp -Recurse

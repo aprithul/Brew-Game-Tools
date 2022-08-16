@@ -1,5 +1,6 @@
-[![Build Status](http://ec2-184-169-183-110.us-west-1.compute.amazonaws.com:8080/buildStatus/icon?job=Brew-Game-Tools)](http://ec2-184-169-183-110.us-west-1.compute.amazonaws.com:8080/job/Brew-Game-Tools/)
 ![df658864db6ded7b48d11d854c1de603](https://user-images.githubusercontent.com/8151229/169726159-d70c5323-072f-4379-80ab-7247dc127b91.gif)
+
+[![Build Status](http://ec2-184-169-183-110.us-west-1.compute.amazonaws.com:8080/buildStatus/icon?job=Brew-Game-Tools)](http://ec2-184-169-183-110.us-west-1.compute.amazonaws.com:8080/job/Brew-Game-Tools/)
 
 # Brew-Game-Tools
 Brew Game Tools (or BGT) is a small 2D game framwork written in C++ with the main goal being simplicity. 

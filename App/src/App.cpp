@@ -81,8 +81,6 @@ void update()
 
     zombieAnim.Update(bgt.DeltaTime);
        
-    //bgt.BlitImage(_id1,  originA, rot, transA, scaleB, INTERPOLATION_NEAREST);
-
     Uint_32 zombieId = zombieAnim.GetCurrentFrame();
     Vec2f originB{bgt.GetImageById(zombieId)->Width/2.f, bgt.GetImageById(zombieId)->Height/2.f};
 

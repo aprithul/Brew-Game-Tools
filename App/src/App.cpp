@@ -77,11 +77,7 @@ void update()
     static Float_32 zombieSpeed = 150;
     _x += (Float_32)(bgt.GetKey(BGTK_RIGHT)*zombieSpeed*(bgt.DeltaTime)) - (Float_32)(bgt.GetKey(BGTK_LEFT)*zombieSpeed*(bgt.DeltaTime));
 
-    //static Vec2f transB{(Float_32) w*3/4, (Float_32)h/2};
-    //static Vec2f scaleA{2.f, 2.f};
     static Vec2f scaleB{0.3f, 0.3f};
-    //static Vec2f originA{bgt.GetImageById(_id1)->Width/2.f, bgt.GetImageById(_id1)->Height/2.f};
-    
 
     zombieAnim.Update(bgt.DeltaTime);
        

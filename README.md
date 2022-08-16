@@ -1,3 +1,5 @@
+[![Build Status](http://54.241.173.59:8080/buildStatus/icon?job=Brew-Game-Tools)](http://54.241.173.59:8080/job/Brew-Game-Tools/)
+
 ![df658864db6ded7b48d11d854c1de603](https://user-images.githubusercontent.com/8151229/169726159-d70c5323-072f-4379-80ab-7247dc127b91.gif)
 
 # Brew-Game-Tools

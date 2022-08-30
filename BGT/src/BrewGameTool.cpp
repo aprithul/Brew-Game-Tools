@@ -169,6 +169,9 @@ Uint_32 BrewGameTool::LoadImage(const char* _filename)
     Image _image;
     stbi_uc* _imageData = stbi_load(_filename, &_image.Width,&_image.Height, &_image.Channels, 4);
     _image.Diagonal = sqrtf(_image.Width*_image.Width + _image.Height*_image.Height);
+    _image.Origin_x = _image.Width/2.f;
+    _image.Origin_y = _image.Height/2.f;
+
     if(_imageData)
     {
         nextId++;
@@ -206,13 +209,24 @@ void BrewGameTool::DeleteImageById(Uint_32 _id)
     }
 }
 
+void BrewGameTool::SetImageOrigin(Uint_32 _id, Float_32 _x, Float_32 _y)
+{
+    Image* img = GetImageById(_id);
+    if(img)
+    {
+        img->Origin_x = _x;
+        img->Origin_y = _y;
+    }
+}
+
+
 void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin)
 {
     Image* _image = GetImageById(_imageId);
     renderer->BlitImage(_image, _pos, _origin);
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
@@ -221,11 +235,11 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Ve
     rotMat(1,0) = sinf(_rot);
     rotMat(1,1) = cosf(_rot);
 
-    renderer->BlitImage(_image, _origin, rotMat, _trans, _scale, _interpolationMode);
+    renderer->BlitImage(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, _interpolationMode);
 
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
@@ -233,27 +247,30 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Ve
     rotMat(0,1) = -sinf(_rot);
     rotMat(1,0) = sinf(_rot);
     rotMat(1,1) = cosf(_rot);
-   renderer->BlitImage(_image, _origin, rotMat, _trans, _scale, brightness, _interpolationMode);
+   renderer->BlitImage(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, brightness, _interpolationMode);
 }
 
-void BrewGameTool::DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
+
+    Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(_rot);
     rotMat(0,1) = -sinf(_rot);
     rotMat(1,0) = sinf(_rot);
     rotMat(1,1) = cosf(_rot);
-    renderer->BlitImageAlphaBlended(_image, _origin, rotMat, _trans, _scale, _interpolationMode);
+    renderer->BlitImageAlphaBlended(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, _interpolationMode);
 }
 
-void BrewGameTool::DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
+    Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(_rot);
     rotMat(0,1) = -sinf(_rot);
     rotMat(1,0) = sinf(_rot);
     rotMat(1,1) = cosf(_rot);
-    renderer->BlitImageAlphaBlended(_image, _origin, rotMat, _trans, _scale, brightness, _interpolationMode);
+    renderer->BlitImageAlphaBlended(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, brightness, _interpolationMode);
 }
 
 void BrewGameTool::SetVsyncMode(VsyncMode _mode)

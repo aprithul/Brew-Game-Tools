@@ -39,13 +39,15 @@ struct Color
 };
 
 
-struct Image // 192 bytes
+struct Image // 200 bytes
 {
     Uint_32* Data;
     Int_32 Width;
     Int_32 Height;
     Int_32 Diagonal;
     Int_32 Channels;
+    Float_32 Origin_x;
+    Float_32 Origin_y;
 };
 
 

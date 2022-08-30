@@ -18,14 +18,11 @@ BrewGameTool bgt;
 
 
 Uint_32 boy_img_id = 0;
-Vec2f boy_img_origin;
 
 
 void load_sprites()
 {
     boy_img_id  = bgt.LoadImage(GetResourcePath("boy.png"));
-    const Image* img = bgt.GetImageById(boy_img_id);
-    boy_img_origin = {img->Width/2.f, img->Height/2.f};
 }
 
 void init()
@@ -43,7 +40,7 @@ void update()
 {
     Vec2f translation = {screen_width/2.f, screen_height/2.f};
     Vec2f scale = {1.f,1.f};
-    bgt.DrawImageAlphaBlended(boy_img_id, boy_img_origin, 0, translation, scale, INTERPOLATION_NEAREST);
+    bgt.DrawImageAlphaBlended(boy_img_id, 0, translation, scale, INTERPOLATION_NEAREST);
 }
 
 void close()

@@ -45,7 +45,7 @@ struct DllExport BrewGameTool
     Uint_32 LoadImage(const char* _filename);
     Image* const GetImageById(Uint_32 _id);
     void DeleteImageById(Uint_32 _id);
-
+    void SetImageOrigin(Uint_32 _id, Float_32 _x, Float_32 _y);
 
     Uint_32 LoadMusic(const char* _filename);
     Uint_32 LoadSoundEffect(const char* _filename);
@@ -64,10 +64,10 @@ struct DllExport BrewGameTool
 
     // image blitting function
     void DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin);
-    void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
     
     
     // drawing funcitons

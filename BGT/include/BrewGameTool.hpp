@@ -66,8 +66,8 @@ struct DllExport BrewGameTool
     void DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin);
     void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
     void DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
     
     
     // drawing funcitons

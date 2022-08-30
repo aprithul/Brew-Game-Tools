@@ -236,8 +236,10 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Ve
    renderer->BlitImage(_image, _origin, rotMat, _trans, _scale, brightness, _interpolationMode);
 }
 
-void BrewGameTool::DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
 {
+
+    Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(_rot);
     rotMat(0,1) = -sinf(_rot);
@@ -246,8 +248,9 @@ void BrewGameTool::DrawImageAlphaBlended(const Image* const _image, Vec2f& _orig
     renderer->BlitImageAlphaBlended(_image, _origin, rotMat, _trans, _scale, _interpolationMode);
 }
 
-void BrewGameTool::DrawImageAlphaBlended(const Image* const _image, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Vec2f& _origin, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
+    Image* _image = GetImageById(_imageId);
     Mat3x3 rotMat = Mat3x3::Identity();
     rotMat(0,0) = cosf(_rot);
     rotMat(0,1) = -sinf(_rot);

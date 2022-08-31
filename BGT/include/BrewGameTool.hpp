@@ -64,11 +64,11 @@ struct DllExport BrewGameTool
     void SetMasterVolume(Float_32 _volume);
 
     // image blitting function
-    void DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin);
-    void DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode);
-    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, const Vec2f& _pos);
+    void DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode);
+    void DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode);
     
     
     // drawing funcitons

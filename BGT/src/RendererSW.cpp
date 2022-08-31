@@ -1,10 +1,12 @@
 #include "Renderer.hpp"
 #include "Utils.hpp"
+#include "Rect.hpp"
 #include <queue>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
-// define becfore including rendering backend,
+// define before including rendering backend,
 // because rendering backend needs them
 Uint_32* canvasBuffer;
 Uint_32 canvasBufferSizeInBytes = 0;
@@ -14,6 +16,14 @@ Image textImg;
 #if defined(RENDERING_BACKEND_SDL2_OPENGL) || defined(_DEBUG)
     #include "RenderingBackend_SDL2_OpenGL.cpp"
 #endif
+
+
+
+std::vector<std::thread> drawingThreads;
+std::atomic_int numOfThreadsCurrentlyDrawing;
+volatile bool closeThreads = false;
+Rectf quadrantBoundaries[9]; // we want to index using the quadrant enum, which has values 1,2,4,8
+
 
 enum Quadrant
 {
@@ -25,23 +35,26 @@ enum Quadrant
     BOTTOM_LEFT_BOTTOM_RIGHT    = 0b00001100,
     TOP_LEFT_BOTTOM_LEFT        = 0b00001001,
     TOP_RIGHT_BOTTOM_RIGHT      = 0b00000110,
-    ALL                         = 0b00001111
+    ALL                         = 0b00001111,
+
+    QUAD_COUNT
 };
 
 enum DrawFunction
 {
     BLIT_AABB,
     BLIT_TRANSFORMED,
-    BLIT_BRIGHTENED,
+    BLIT_TRANSFORMED_BRIGHTENED,
 
     BLIT_AABB_ALPHA,
     BLIT_TRANSFORMED_ALPHA,
-    BLIT_BRIGHTENED_ALPHA,
+    BLIT_TRANSFORMED_BRIGHTENED_ALPHA,
     
 };
 
 struct DrawCommand
 {
+    Quadrant quadrant;
     const Image* const image;
     DrawFunction drawFunc;
     Vec2f pos;
@@ -50,14 +63,14 @@ struct DrawCommand
     Float_32 brightness;
 };
 
-std::mutex q0mtx;
-std::mutex q1mtx;
-std::mutex q2mtx;
-std::mutex q3mtx;
-std::queue<DrawCommand> q0DrawList;
-std::queue<DrawCommand> q1DrawList;
-std::queue<DrawCommand> q2DrawList;
-std::queue<DrawCommand> q3DrawList;
+std::mutex mtx[QUAD_COUNT];
+// std::mutex q1mtx;
+// std::mutex q2mtx;
+// std::mutex q3mtx;
+std::queue<DrawCommand> drawCommandQueues[QUAD_COUNT];
+// std::queue<DrawCommand> q1DrawList;
+// std::queue<DrawCommand> q2DrawList;
+// std::queue<DrawCommand> q3DrawList;
 
 void getDrawnImageBounds(const Image* const _img, const Vec2f& _translation, const Mat3x3& _rot, const Vec2f& _scale, Vec2f& _bottomLeft, Vec2f& _topRight)
 {
@@ -130,6 +143,7 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
     Quadrant qd = getBlitQuadrant(bl,tr);
 
     DrawCommand dc = {
+                        qd,
                         _image,
                         df,
                         _pos,
@@ -142,48 +156,91 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
     {
     case TOP_LEFT:
         {
-            std::lock_guard<std::mutex> q0Lk(q0mtx);
-            q0DrawList.push(dc);
+            std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
+            drawCommandQueues[TOP_LEFT].push(dc);
         }
         break;
     case TOP_RIGHT:
         {
-            std::lock_guard<std::mutex> q1Lk(q1mtx);
-            q1DrawList.push(dc);
+            std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
+            drawCommandQueues[TOP_RIGHT].push(dc);
         }
         break;
     case BOTTOM_LEFT:
         {
-            std::lock_guard<std::mutex> q3Lk(q3mtx);
-            q3DrawList.push(dc);
+            std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_LEFT]);
+            drawCommandQueues[BOTTOM_LEFT].push(dc);
         }
         break;
     case BOTTOM_RIGHT:
         {
-            std::lock_guard<std::mutex> q2Lk(q2mtx);
-            q2DrawList.push(dc);
+            std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_RIGHT]);
+            drawCommandQueues[BOTTOM_RIGHT].push(dc);
         }
         break;
     case TOP_LEFT_TOP_RIGHT:
         {
-            
+            std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
+            dc.quadrant = TOP_LEFT;
+            drawCommandQueues[TOP_LEFT].push(dc);
+
+            std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
+            dc.quadrant = TOP_RIGHT;
+            drawCommandQueues[TOP_RIGHT].push(dc);
         }
         break;
     case BOTTOM_LEFT_BOTTOM_RIGHT:
         {
-            
+            std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
+            dc.quadrant = BOTTOM_LEFT;
+            drawCommandQueues[BOTTOM_LEFT].push(dc);
+
+            std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
+            dc.quadrant = BOTTOM_RIGHT;
+            drawCommandQueues[BOTTOM_RIGHT].push(dc);
         }
         break;
     case TOP_LEFT_BOTTOM_LEFT:
         {
-            
+            std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
+            dc.quadrant = TOP_LEFT;
+            drawCommandQueues[TOP_LEFT].push(dc);
+
+            std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
+            dc.quadrant = BOTTOM_LEFT;
+            drawCommandQueues[BOTTOM_LEFT].push(dc);
         }
         break;
     case TOP_RIGHT_BOTTOM_RIGHT:
         {
-            
+            std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
+            dc.quadrant = TOP_RIGHT;
+            drawCommandQueues[TOP_RIGHT].push(dc);
+
+            std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
+            dc.quadrant = BOTTOM_RIGHT;
+            drawCommandQueues[BOTTOM_RIGHT].push(dc);
         }
         break;
+    case ALL:
+    {
+            std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
+            dc.quadrant = TOP_LEFT;
+            drawCommandQueues[TOP_LEFT].push(dc);
+
+            std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
+            dc.quadrant = BOTTOM_LEFT;
+            drawCommandQueues[BOTTOM_LEFT].push(dc);
+
+            std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
+            dc.quadrant = TOP_RIGHT;
+            drawCommandQueues[TOP_RIGHT].push(dc);
+
+            std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
+            dc.quadrant = BOTTOM_RIGHT;
+            drawCommandQueues[BOTTOM_RIGHT].push(dc);
+    }
+    break;
     default:
         break;
     }
@@ -192,7 +249,6 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
 void executeDrawCommand(DrawCommand& _drawCommand);
 
 
-volatile bool closeThreads = false;
 void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk)
 {
     static Int_32 tc = 0;
@@ -200,22 +256,26 @@ void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk)
 
     while(!closeThreads)
     {
-        lk.lock();
         if(!cmdList.empty())
         {
+            lk.lock();
+        //if(!cmdList.empty())
+        //{
             DrawCommand dc = cmdList.front();
             cmdList.pop();
             lk.unlock();
             
+            ++numOfThreadsCurrentlyDrawing;
             executeDrawCommand(dc);
+            --numOfThreadsCurrentlyDrawing;
         }
-        else
-            lk.unlock();
+        //}
+        //else
+        //lk.unlock();
     }
 }
 
 
-std::vector<std::thread> drawingThreads;
 
 void Renderer_Create(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32 _pixelSize, Bool_8 _setFullscreen, VsyncMode _mode)
 {
@@ -241,27 +301,33 @@ void Renderer_Create(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32
         drawPixelAlphaBlendedFptr = &Renderer_DrawPixelAlphaBlended;
     }
 
+    // calculate quadrant boundaries, will be used when blit functions
+    quadrantBoundaries[TOP_LEFT] = {0,Height/2.f, Width/2.f, Height/2.f};
+    quadrantBoundaries[TOP_RIGHT] = {Width/2.f, Height/2.f, Width/2.f, Height/2.f};
+    quadrantBoundaries[BOTTOM_RIGHT] = {Width/2.f, 0, Width/2.f, Height/2.f};
+    quadrantBoundaries[BOTTOM_LEFT] = {0, 0, Width/2.f, Height/2.f};
 
     // drawing threads, 1 for each of the 4 quadrants
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(q0DrawList), std::ref(q0mtx)));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(q1DrawList), std::ref(q1mtx)));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(q2DrawList), std::ref(q2mtx)));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(q3DrawList), std::ref(q3mtx)));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_LEFT]), std::ref(mtx[TOP_LEFT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_RIGHT]), std::ref(mtx[TOP_RIGHT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_RIGHT]), std::ref(mtx[BOTTOM_RIGHT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_LEFT]), std::ref(mtx[BOTTOM_LEFT])));
 }
 
 // drawing
 
 void Renderer_DrawPixel1x(Int_32 _x, Int_32 _y, const Color& color)
 {
-    if(_x <0 || _x > Width || _y < 0 || _y > Height)
+    if(_x <0 || _x >= Width || _y < 0 || _y >= Height)
         return;
 
-    canvasBuffer[(Width*_y)+_x] = color.Value;
+    int imd=(Width*_y);
+    canvasBuffer[imd +_x] = color.Value;
 }
 
 void Renderer_DrawPixelAlphaBlended1x(Int_32 _x, Int_32 _y, const Color& color)
 {
-    if(_x <0 || _x > Width || _y < 0 || _y > Height)
+    if(_x <0 || _x >= Width || _y < 0 || _y >= Height)
         return;
 
     Color sColor = canvasBuffer[(Width*_y)+_x];
@@ -474,15 +540,22 @@ void Renderer_DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height,
 
 
 
-void blitImageImmediate(const Image* const _image, Vec2f _pos)
+
+void blitAabb(const Image* const _image, Vec2f _pos, Quadrant qd)
 {
-    for(Float_32 _i =0; _i< _image->Width; _i++)
+
+    Float_32 xMin = std::max(std::max(_pos.x - _image->Origin_x, 0.f), quadrantBoundaries[qd].x);
+    Float_32 xMax = std::min( std::min(_pos.x - _image->Origin_x+_image->Width, (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMin = std::max(std::max(_pos.y - _image->Origin_y, 0.f), quadrantBoundaries[qd].y);
+    Float_32 yMax = std::min( std::min(_pos.y - _image->Origin_y+_image->Height, (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+
+    for(Float_32 _i =xMin; _i< xMax; _i++)
     {
-        for (Float_32 _j = 0; _j < _image->Height; _j++)
+        for (Float_32 _j = yMin; _j < yMax; _j++)
         {
-            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width*_j + _i)];
+            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width* (_j-yMin) + (_i-xMin))];
             Color _pixelCol(_pixelVal);
-            (*drawPixelFptr)(_pos.x - _image->Origin_x +_i, _pos.y - _image->Origin_y +_j, _pixelCol);
+            drawPixelFptr( _i, _j, _pixelCol);
         }
     }
 }
@@ -496,28 +569,37 @@ void Renderer_BlitImage(const Image* const _image, Vec2f _pos)
 }
 
 
-void blitImageAlphaBlendedImmediate(const Image* const _image, Vec2f _pos)
+void blitAabbAlpha(const Image* const _image, Vec2f _pos, Quadrant qd)
 {
-    for(Float_32 _i =0; _i< _image->Width; _i++)
+
+    Float_32 xMin = std::max(std::max(_pos.x - _image->Origin_x, 0.f), quadrantBoundaries[qd].x);
+    Float_32 xMax = std::min( std::min(_pos.x - _image->Origin_x+_image->Width, (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMin = std::max(std::max(_pos.y - _image->Origin_y, 0.f), quadrantBoundaries[qd].y);
+    Float_32 yMax = std::min( std::min(_pos.y - _image->Origin_y+_image->Height, (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+
+    for(Float_32 _i =xMin; _i< xMax; _i++)
     {
-        for (Float_32 _j = 0; _j < _image->Height; _j++)
+        for (Float_32 _j = yMin; _j < yMax; _j++)
         {
-            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width*_j + _i)];
+            Uint_32 _pixelVal = _image->Data[ (Int_32)(_image->Width* (_j-yMin) + (_i-xMin))];
             if(_pixelVal & 0xff000000)
             {
                 Color _pixelCol(_pixelVal);
-                (*drawPixelAlphaBlendedFptr)(_pos.x - _image->Origin_x +_i, _pos.y - _image->Origin_y +_j, _pixelCol);
+                drawPixelFptr( _i, _j, _pixelCol);
             }
         }
-        
     }
 }
+
 void Renderer_BlitImageAlphaBlended(const Image* const _image, Vec2f _pos)
 {
-    blitImageAlphaBlendedImmediate(_image, _pos);
+    Mat3x3 identity = Mat3x3::Identity();
+    Vec2f scale = {1,1};
+    EnqueueDrawCommand(BLIT_AABB_ALPHA, _image, _pos, identity, scale, 1.f);
+    //blitImageAlphaBlendedImmediate(_image, _pos);
 }
 
-void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
+void blitTransformed(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode, Quadrant qd)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -539,21 +621,28 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
     Float_32 org_x = _image->Origin_x * _scale.x;
     Float_32 org_y = _image->Origin_y * _scale.y;
 
-    Float_32 sX = _trans.x-(img_d/2);
-    Float_32 sY = _trans.y-(img_d/2);
-    for(Float_32 _x = sX; _x <= _trans.x+(img_d/2); _x++)
-    {
-        for(Float_32 _y = sY; _y <= _trans.y+(img_d/2); _y++)
-        {
-            if(_x<0 || _x> Width || _y<0 || _y> Height)
-                continue;
+    Float_32 sX = _trans.x-(img_d/2.f);
+    Float_32 sY = _trans.y-(img_d/2.f);
 
+    Float_32 xMax = std::min( std::min(_trans.x+(img_d/2.f), (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMax = std::min( std::min(_trans.y+(img_d/2.f), (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+    Float_32 xMin = std::max(std::max(sX, 0.f), quadrantBoundaries[qd].x);
+    Float_32 yMin = std::max(std::max(sY, 0.f), quadrantBoundaries[qd].y);
+
+    for(Float_32 _x = xMin; _x <= xMax; _x++)
+    {
+        for(Float_32 _y = yMin; _y <= yMax; _y++)
+        {
+            //if(_x<0 || _x> Width || _y<0 || _y> Height)
+            //    continue;
+    
 
             Vec2f vp(_x-_trans.x, _y-_trans.y);
             Float_32 _u = Dot(vu, vp);
             Float_32 _v = Dot(vv, vp);
 
-            
+
+
             if(_u > -org_x  && _u < img_w - org_x && _v>-org_y && _v <img_h-org_y)
             {
                 switch (_interpolationMode)
@@ -574,7 +663,9 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            (*drawPixelFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            Float_32 _px = floorf(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)) + 0.5f);
+                            Float_32 _py = floorf(sY + flipSignV*(flipVertical*(img_d) - (_y - sY))+ 0.5f);
+                            (*drawPixelFptr)(_px, _py, _pixelCol);
                         }
                     }
                     break;
@@ -607,6 +698,7 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
                     break;
                 }
             }
+
         }
     }
 
@@ -614,12 +706,11 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
 }
 void Renderer_BlitImage(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
 {
-
-    EnqueueDrawCommand(BLIT_AABB, _image, _trans, _rot, _scale, 1.f);
+    EnqueueDrawCommand(BLIT_TRANSFORMED, _image, _trans, _rot, _scale, 1.f);
     //blitImageImmediate(_image, _rot, _trans, _scale, _interpolationMode);
 }
 
-void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode)
+void blitTransformedBrightened(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode, Quadrant qd)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -640,12 +731,17 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
     Float_32 sX = _trans.x-(img_d/2);
     Float_32 sY = _trans.y-(img_d/2);
 
-    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    Float_32 xMax = std::min( std::min(_trans.x+(img_d/2), (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMax = std::min( std::min(_trans.y+(img_d/2), (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+    Float_32 xMin = std::max(std::max(sX, 0.f), quadrantBoundaries[qd].x);
+    Float_32 yMin = std::max(std::max(sY, 0.f), quadrantBoundaries[qd].y);
+
+    for(Float_32 _x = xMin; _x <= xMax; _x++)
     {
-        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        for(Float_32 _y =  yMin; _y <= yMax; _y++)
         {
-            if(_x<0 || _x> Width || _y<0 || _y> Height)
-                continue;
+            //if(_x<0 || _x> Width || _y<0 || _y> Height)
+            //    continue;
 
 
             Vec2f vp(_x-_trans.x, _y-_trans.y);
@@ -683,7 +779,9 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            (*drawPixelFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            Float_32 _px = floorf(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)) + 0.5f);
+                            Float_32 _py = floorf(sY + flipSignV*(flipVertical*(img_d) - (_y - sY))+ 0.5f);
+                            (*drawPixelFptr)(_px, _py, _pixelCol);
                         }
                     }
                     break;
@@ -721,11 +819,12 @@ void blitImageImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _tr
 }
 void Renderer_BlitImage(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode)
 {
-    blitImageImmediate(_image, _rot,_trans, _scale, _brightness, _interpolationMode);
+    EnqueueDrawCommand(BLIT_TRANSFORMED_BRIGHTENED, _image, _trans, _rot, _scale, 1.f);
+    //blitImageImmediate(_image, _rot,_trans, _scale, _brightness, _interpolationMode);
 }
 
 
-void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
+void blitTransformedAlpha(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode, Quadrant qd)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -746,12 +845,17 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
     Float_32 sX = _trans.x-(img_d/2);
     Float_32 sY = _trans.y-(img_d/2);
 
-    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    Float_32 xMax = std::min( std::min(_trans.x+(img_d/2), (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMax = std::min( std::min(_trans.y+(img_d/2), (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+    Float_32 xMin = std::max(std::max(sX, 0.f), quadrantBoundaries[qd].x);
+    Float_32 yMin = std::max(std::max(sY, 0.f), quadrantBoundaries[qd].y);
+
+    for(Float_32 _x = xMin; _x <= xMax; _x++)
     {
-        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        for(Float_32 _y = yMin; _y <= yMax; _y++)
         {
-            if(_x<0 || _x>Width || _y<0 || _y>Height)
-                continue;
+            //if(_x<0 || _x>Width || _y<0 || _y>Height)
+            //    continue;
 
 
             Vec2f vp(_x-_trans.x, _y-_trans.y);
@@ -778,7 +882,9 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            (*drawPixelAlphaBlendedFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
+                            Float_32 _px = floorf(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)) + 0.5f);
+                            Float_32 _py = floorf(sY + flipSignV*(flipVertical*(img_d) - (_y - sY))+ 0.5f);
+                            (*drawPixelFptr)(_px, _py, _pixelCol);
                         }
                     }
                     break;
@@ -816,10 +922,11 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
 }
 void Renderer_BlitImageAlphaBlended(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Interpolation _interpolationMode)
 {
-    blitImageAlphaBlendedImmediate(_image, _rot,_trans, _scale, _interpolationMode);
+    EnqueueDrawCommand(BLIT_TRANSFORMED_ALPHA, _image, _trans, _rot, _scale, 1.f);
+   // blitImageAlphaBlendedImmediate(_image, _rot,_trans, _scale, _interpolationMode);
 }
 
-void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode)
+void blitTransformedBrightenedAlpha(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode, Quadrant qd)
 {
     Vec2f vu(1,0);
     vu = (_rot * vu);
@@ -840,12 +947,17 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
     Float_32 sX = _trans.x-(img_d/2);
     Float_32 sY = _trans.y-(img_d/2);
 
-    for(Float_32 _x = _trans.x-(img_d/2); _x <= _trans.x+(img_d/2); _x++)
+    Float_32 xMax = std::min( std::min(_trans.x+(img_d/2), (Float_32)Width), quadrantBoundaries[qd].x+quadrantBoundaries[qd].w);
+    Float_32 yMax = std::min( std::min(_trans.y+(img_d/2), (Float_32)Height), quadrantBoundaries[qd].y+quadrantBoundaries[qd].h);
+    Float_32 xMin = std::max(std::max(sX, 0.f), quadrantBoundaries[qd].x);
+    Float_32 yMin = std::max(std::max(sY, 0.f), quadrantBoundaries[qd].y);
+
+    for(Float_32 _x = xMin; _x <= xMax; _x++)
     {
-        for(Float_32 _y =  _trans.y-(img_d/2); _y <= _trans.y+(img_d/2); _y++)
+        for(Float_32 _y = yMin; _y <= yMax; _y++)
         {
-            if(_x<0 || _x> Width || _y<0 || _y> Height)
-                continue;
+            //if(_x<0 || _x> Width || _y<0 || _y> Height)
+            //    continue;
 
 
             Vec2f vp(_x-_trans.x, _y-_trans.y);
@@ -883,8 +995,9 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
                             // add difference between iterated position and start position to start position ( same as just _x if we didn't need flipping)
                             // if scale is negative, we move to right/top most pixel and move to the left/bottom by (_x-sX) / (_y-sY) amount (we use flipSign* to negate for this)
                             // otherwise we move towards right/top and have flipSign* positive.
-                            (*drawPixelAlphaBlendedFptr)(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)), sY + flipSignV*(flipVertical*(img_d) - (_y - sY)), _pixelCol);
-                        }
+                            Float_32 _px = floorf(sX + flipSignH*(flipHorizontal*(img_d) - (_x - sX)) + 0.5f);
+                            Float_32 _py = floorf(sY + flipSignV*(flipVertical*(img_d) - (_y - sY))+ 0.5f);
+                            (*drawPixelFptr)(_px, _py, _pixelCol);                        }
                     }
                     break;
                     case INTERPOLATION_LINEAR:
@@ -921,7 +1034,8 @@ void blitImageAlphaBlendedImmediate(const Image* const _image, const Mat3x3& _ro
 }
 void Renderer_BlitImageAlphaBlended(const Image* const _image, const Mat3x3& _rot, Vec2f _trans, Vec2f _scale, Float_32 _brightness, Interpolation _interpolationMode)
 {
-    blitImageAlphaBlendedImmediate(_image, _rot,_trans, _scale, _brightness, _interpolationMode);
+    EnqueueDrawCommand(BLIT_TRANSFORMED_BRIGHTENED_ALPHA, _image, _trans, _rot, _scale, 1.f);
+    //blitImageAlphaBlendedImmediate(_image, _rot,_trans, _scale, _brightness, _interpolationMode);
 }
 
 
@@ -929,38 +1043,41 @@ void Renderer_BlitImageAlphaBlended(const Image* const _image, const Mat3x3& _ro
 
 void executeDrawCommand(DrawCommand& _drawCommand)
 {
+
+    
+
     switch (_drawCommand.drawFunc)
     {
     case BLIT_AABB:
         {
-            blitImageImmediate(_drawCommand.image, _drawCommand.pos);
+            blitAabb(_drawCommand.image, _drawCommand.pos, _drawCommand.quadrant);
         }
         break;
     case BLIT_TRANSFORMED:
         {
-            blitImageImmediate(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, INTERPOLATION_NEAREST);
+            blitTransformed(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, INTERPOLATION_NEAREST, _drawCommand.quadrant);
         }
         break;
-    case BLIT_BRIGHTENED:
+    case BLIT_TRANSFORMED_BRIGHTENED:
         {
-            blitImageImmediate(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, _drawCommand.brightness, INTERPOLATION_NEAREST);
+            blitTransformedBrightened(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, _drawCommand.brightness, INTERPOLATION_NEAREST, _drawCommand.quadrant);
         }
         break;
     case BLIT_AABB_ALPHA:
         {
-            blitImageAlphaBlendedImmediate(_drawCommand.image, _drawCommand.pos);
+            blitAabbAlpha(_drawCommand.image, _drawCommand.pos, _drawCommand.quadrant);
             
         }
         break;
     case BLIT_TRANSFORMED_ALPHA:
         {
-            blitImageAlphaBlendedImmediate(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, INTERPOLATION_NEAREST);
+            blitTransformedAlpha(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, INTERPOLATION_NEAREST, _drawCommand.quadrant);
             
         }
         break;
-    case BLIT_BRIGHTENED_ALPHA:
+    case BLIT_TRANSFORMED_BRIGHTENED_ALPHA:
         {
-            blitImageAlphaBlendedImmediate(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, _drawCommand.brightness, INTERPOLATION_NEAREST);
+            blitTransformedBrightenedAlpha(_drawCommand.image, _drawCommand.rot, _drawCommand.pos, _drawCommand.scale, _drawCommand.brightness, INTERPOLATION_NEAREST, _drawCommand.quadrant);
         }
         break;
     
@@ -991,6 +1108,24 @@ void Renderer_ClearSlow(const Color& _col)
 
 void Renderer_Draw()
 {
+    static Quadrant quadrants[4] = {TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT};
+
+    // wait until all drawing is done
+    while(true)
+    {
+        bool allEmpty = true;
+        for(Quadrant qd : quadrants)
+        {
+            mtx[qd].lock();
+            if(!drawCommandQueues[qd].empty())
+                allEmpty = false;
+            mtx[qd].unlock();
+        }
+
+        if(allEmpty && numOfThreadsCurrentlyDrawing.load() == 0)
+            break;
+    }
+
     // copies canvasbuffer data to the screen
     RB_DrawScreen();
 }

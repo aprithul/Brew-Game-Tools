@@ -218,7 +218,7 @@ void BrewGameTool::SetImageOrigin(Uint_32 _id, Float_32 _x, Float_32 _y)
 
 
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin)
+void BrewGameTool::DrawImage(Uint_32 _imageId, const Vec2f& _pos)
 {
 
     Image* _image = GetImageById(_imageId);
@@ -228,7 +228,7 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin)
     }
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
     if(_image)
@@ -244,7 +244,7 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec
     }
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
     if(_image)
@@ -259,7 +259,7 @@ void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec
     }
 }
 
-void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode)
 {
 
     Image* _image = GetImageById(_imageId);
@@ -277,7 +277,7 @@ void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f&
     }
 }
 
-void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
     if(_image)

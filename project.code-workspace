@@ -85,7 +85,10 @@
 			"list": "cpp",
 			"unordered_set": "cpp",
 			"xhash": "cpp",
-			"variant": "cpp"
+			"variant": "cpp",
+			"deque": "cpp",
+			"queue": "cpp",
+			"thread": "cpp"
 		}
 	}
 }

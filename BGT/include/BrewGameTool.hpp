@@ -16,6 +16,7 @@
 #include "GraphicsUtil.hpp"
 #include "MathUtil.hpp"
 #include <unordered_map>
+#include <vector>
 
 struct DllExport BrewGameTool
 {
@@ -100,10 +101,6 @@ struct DllExport BrewGameTool
         void (*init) ();
         void (*update) ();
         void (*close) ();
-        Renderer* renderer;
-        AudioManager* audioManager;
-        InputManager* inputManager;
-
 
 };
 

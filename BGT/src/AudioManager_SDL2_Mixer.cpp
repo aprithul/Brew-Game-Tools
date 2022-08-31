@@ -10,7 +10,7 @@ std::unordered_map<Uint_32, Mix_Chunk*> loadedChunk;
 Uint_32 nextMusicId = 0;
 Uint_32 nextChunkId = 0;
 
-AudioManager::AudioManager(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize)
+void Audio_Create(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize)
 {
     
     if(SDL_Init(SDL_INIT_AUDIO) == 0)
@@ -26,7 +26,7 @@ AudioManager::AudioManager(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSiz
         printf("Couldn't initialize sdl Audio\n");
 }
 
-AudioManager::~AudioManager()
+void Audio_Close()
 {
     for(auto& _music : loadedMusic)
     {
@@ -43,7 +43,7 @@ AudioManager::~AudioManager()
 }
 
 
-Uint_32 AudioManager::LoadMusic(const char* _filename)
+Uint_32 Audio_LoadMusic(const char* _filename)
 {
     Mix_Music* _music = Mix_LoadMUS(_filename);
     if(_music)
@@ -57,7 +57,7 @@ Uint_32 AudioManager::LoadMusic(const char* _filename)
     return nextMusicId;
 }
 
-void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
+void Audio_PlayMusic(Uint_32 musicId, Bool_8 doLoop)
 {
     if(loadedMusic.find(musicId) != loadedMusic.end())
         Mix_PlayMusic( loadedMusic[musicId], doLoop? -1 : 1); // -1 == play infinite times
@@ -65,34 +65,34 @@ void AudioManager::PlayMusic(Uint_32 musicId, Bool_8 doLoop)
         printf("Music with id : %u not found\n", musicId);
 }
 
-void AudioManager::SetMusicVolume(Float_32 _volume)
+void Audio_SetMusicVolume(Float_32 _volume)
 {
     _volume = ClampF(_volume, 0, 1);
     Int_32 _volumeI = (Int_32)(_volume*128);
     Mix_VolumeMusic(_volumeI);
 }
 
-void AudioManager::PauseMusic()
+void Audio_PauseMusic()
 {
     Mix_PauseMusic();
 }
 
-void AudioManager::ResumeMusic()
+void Audio_ResumeMusic()
 {
     Mix_ResumeMusic();
 }
 
-Bool_8 AudioManager::IsPlayingMusic()
+Bool_8 Audio_IsPlayingMusic()
 {
     return !Mix_PausedMusic() && Mix_PlayingMusic();
 }
 
-void AudioManager::StopMusic()
+void Audio_StopMusic()
 {
     Mix_HaltMusic();
 }
 
-Uint_32 AudioManager::LoadSoundEffect(const char* _filename)
+Uint_32 Audio_LoadSoundEffect(const char* _filename)
 {
     
 
@@ -108,7 +108,7 @@ Uint_32 AudioManager::LoadSoundEffect(const char* _filename)
     return nextChunkId;
 }
 
-void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
+void Audio_PlaySoundEffect(Uint_32 _soundEffect)
 {
      if(loadedChunk.find(_soundEffect) != loadedChunk.end())
         Mix_PlayChannel(-1, loadedChunk[_soundEffect], 0); // -1 == play infinite times
@@ -117,7 +117,7 @@ void AudioManager::PlaySoundEffect(Uint_32 _soundEffect)
 }
 
 
-void AudioManager::SetSoundEffectVolume(Float_32 _volume)
+void Audio_SetSoundEffectVolume(Float_32 _volume)
 {
     _volume = ClampF(_volume, 0, 1);
     Int_32 _volumeI = (Int_32)(_volume*128);

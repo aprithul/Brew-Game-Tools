@@ -101,7 +101,7 @@ void mapSdlkToBgtk()
     sdlToBgtKeymap[SDLK_F12] = BGTK_F12;
 }
 
-InputManager::InputManager()
+void Input_Create()
 {
     if(SDL_Init(SDL_INIT_EVENTS)==0)
     {
@@ -112,7 +112,7 @@ InputManager::InputManager()
 
 }
 
-void InputManager::ProcessInput()
+void Input_ProcessInput()
 {
     keysPressedThisFrame.clear();
     keysReleasedThisFrame.clear();
@@ -149,27 +149,27 @@ void InputManager::ProcessInput()
     }   
 }
 
-Bool_8 InputManager::WasWindowCrossed()
+Bool_8 Input_WasWindowCrossed()
 {
     return windowCrossed;
 }
 
-Bool_8 InputManager::OnKeyDown(BGT_Key _key)
+Bool_8 Input_OnKeyDown(BGT_Key _key)
 {
     return keysPressedThisFrame.find(_key) != keysPressedThisFrame.end();
 }
 
-Bool_8 InputManager::OnKeyUp(BGT_Key _key)
+Bool_8 Input_OnKeyUp(BGT_Key _key)
 {
     return keysReleasedThisFrame.find(_key) != keysReleasedThisFrame.end();
 }
 
-Float_32 InputManager::GetKey(BGT_Key _key)
+Float_32 Input_GetKey(BGT_Key _key)
 {
     return keyVal[_key];
 }
 
-InputManager::~InputManager()
+void Input_Close()
 {
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     printf("Input events backend cleaned\n");

@@ -3,20 +3,15 @@
 
 #include "Types.hpp"
 
-class InputManager
-{
-private:
-    /* data */
-public:
-    InputManager(/* args */);
-    ~InputManager();
 
-    Bool_8 WasWindowCrossed();
+void Input_Create(/* args */);
+void Input_Close();
 
-    void ProcessInput();
-    Bool_8 OnKeyDown(BGT_Key _key);
-    Bool_8 OnKeyUp(BGT_Key _key);
-    Float_32 GetKey(BGT_Key _key);
-};
+Bool_8 Input_WasWindowCrossed();
+
+void Input_ProcessInput();
+Bool_8 Input_OnKeyDown(BGT_Key _key);
+Bool_8 Input_OnKeyUp(BGT_Key _key);
+Float_32 Input_GetKey(BGT_Key _key);
 
 #endif // CONTROL_MANAGER

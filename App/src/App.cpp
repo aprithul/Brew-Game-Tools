@@ -12,8 +12,8 @@
 #include "GraphicsUtil.hpp"
 
 
-Int_32 screen_width = 600;
-Int_32 screen_height = 330;
+Int_32 screen_width = 1280;
+Int_32 screen_height = 720;
 BrewGameTool bgt;
 
 
@@ -22,7 +22,7 @@ Uint_32 boy_img_id = 0;
 
 void load_sprites()
 {
-    boy_img_id  = bgt.LoadImage(GetResourcePath("boy.png"));
+    boy_img_id  = bgt.LoadImage(GetResourcePath("red.png"));
 }
 
 void init()
@@ -38,9 +38,13 @@ void init()
 
 void update()
 {
-    Vec2f translation = {screen_width/2.f, screen_height/2.f};
+    Vec2f translation = {screen_width/6.f, screen_height/6.f};
     Vec2f scale = {1.f,1.f};
-    bgt.DrawImageAlphaBlended(boy_img_id, 0, translation, scale, INTERPOLATION_NEAREST);
+
+    static Float_32 _rot = 0;
+    _rot += bgt.DeltaTime * 45;
+
+    bgt.DrawImage(boy_img_id, _rot, translation, scale, INTERPOLATION_NEAREST);
 }
 
 void close()

@@ -38,7 +38,6 @@ void init()
 
     load_sprites();
     printf("App initialized\n");
-
 }
 
 void update()

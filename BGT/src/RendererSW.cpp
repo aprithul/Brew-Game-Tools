@@ -263,9 +263,9 @@ void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk)
         //{
             DrawCommand dc = cmdList.front();
             cmdList.pop();
+            ++numOfThreadsCurrentlyDrawing;
             lk.unlock();
             
-            ++numOfThreadsCurrentlyDrawing;
             executeDrawCommand(dc);
             --numOfThreadsCurrentlyDrawing;
         }

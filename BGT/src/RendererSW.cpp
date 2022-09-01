@@ -253,7 +253,7 @@ void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk)
 {
     static Int_32 tc = 0;
     printf("Started drawing thread [%d]\n", tc++);
-
+    
     while(!closeThreads)
     {
         if(!cmdList.empty())

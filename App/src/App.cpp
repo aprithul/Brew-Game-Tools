@@ -57,14 +57,12 @@ void update()
     if(bgt.GetKey(BGTK_DOWN))
         translation.y -= bgt.DeltaTime * 128;
     
-    int c = 0;
-
     for(int i=0; i<canvas_width;i += canvas_width/16)
     {
         bgt.DrawLine(i,0,i,canvas_width, Color(0xff0000ff));
     }
 
-    bgt.DrawImage(boy_img_id, _rot, Vec2f(canvas_width/2, canvas_height/2)+translation, scale, INTERPOLATION_NEAREST);
+        bgt.DrawImage(boy_img_id, _rot, Vec2f(canvas_width/2, canvas_height/2)+translation, scale, INTERPOLATION_NEAREST);
 }
 
 void close()

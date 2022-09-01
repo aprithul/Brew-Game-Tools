@@ -39,21 +39,21 @@ void BrewGameTool::SetupRenderer(const char* _name, Uint_32 _width, Uint_32 _hei
     Height = _height;
     PixelSize = _pixelSize;
 
-    renderer = new Renderer(_name, _width, _height, _pixelSize, _setFullscreen, _mode);
+    Renderer_Create(_name, _width, _height, _pixelSize, _setFullscreen, _mode);
     printf("Renderer created.\n");
     
 }
 
 void BrewGameTool::SetupAudio(Int_32 _frequency, Int_32 _channels, Int_32 _chunkSize)
 {
-    audioManager = new AudioManager(_frequency, _channels, _chunkSize);
+    Audio_Create(_frequency, _channels, _chunkSize);
     printf("Audio manager created.\n");
 
 }
 
 void BrewGameTool::SetupInput()
 {
-    inputManager = new InputManager();
+    Input_Create();
     printf("Input manager created.\n");
 
 }
@@ -84,14 +84,14 @@ Int_32 BrewGameTool::Run()
     steady_clock::time_point _lastTime = steady_clock::now();
     while(isGameRunning)
     {
-        inputManager->ProcessInput();
-        if(inputManager->WasWindowCrossed())
+        Input_ProcessInput();
+        if(Input_WasWindowCrossed())
             isGameRunning = false;
 
-        //renderer->ClearSlow(clearColor);
-        renderer->ClearFast(0x80);
+        //ClearSlow(clearColor);
+        Renderer_ClearFast(0x80);
         update(); // app update
-        renderer->Draw();
+        Renderer_Draw();
            
         duration<Double_64> time_span = duration_cast<duration<Double_64> >(steady_clock::now() - _lastTime);
         _lastTime = steady_clock::now();
@@ -105,8 +105,8 @@ Int_32 BrewGameTool::Run()
             
             //printf("FPS: %d\n", frameCount);
             char buffer[64];
-            sprintf(buffer, "%s | %d x %d x %d | FPS: %d", renderer->windowTitle, Width, Height, PixelSize, frameCount);
-            renderer->SetWindowTitle(buffer);
+            sprintf(buffer, "%s | %d x %d x %d | FPS: %d", windowTitle, Width, Height, PixelSize, frameCount);
+            Renderer_SetWindowTitle(buffer);
             secondCounter -= 1.0;
             frameCount = 0;
         }
@@ -135,32 +135,32 @@ void BrewGameTool::SetCloseFunc(void (*_close) ())
 // Drawing
 void BrewGameTool::DrawPixel(Float_32 _x, Float_32 _y, Color _color)
 {
-    renderer->DrawPixel(_x, _y, _color);
+    Renderer_DrawPixel(_x, _y, _color);
 }
 
 void BrewGameTool::DrawPixelAlphaBlended(Float_32 _x, Float_32 _y, Color _color)
 {
-    renderer->DrawPixel(_x, _y, _color);
+    Renderer_DrawPixel(_x, _y, _color);
 }
 
 void BrewGameTool::DrawLine(Int_32 _x1,  Int_32 _y1, Int_32 _x2, Int_32 _y2,Color _color)
 {
-   renderer->DrawLine(_x1,  _y1, _x2, _y2, _color);
+    Renderer_DrawLine(_x1,  _y1, _x2, _y2, _color);
 }
 
 void BrewGameTool::DrawCircle(Int_32 _x, Int_32 _y, Int_32 _radius,Color _color)
 {
-    renderer->DrawCircle(_x, _y, _radius, _color);
+    Renderer_DrawCircle(_x, _y, _radius, _color);
 }
 
 void BrewGameTool::DrawFilledCircle(Int_32 _x, Int_32 _y, Int_32 _radius, Color _fillColor)
 {
-    renderer->DrawFilledCircle(_x, _y, _radius, _fillColor);
+    Renderer_DrawFilledCircle(_x, _y, _radius, _fillColor);
 }
 
 void BrewGameTool::DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height, Color _color)
 {
-    renderer->DrawRectangle(_x, _y, _width, _height, _color);
+    Renderer_DrawRectangle(_x, _y, _width, _height, _color);
 }
 
 Uint_32 BrewGameTool::LoadImage(const char* _filename)
@@ -211,102 +211,121 @@ void BrewGameTool::DeleteImageById(Uint_32 _id)
 
 void BrewGameTool::SetImageOrigin(Uint_32 _id, Float_32 _x, Float_32 _y)
 {
-    Image* img = GetImageById(_id);
-    if(img)
+    Image* _img = GetImageById(_id);
+    if(_img)
+        Renderer_SetImageOrigin(_img, _x, _y);
+}
+
+
+
+void BrewGameTool::DrawImage(Uint_32 _imageId, const Vec2f& _pos)
+{
+
+    Image* _image = GetImageById(_imageId);
+    if(_image)
     {
-        img->Origin_x = _x;
-        img->Origin_y = _y;
+        Renderer_BlitImage(_image, _pos);
     }
 }
 
-
-void BrewGameTool::DrawImage(Uint_32 _imageId, Vec2f& _pos, Vec2f& _origin)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
-    renderer->BlitImage(_image, _pos, _origin);
+    if(_image)
+    {
+        _rot = DEG_TO_RAD*_rot;
+        Mat3x3 rotMat = Mat3x3::Identity();
+        rotMat(0,0) = cosf(_rot);
+        rotMat(0,1) = -sinf(_rot);
+        rotMat(1,0) = sinf(_rot);
+        rotMat(1,1) = cosf(_rot);
+
+        Renderer_BlitImage(_image, rotMat, _trans, _scale, _interpolationMode);
+    }
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
+void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
-    Mat3x3 rotMat = Mat3x3::Identity();
-    rotMat(0,0) = cosf(_rot);
-    rotMat(0,1) = -sinf(_rot);
-    rotMat(1,0) = sinf(_rot);
-    rotMat(1,1) = cosf(_rot);
-
-    renderer->BlitImage(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, _interpolationMode);
-
+    if(_image)
+    {
+        _rot = DEG_TO_RAD*_rot;
+        Mat3x3 rotMat = Mat3x3::Identity();
+        rotMat(0,0) = cosf(_rot);
+        rotMat(0,1) = -sinf(_rot);
+        rotMat(1,0) = sinf(_rot);
+        rotMat(1,1) = cosf(_rot);
+        Renderer_BlitImage(_image, rotMat, _trans, _scale, brightness, _interpolationMode);
+    }
 }
 
-void BrewGameTool::DrawImage(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Interpolation _interpolationMode)
 {
+
     Image* _image = GetImageById(_imageId);
-    Mat3x3 rotMat = Mat3x3::Identity();
-    rotMat(0,0) = cosf(_rot);
-    rotMat(0,1) = -sinf(_rot);
-    rotMat(1,0) = sinf(_rot);
-    rotMat(1,1) = cosf(_rot);
-   renderer->BlitImage(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, brightness, _interpolationMode);
+    if(_image)
+    {
+        Vec2f bl,tr;
+
+        _rot = DEG_TO_RAD*_rot;
+        Mat3x3 rotMat = Mat3x3::Identity();
+        rotMat(0,0) = cosf(_rot);
+        rotMat(0,1) = -sinf(_rot);
+        rotMat(1,0) = sinf(_rot);
+        rotMat(1,1) = cosf(_rot);
+        Renderer_BlitImageAlphaBlended(_image, rotMat, _trans, _scale, _interpolationMode);
+    }
 }
 
-void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Interpolation _interpolationMode)
-{
-
-    Image* _image = GetImageById(_imageId);
-    Mat3x3 rotMat = Mat3x3::Identity();
-    rotMat(0,0) = cosf(_rot);
-    rotMat(0,1) = -sinf(_rot);
-    rotMat(1,0) = sinf(_rot);
-    rotMat(1,1) = cosf(_rot);
-    renderer->BlitImageAlphaBlended(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, _interpolationMode);
-}
-
-void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, Vec2f& _trans, Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
+void BrewGameTool::DrawImageAlphaBlended(Uint_32 _imageId, Float_32 _rot, const Vec2f& _trans, const Vec2f& _scale, Float_32 brightness, Interpolation _interpolationMode)
 {
     Image* _image = GetImageById(_imageId);
-    Mat3x3 rotMat = Mat3x3::Identity();
-    rotMat(0,0) = cosf(_rot);
-    rotMat(0,1) = -sinf(_rot);
-    rotMat(1,0) = sinf(_rot);
-    rotMat(1,1) = cosf(_rot);
-    renderer->BlitImageAlphaBlended(_image, {_image->Origin_x, _image->Origin_y}, rotMat, _trans, _scale, brightness, _interpolationMode);
+    if(_image)
+    {
+        _rot = DEG_TO_RAD*_rot;
+        Mat3x3 rotMat = Mat3x3::Identity();
+        rotMat(0,0) = cosf(_rot);
+        rotMat(0,1) = -sinf(_rot);
+        rotMat(1,0) = sinf(_rot);
+        rotMat(1,1) = cosf(_rot);
+        Renderer_BlitImageAlphaBlended(_image, rotMat, _trans, _scale, brightness, _interpolationMode);
+    }
 }
 
 void BrewGameTool::SetVsyncMode(VsyncMode _mode)
 {
-    renderer->SetVsyncMode(_mode);
+    Renderer_SetVsyncMode(_mode);
 }
 
 void BrewGameTool::SetFrameRate(Uint_32 _fps)
 {
-    renderer->SetFrameRate(_fps);
+    Renderer_SetFrameRate(_fps);
 }
 //  Drawing
 
 Uint_32 BrewGameTool::LoadFont(const char* _filename)
 {
-    return renderer->LoadFont(_filename);
+    return Renderer_LoadFont(_filename);
 }
 
 void BrewGameTool::DeleteFont(Uint_32 _font)
 {
-    renderer->DeleteFont(_font);
+    Renderer_DeleteFont(_font);
 }
 
 void BrewGameTool::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location)
 {
-    renderer->DrawText(_text, _font, _size, _col, _location);
+    Renderer_DrawText(_text, _font, _size, _col, _location);
 }
 
 void BrewGameTool::DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale)
 {
-    renderer->DrawText(_text, _font, _size, _col, _location, _rot, _scale);
+    Renderer_DrawText(_text, _font, _size, _col, _location, _rot, _scale);
 }
 
 void BrewGameTool::SetFontSize(Uint_32 _size)
 {
-    renderer->SetFontSize(_size);
+    Renderer_SetFontSize(_size);
 }
 
 
@@ -315,17 +334,17 @@ void BrewGameTool::SetFontSize(Uint_32 _size)
 // Input
 Bool_8 BrewGameTool::OnKeyDown(BGT_Key _key)
 {
-    return inputManager->OnKeyDown(_key);
+    return Input_OnKeyDown(_key);
 }
 
 Bool_8 BrewGameTool::OnKeyUp(BGT_Key _key)
 {
-    return inputManager->OnKeyUp(_key);
+    return Input_OnKeyUp(_key);
 }
 
 Float_32 BrewGameTool::GetKey(BGT_Key _key)
 {
-    return inputManager->GetKey(_key);
+    return Input_GetKey(_key);
 }
 
 
@@ -333,59 +352,59 @@ Float_32 BrewGameTool::GetKey(BGT_Key _key)
 // Music
 Uint_32 BrewGameTool::LoadMusic(const char* _filename)
 {
-    return audioManager->LoadMusic(_filename);
+    return Audio_LoadMusic(_filename);
 }
 
 void BrewGameTool::PlayMusic(Uint_32 _music, Bool_8 doLoop)
 {
-    audioManager->PlayMusic(_music, doLoop);
+    Audio_PlayMusic(_music, doLoop);
 }
 
 void BrewGameTool::PauseMusic()
 {
-    audioManager->PauseMusic();
+    Audio_PauseMusic();
 }
 
 void BrewGameTool::ResumeMusic()
 {
-    audioManager->ResumeMusic();
+    Audio_ResumeMusic();
 }
 
 Bool_8 BrewGameTool::IsPlayingMusic()
 {
-    return audioManager->IsPlayingMusic();
+    return Audio_IsPlayingMusic();
 }
 
 void BrewGameTool::StopMusic()
 {
-    audioManager->StopMusic();
+    Audio_StopMusic();
 }
 
 
 void BrewGameTool::SetMusicVolume(Float_32 _volume)
 {
-    audioManager->SetMusicVolume(_volume);
+    Audio_SetMusicVolume(_volume);
 }
 
 Uint_32 BrewGameTool::LoadSoundEffect(const char* _filename)
 {
-    return audioManager->LoadSoundEffect(_filename);
+    return Audio_LoadSoundEffect(_filename);
 }
 
 void BrewGameTool::PlaySoundEffect(Uint_32 _effect)
 {
-    audioManager->PlaySoundEffect(_effect);
+    Audio_PlaySoundEffect(_effect);
 }
 
 void BrewGameTool::SetSoundEffectVolume(Float_32 _volume)
 {
-    audioManager->SetSoundEffectVolume(_volume);
+    Audio_SetSoundEffectVolume(_volume);
 }
 
 void BrewGameTool::SetMasterVolume(Float_32 _volume)
 {
-    audioManager->SetMusicVolume(_volume);
-    audioManager->SetSoundEffectVolume(_volume);
+    Audio_SetMusicVolume(_volume);
+    Audio_SetSoundEffectVolume(_volume);
 }
 
 
@@ -394,9 +413,9 @@ BrewGameTool::~BrewGameTool()
     // cleanup input, audio and renderer
     
     
-    delete inputManager;
-    delete audioManager;
-    delete renderer;
+    Input_Close();
+    Audio_Close();
+    Renderer_Close();
     CleanupBackend();
 
     for(auto it : _imageDataStore)

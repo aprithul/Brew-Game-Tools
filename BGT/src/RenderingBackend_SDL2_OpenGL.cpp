@@ -34,8 +34,8 @@ GLuint fShader;
 GLuint shaderProgram;
 GLuint canvasTexture;
 
-Int_32 width;
-Int_32 height;
+Int_32 RenderTextureWidth;
+Int_32 RenderTextureHeight;
 Uint_32 nextFontId = 0;
 std::unordered_map<Uint_32, TTF_Font*> fonts;
 
@@ -167,8 +167,8 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
         // _displayMode.h = 100;
         // SDL_SetWindowDisplayMode(window, &_displayMode);
 
-        width = _width;
-        height = _height;
+        RenderTextureWidth = _width;
+        RenderTextureHeight = _height;
         gl_context = SDL_GL_CreateContext(window);
         
 
@@ -190,7 +190,7 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
             r = (Float_32)_displayMode.w/_displayMode.h;
         }
 
-        Float_32 _w = (Float_32)width/height/r;
+        Float_32 _w = (Float_32)RenderTextureWidth/RenderTextureHeight/r;
         Float_32 vertices[] = {
             -_w,  1.f, 0, 0, 1,
              _w,  1.f, 0, 1, 1,
@@ -243,12 +243,12 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, RenderTextureWidth, RenderTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
         makeShaderForQuad();
-        canvasBuffer = new GLuint[width * height];
+        canvasBuffer = new GLuint[RenderTextureWidth * RenderTextureHeight];
     }
     else
         printf("Failed to setup Video\n");
@@ -264,7 +264,7 @@ void RB_CreateWindow(const char* _name, Int_32 _width, Int_32 _height, Bool_8 _s
 
 void RB_DrawScreen()
 {
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, canvasBuffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0, RenderTextureWidth, RenderTextureHeight, GL_BGRA, GL_UNSIGNED_BYTE, canvasBuffer);
 
     glClearColor( 0,0,0,1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

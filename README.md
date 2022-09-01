@@ -4,7 +4,7 @@
 Brew Game Tools (or BGT) is a small 2D game framwork written in C++ with the main goal being simplicity. 
 It uses a software renderer that let's you draw directly to the display window. Underneath, the renderer uses an SDL2 backed OpenGL texture. This texture is mapped to a quad and rendered every frame. Additionally, it uses the clang++ compiler.
 
-I've tested it to work on Windows 10 and MacOS. Build is handled through Make. The setup process automatically creates a starter project with all the required libraries and settings. You can probably use any IDE but using VS-Code will make your life way easier since the setup process generates a VS-Code workspace project.<br><br>
+I've tested it to work on Windows 10 and MacOS. Build is handled through Make. The setup process automatically creates a starter project with all the required libraries and settings. You can probably use any IDE but using VS-Code will make your life way easier since the setup process generates a VS-Code workspace project. If you are on windows, the 'build_windows.ps1' can be run to build both the framework, and your app together instead of using VS-Code.<br><br>
 Keep reading for setup instructions.
 
 ## Project Structure
@@ -66,7 +66,7 @@ You need to have:
   I wasn't aware of its existance when I started writing this framework. With most of my personal projects, the goal was for me to learn as much as I could. Ultimately I think, implementing the drawing library myself was a great learning experience. Also, if I had used SDL_gfx, changing to a different backends might become harder as one would need to reimplement all shape drawing functions or use a third party one.<p>
     
   <b>5. What are the future plans?</b><br>
-  A few things I currently have in mind: better animation support, Basic 2D physics support, multi-threaded renderer.<p>
+  A few things I currently have in mind: better animation support, Basic 2D physics support.<p>
   
   <b>6. Why another framework? Don't we have too many already?</b><br>
     My main goal with BGT was to make a framework that is very easy to make 2d prototypes in. More specifically, I wanted the features that I always end up missing while prototyping a new idea, for example ease of setup (I tend to try out a ton of different ideas) and directly drawing pixels to the screen. While tools like SDL2 are easy to use, everytime you create a new project, you are required to go through a bunch of setup process. BGT doesn't provide a ton of different features but does the ones that are essential to me. If it also ends up being useful to you, that's great.<p>

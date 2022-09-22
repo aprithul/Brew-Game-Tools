@@ -68,6 +68,7 @@ std::mutex mtx[QUAD_COUNT];
 // std::mutex q2mtx;
 // std::mutex q3mtx;
 std::queue<DrawCommand> drawCommandQueues[QUAD_COUNT];
+std::condition_variable cvs[QUAD_COUNT];
 // std::queue<DrawCommand> q1DrawList;
 // std::queue<DrawCommand> q2DrawList;
 // std::queue<DrawCommand> q3DrawList;
@@ -158,24 +159,28 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
         {
             std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
             drawCommandQueues[TOP_LEFT].push(dc);
+            cvs[TOP_LEFT].notify_one();
         }
         break;
     case TOP_RIGHT:
         {
             std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
             drawCommandQueues[TOP_RIGHT].push(dc);
+            cvs[TOP_RIGHT].notify_one();
         }
         break;
     case BOTTOM_LEFT:
         {
             std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_LEFT]);
             drawCommandQueues[BOTTOM_LEFT].push(dc);
+            cvs[BOTTOM_LEFT].notify_one();
         }
         break;
     case BOTTOM_RIGHT:
         {
             std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_RIGHT]);
             drawCommandQueues[BOTTOM_RIGHT].push(dc);
+            cvs[BOTTOM_RIGHT].notify_one();
         }
         break;
     case TOP_LEFT_TOP_RIGHT:
@@ -183,10 +188,12 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
             std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
             dc.quadrant = TOP_LEFT;
             drawCommandQueues[TOP_LEFT].push(dc);
+            cvs[TOP_LEFT].notify_one();
 
             std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
             dc.quadrant = TOP_RIGHT;
             drawCommandQueues[TOP_RIGHT].push(dc);
+            cvs[TOP_RIGHT].notify_one();
         }
         break;
     case BOTTOM_LEFT_BOTTOM_RIGHT:
@@ -194,10 +201,12 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
             std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
             dc.quadrant = BOTTOM_LEFT;
             drawCommandQueues[BOTTOM_LEFT].push(dc);
+            cvs[BOTTOM_LEFT].notify_one();
 
             std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
             dc.quadrant = BOTTOM_RIGHT;
             drawCommandQueues[BOTTOM_RIGHT].push(dc);
+            cvs[BOTTOM_RIGHT].notify_one();
         }
         break;
     case TOP_LEFT_BOTTOM_LEFT:
@@ -205,10 +214,12 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
             std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
             dc.quadrant = TOP_LEFT;
             drawCommandQueues[TOP_LEFT].push(dc);
+            cvs[TOP_LEFT].notify_one();
 
             std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
             dc.quadrant = BOTTOM_LEFT;
             drawCommandQueues[BOTTOM_LEFT].push(dc);
+            cvs[BOTTOM_LEFT].notify_one();
         }
         break;
     case TOP_RIGHT_BOTTOM_RIGHT:
@@ -216,10 +227,12 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
             std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
             dc.quadrant = TOP_RIGHT;
             drawCommandQueues[TOP_RIGHT].push(dc);
+            cvs[TOP_RIGHT].notify_one();
 
             std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
             dc.quadrant = BOTTOM_RIGHT;
             drawCommandQueues[BOTTOM_RIGHT].push(dc);
+            cvs[BOTTOM_RIGHT].notify_one();
         }
         break;
     case ALL:
@@ -227,18 +240,23 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
             std::lock_guard<std::mutex> q0Lk(mtx[TOP_LEFT]);
             dc.quadrant = TOP_LEFT;
             drawCommandQueues[TOP_LEFT].push(dc);
+            cvs[TOP_LEFT].notify_one();
 
             std::lock_guard<std::mutex> q2Lk(mtx[BOTTOM_LEFT]);
             dc.quadrant = BOTTOM_LEFT;
             drawCommandQueues[BOTTOM_LEFT].push(dc);
+            cvs[BOTTOM_LEFT].notify_one();
 
             std::lock_guard<std::mutex> q1Lk(mtx[TOP_RIGHT]);
             dc.quadrant = TOP_RIGHT;
             drawCommandQueues[TOP_RIGHT].push(dc);
+            cvs[TOP_RIGHT].notify_one();
 
             std::lock_guard<std::mutex> q3Lk(mtx[BOTTOM_RIGHT]);
             dc.quadrant = BOTTOM_RIGHT;
             drawCommandQueues[BOTTOM_RIGHT].push(dc);
+            cvs[BOTTOM_RIGHT].notify_one();
+
     }
     break;
     default:
@@ -249,22 +267,25 @@ void EnqueueDrawCommand(DrawFunction df, const Image* const _image, const Vec2f&
 void executeDrawCommand(DrawCommand& _drawCommand);
 
 
-void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk)
+void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk, std::condition_variable& cv)
 {
     static Int_32 tc = 0;
     printf("Started drawing thread [%d]\n", tc++);
 
-    while(!closeThreads)
+    while(true)
     {
-        if(!cmdList.empty())
+        //if(!cmdList.empty())
         {
-            lk.lock();
+            std::unique_lock<std::mutex> ulk(lk);
+            cv.wait(ulk, [&](){return !cmdList.empty() || closeThreads;});
+            if(closeThreads)
+                return;
         //if(!cmdList.empty())
         //{
             DrawCommand dc = cmdList.front();
             cmdList.pop();
             ++numOfThreadsCurrentlyDrawing;
-            lk.unlock();
+            ulk.unlock();
             
             executeDrawCommand(dc);
             --numOfThreadsCurrentlyDrawing;
@@ -308,10 +329,10 @@ void Renderer_Create(const char* _name, Uint_32 _width, Uint_32 _height, Uint_32
     quadrantBoundaries[BOTTOM_LEFT] = {0, 0, Width/2.f, Height/2.f};
 
     // drawing threads, 1 for each of the 4 quadrants
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_LEFT]), std::ref(mtx[TOP_LEFT])));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_RIGHT]), std::ref(mtx[TOP_RIGHT])));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_RIGHT]), std::ref(mtx[BOTTOM_RIGHT])));
-    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_LEFT]), std::ref(mtx[BOTTOM_LEFT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_LEFT]), std::ref(mtx[TOP_LEFT]), std::ref(cvs[TOP_LEFT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[TOP_RIGHT]), std::ref(mtx[TOP_RIGHT]), std::ref(cvs[TOP_RIGHT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_RIGHT]), std::ref(mtx[BOTTOM_RIGHT]), std::ref(cvs[BOTTOM_RIGHT])));
+    drawingThreads.push_back(std::thread(DrawQuadrant, std::ref(drawCommandQueues[BOTTOM_LEFT]), std::ref(mtx[BOTTOM_LEFT]), std::ref(cvs[BOTTOM_LEFT])));
 }
 
 // drawing
@@ -1195,6 +1216,8 @@ void Renderer_Close()
 {
     
     closeThreads = true;
+    for(auto& cv :cvs)
+        cv.notify_one();
 
     for(auto& t : drawingThreads)
         t.join();

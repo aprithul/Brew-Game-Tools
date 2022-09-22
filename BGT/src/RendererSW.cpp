@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <cstring>
 
 // define before including rendering backend,
 // because rendering backend needs them
@@ -271,8 +272,8 @@ void DrawQuadrant(std::queue<DrawCommand>& cmdList, std::mutex& lk, std::conditi
 {
     static Int_32 tc = 0;
     printf("Started drawing thread [%d]\n", tc++);
-
-    while(true)
+    
+    while(!closeThreads)
     {
         //if(!cmdList.empty())
         {
@@ -1171,9 +1172,9 @@ void Renderer_SetWindowTitle(const char* _title)
 
 
 // Text rendering
-Uint_32 Renderer_LoadFont(const char* _filename)
+Uint_32 Renderer_LoadFont(const char* _filename, Uint_32 _size)
 {
-    return RB_LoadFont(_filename);
+    return RB_LoadFont(_filename, _size);
 }
 
 void Renderer_DeleteFont(Uint_32 _font)

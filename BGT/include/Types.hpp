@@ -1,6 +1,8 @@
 #ifndef PLATFORM_HPP
 #define PLATFORM_HPP
 
+#include <climits>
+
 typedef float Float_32;
 typedef int Int_32;
 typedef unsigned int Uint_32;

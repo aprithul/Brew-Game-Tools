@@ -56,11 +56,7 @@ void update()
         translation.y += bgt.DeltaTime * 128;
     if(bgt.GetKey(BGTK_DOWN))
         translation.y -= bgt.DeltaTime * 128;
-    if(bgt.GetKey(BGTK_ESCAPE))
-        bgt.Quit();
-
-    int c = 0;
-
+   
     for(int i=0; i<canvas_width;i += canvas_width/16)
     {
         bgt.DrawLine(i,0,i,canvas_width, Color(0xff0000ff));

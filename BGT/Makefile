@@ -15,7 +15,7 @@ endif
 
 ifeq ($(detected_OS),Windows)
 LINKER_FLAGS = -lsdl2 -lopengl32 -lsdl2_mixer -lsdl2_ttf  -lglew32 -Wl,--out-implib,$(BUILD_DIR)/libbgt_dll.a
-COMPILER_FLAGS = -std=c++11 -c -Wall -O0 -g
+COMPILER_FLAGS = -std=c++11 -c -Wall -O2 -g
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/SDL2/lib -L../Vendor/GL/lib
 	
 all: $(BUILD_DIR)/bgt.o
@@ -31,7 +31,7 @@ endif
 
 ifeq ($(detected_OS),Darwin)
 LINKER_FLAGS = -framework OpenGL -lsdl2 -lsdl2_mixer -lsdl2_ttf -lglew
-COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g -v
+COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O2 -g -v
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/GL/lib
 
 all: $(BUILD_DIR)/bgt.o
@@ -46,10 +46,10 @@ $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
 endif
 	
 ifeq ($(detected_OS),Linux)
-LINKER_FLAGS = -lsdl2 -lsdl2_mixer -lsdl2_ttf -lglew
-COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O0 -g -v
+LINKER_FLAGS = -lSDL2 -lSDL2_mixer -lSDL2_ttf -lGLEW
+COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O2 -g -v
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/GL/lib
-
+CC = clang++
 all: $(BUILD_DIR)/bgt.o
 
 clean:
@@ -57,6 +57,6 @@ clean:
 
 $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
 	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
-	$(CC) -dynamiclib -o $(BUILD_DIR)/libbgt.dylib $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
+	$(CC) -shared -o $(BUILD_DIR)/libbgt.so $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
 
 endif

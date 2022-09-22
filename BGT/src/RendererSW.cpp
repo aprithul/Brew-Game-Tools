@@ -6,6 +6,7 @@
 #include <mutex>
 #include <atomic>
 #include <cstring>
+#include <condition_variable>
 
 // define before including rendering backend,
 // because rendering backend needs them

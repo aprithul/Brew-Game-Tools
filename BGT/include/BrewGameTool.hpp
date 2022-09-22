@@ -80,7 +80,7 @@ struct DllExport BrewGameTool
     void DrawRectangle(Int_32 _x, Int_32 _y, Int_32 _width, Int_32 _height,Color color);
 
     // text drawing
-    Uint_32 LoadFont(const char* _filename);
+    Uint_32 LoadFont(const char* _filename, Uint_32 _size);
     void DeleteFont(Uint_32 _font);
     void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location);
     void DrawText(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Vec2f _location, Float_32 _rot, Vec2f _scale);

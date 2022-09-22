@@ -9,7 +9,7 @@ void RB_DrawScreen();
 void RB_Cleanup();
 void RB_SetWindowTitle(const char* _title);
 
-Uint_32 RB_LoadFont(const char* _filename);
+Uint_32 RB_LoadFont(const char* _filename, Uint_32 _size);
 void RB_DeleteFont(Uint_32 _font);
 void RB_GetTextBitmap(const char* _text, Uint_32 _font, Int_32 _size, Color _col, Uint_32* textBmp,Int_32* w, Int_32* h);
 //void RB_DrawText(const char* _text, Uint_32 _font, Vec2f _location);

@@ -46,10 +46,10 @@ $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
 endif
 	
 ifeq ($(detected_OS),Linux)
-LINKER_FLAGS = -lsdl2 -lsdl2_mixer -lsdl2_ttf -lglew
+LINKER_FLAGS = -lSDL2 -lSDL2_mixer -lSDL2_ttf -lGLEW
 COMPILER_FLAGS = -std=c++11 -c -Wall -fPIC -O2 -g -v
 LIBRARY_PATHS = -L../BGT/build/debug/ -L../Vendor/GL/lib
-
+CC = clang++
 all: $(BUILD_DIR)/bgt.o
 
 clean:
@@ -57,6 +57,6 @@ clean:
 
 $(BUILD_DIR)/bgt.o:$(SRC_DIR)/*.cpp
 	$(CC) $(COMPILER_FLAGS) $(INCLUDE_PATHS) $(SRC_DIR)/BrewGameTool.cpp -o $(BUILD_DIR)/bgt.o
-	$(CC) -dynamiclib -o $(BUILD_DIR)/libbgt.dylib $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
+	$(CC) -shared -o $(BUILD_DIR)/libbgt.so $(BUILD_DIR)/bgt.o $(LIBRARY_PATHS) $(LINKER_FLAGS) 
 
 endif

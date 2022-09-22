@@ -32,7 +32,7 @@
 
 
     // Text rendering
-    Uint_32 Renderer_LoadFont(const char* _filename);
+    Uint_32 Renderer_LoadFont(const char* _filename, Uint_32 _size);
     void Renderer_DeleteFont(Uint_32 _font);
     void Renderer_GetTextBmp(const char* _text, Uint_32 _font);
     void Renderer_DrawText(const char* _text, Uint_32 _font, Int_32 _size, const Color& _col, Vec2f _location);

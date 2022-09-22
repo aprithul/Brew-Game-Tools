@@ -20,6 +20,3 @@ void CleanupBackend()
     SDL_Quit();
 }
 
- 
-
-

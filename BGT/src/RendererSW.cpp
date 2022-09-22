@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <cstring>
 
 // define before including rendering backend,
 // because rendering backend needs them
@@ -1150,9 +1151,9 @@ void Renderer_SetWindowTitle(const char* _title)
 
 
 // Text rendering
-Uint_32 Renderer_LoadFont(const char* _filename)
+Uint_32 Renderer_LoadFont(const char* _filename, Uint_32 _size)
 {
-    return RB_LoadFont(_filename);
+    return RB_LoadFont(_filename, _size);
 }
 
 void Renderer_DeleteFont(Uint_32 _font)
